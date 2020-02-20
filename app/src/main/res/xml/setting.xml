@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:tools="http://schemas.android.com/tools"
+                  xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/simvol_rub_string"
+        android:title="@string/simvol_rub_string"/>
+    <ListPreference
+        android:defaultValue="ք Рубль"
+        android:enabled="false"
+        android:entries="@array/valuta_array"
+        android:entryValues="@array/valuta_array"
+        android:key="@string/chek_simvol"
+        android:summary="@string/chek_simvol_subtitle"
+        android:title="@string/chek_simvol"/>
+    <PreferenceScreen
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:key="@string/font_setting"
+        android:summary="@string/font_setting_subtitle"
+        android:title="@string/font_setting">
+
+    </PreferenceScreen>
+
+    <PreferenceCategory
+        android:title="@string/date_pref">
+
+        <ListPreference
+            android:defaultValue="1"
+            android:entryValues="@array/date_array"
+            android:key="@string/date_pref_for_zapisi"
+            android:title="@string/date_pref_for_zapisi"/>
+        <ListPreference
+            android:defaultValue="1"
+            android:entryValues="@array/date_array"
+            android:key="@string/date_pref_for_card"
+            android:title="@string/date_pref_for_card"/>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="@string/backup_Category"
+        android:title="@string/backup_Category">
+
+        <PreferenceScreen
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:key="@string/export_data"
+            android:summary="@string/export_data_subtitle"
+            android:title="@string/export_data">
+        </PreferenceScreen>
+        <PreferenceScreen
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:key="@string/import_data"
+            android:summary="@string/import_data_subtitle"
+            android:title="@string/import_data">
+        </PreferenceScreen>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/security"
+        >
+
+        <EditTextPreference
+            android:inputType="numberPassword"
+            android:key="password"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/pass_in_open"/>
+    </PreferenceCategory>
+    <!--<PreferenceCategory-->
+        <!--android:title="@string/spravka">-->
+
+        <!--<PreferenceScreen-->
+            <!--android:key="@string/info_programm"-->
+            <!--android:title="@string/info_programm">-->
+        <!--</PreferenceScreen>-->
+    <!--</PreferenceCategory>-->
+</PreferenceScreen>

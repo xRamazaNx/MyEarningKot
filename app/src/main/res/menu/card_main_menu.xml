@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!--tools:context="com.a4165816.press.zarplata.com.a4165816.press.earnings.ZarplataActivity"-->
+
+
+    <item
+        android:id="@+id/search"
+        android:icon="@drawable/ic_search"
+        android:title="@string/search"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/period"
+        android:icon="@drawable/ic_period"
+        android:title="@string/period"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/sort"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:icon="@drawable/ic_sort"
+        android:title="@string/sort"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/send"
+        android:title="@string/send" />
+
+    <item
+        android:id="@+id/setting"
+        android:title="@string/setting" />
+
+</menu>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/id_proverka_сard"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:background="@drawable/shape_sort"
+              android:orientation="vertical"
+              android:paddingBottom="7dp"
+              android:paddingEnd="13dp"
+              android:paddingLeft="7dp"
+              android:paddingRight="13dp"
+              android:paddingStart="7dp"
+              android:paddingTop="7dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="2dp"
+        android:text="@string/sort"
+        android:textColor="@color/text"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/color_polosa_razdelitel"
+        android:orientation="horizontal">
+    </LinearLayout>
+
+    <RadioGroup
+        android:id="@+id/id_radiogroup_sort_sort"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/radioButton_default_card"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="false"
+            android:text="@string/sort_default"
+            android:textColor="@color/text"/>
+
+        <RadioButton
+            android:id="@+id/radioButton_date_reated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="По дате создания"
+            android:textColor="@color/text"/>
+
+        <RadioButton
+            android:id="@+id/radioButton_date_modify"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="По дате изменения"
+            android:textColor="@color/text"/>
+
+    </RadioGroup>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="2dp"
+        android:text="@string/sort_metod"
+        android:textColor="@color/text"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/color_polosa_razdelitel"
+        android:orientation="horizontal">
+    </LinearLayout>
+
+    <RadioGroup
+        android:id="@+id/id_radiogroup_sort2_metod"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/radioButtonUp_card"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="false"
+            android:text="@string/sort_up"
+            android:textColor="@color/text"/>
+
+        <RadioButton
+            android:id="@+id/radioButtonDown_card"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/sort_down"
+            android:textColor="@color/text"/>
+
+    </RadioGroup>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/color_polosa_razdelitel"
+        android:orientation="horizontal">
+    </LinearLayout>
+
+    <Switch
+        android:id="@+id/id_switch_save_sort_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="5dp"
+        android:paddingLeft="7dp"
+        android:paddingStart="7dp"
+        android:paddingTop="10dp"
+        android:text="@string/save_sort"
+        android:textColor="@color/text"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:theme="@style/switch_style"/>
+
+</LinearLayout>

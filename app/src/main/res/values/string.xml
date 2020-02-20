@@ -1,0 +1,295 @@
+<resources>
+    //основной перевод
+    <string name="dialog_color_picker">Выбор цвета</string>
+    <string name="press_color_apply">Нажмите на цвет для выбора</string>
+    <string name="tit_primer">Заголовок</string>
+
+    <string name="app_name">Мой доход</string>
+    <string name="app_zarplata_label">Активные</string>
+    <string name="add">"Добавить"</string>
+    <string name="delete_all">Удалить все</string>
+
+    <string name="PASTE">Вставить</string>
+    <string name="COPY">Копировать</string>
+    <string name="DUBLICATE">Дублировать</string>
+    <string name="EDIT">Изменить</string>
+    <string name="DELETE">Удалить</string>
+    <string name="NOTE">ЗАМЕТКА</string>
+    <string name="NOTESMALL">Заметка</string>
+    <string name="SUMMA">СУММА</string>
+    <string name="SUMMASMALL">Сумма</string>
+    <string name="cash_advance">АВАНС</string>
+    <string name="cash_advance_small">Аванс</string>
+    <string name="DATE">ДАТА</string>
+    <string name="DATESMALL">Дата</string>
+    <string name="EARNING">ВСЕГО</string>
+    <string name="EARNING_small">Всего</string>
+    <string name="THE_REST">ОСТАТОК</string>
+    <string name="THE_REST_small">Остаток</string>
+    <string name="ARHIVE">Архив</string>
+    <string name="COMPLETE_ACCOUNTING">Завершить учет</string>
+    <string name="COMPLETE_ACCOUNTING_CARD">Завершить</string>
+    <string name="RETURN_ACCOUNTING_CARD">Вернуть</string>
+    <string name="CLEAN_UP_ARCHIVE">Очистить архив</string>
+    <string name="OK">ОК</string>
+    <string name="CANCEL">Отмена</string>
+    <string name="input_of_data">Ввод данных</string>
+    <string name="YES">ДА</string>
+    <string name="NO">НЕТ</string>
+    <string name="NUMBER">№</string>
+    <string name="delete_the_entry">Вы уверены что хотите удалить запись?</string>
+    <string name="is_no_record">Нет ни одной записи</string>
+    <string name="is_no_record_main">Не добавлено ни одной карточки</string>
+    <string name="is_list_empty">Список пуст</string>
+    <string name="want_to_delete_all_records">Вы уверены что хотите удалить все записи?</string>
+    <string name="want_to_set_arhive">Вы уверены что хотите завершить учет?</string>
+    <string name="is_kill_all_arhive">Вы уверены что хотите стереть весь архив?</string>
+    <string name="arhive_null">Архив пуст</string>
+    <string name="close">Закрыть</string>
+    <string name="not_data">нет данных!</string>
+    <string name="greater_zero">введите число больше нуля!</string>
+    <string name="complete_all">Завершить всё</string>
+
+    <!--<string name="overtime">Сверхурочные</string>-->
+    <!--<string name="procent">%</string>-->
+    <!--<string name="hours">Часы</string>-->
+    <!--<string name="rate">Ставка</string>-->
+    <string name="sort">Сортировка</string>
+    <string name="date_sort">По дате</string>
+    <string name="sort_summa">По сумме</string>
+    <string name="sort_rashod">По авансу</string>
+    <string name="sort_default">По умолчанию</string>
+    <string name="sort_metod">Порядок</string>
+    <string name="sort_up">По возрастанию</string>
+    <string name="sort_down">По убыванию</string>
+    <string name="save_sort">Сохранить</string>
+    <string name="settings_label">Настройки</string>
+
+
+    <!--массивы-->
+
+    <array name="item_for_zapisi">
+        <item>Сумма</item>
+        <item>Аванс</item>
+        <item>Заметка</item>
+        <item>Дата</item>
+    </array>
+
+    <array name="item_for_obshee">
+        <item>Всего</item>
+        <item>Аванс</item>
+        <item>Остаток</item>
+    </array>
+
+    <string-array name="style_array">
+        <item>Обычный</item>
+        <item>Курсив</item>
+        <item>Жирный</item>
+        <item>Курсив/жирный</item>
+    </string-array>
+
+    <string-array name="style_array_value">
+        <item>0</item>
+        <item>2</item>
+        <item>1</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="valuta_array">
+        <item>ք Рубль</item>
+        <item>₴ Гривна</item>
+        <item>$ Доллар</item>
+        <item>€ Евро</item>
+    </string-array>
+
+    <string-array name="font_size">
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+        <item>21</item>
+        <item>22</item>
+        <item>23</item>
+        <item>24</item>
+        <item>25</item>
+        <item>26</item>
+    </string-array>
+
+    <string-array name="column_type">
+        <item>Текст</item>
+        <item>Числа</item>
+        <item>Номер</item>
+        <item>Дата</item>
+        <item>Цвет</item>
+        <item>Выбор</item>
+        <item>Картинка</item>
+        <item>Список</item>
+    </string-array>
+
+    <string-array name="date_array">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+    </string-array>
+
+    <string-array name="zapisi_size">
+        <item>18</item>
+        <item>20</item>
+        <item>22</item>
+        <item>24</item>
+        <item>26</item>
+        <item>28</item>
+        <item>30</item>
+        <item>32</item>
+        <item>34</item>
+        <item>36</item>
+        <item>38</item>
+        <item>40</item>
+    </string-array>
+
+
+    <string name="simvol_rub_string">Добавить символ валюты</string>
+    <string name="chek_simvol">Символ</string>
+    <string name="chek_simvol_subtitle">Выберите символ валюты</string>
+
+    <string name="date_pref">НАСТРОЙКИ ОТОБРАЖЕНИЯ ДАТЫ</string>
+    <string name="date_pref_sub">Выберите вариант отображения даты</string>
+    <string name="date_pref_for_zapisi">В записях</string>
+    <string name="date_pref_for_card">В карточках</string>
+
+    <!--<string name="setting_view_type">Внгешний вид</string>-->
+
+    <string name="zapisi_size_key">Высота записи</string>
+    <string name="zapisi_size_key_subtitle">Настройка высоты записей в таблице</string>
+
+    <string name="font_setting">Внешний вид</string>
+    <string name="font_setting_subtitle">Настройка внешнего вида таблицы</string>
+
+    <string name="setting_color">Настройки цвета</string>
+    <string name="primer_number">12345</string>
+    <string name="primer_zametka">пример</string>
+
+    <string name="font_size">Размер шрифта</string>
+    <string name="font_style">Стиль шрифта</string>
+    <string name="info_programm">О программе</string>
+
+    <string name="font_size_zapisi_category">В ЗАПИСЯХ</string>
+    <string name="font_size_zapisi">В записях</string>
+    <string name="font_size_zapisi_subtitle">Размер шрифта в записях</string>
+
+    <string name="number">№</string>
+    <string name="numberKeyStyle">numberKeyStyle</string>
+    <string name="summa">Сумма</string>
+    <string name="summaKeyStyle">summaKeyStyle</string>
+    <string name="avans">Аванс</string>
+    <string name="avansKeyStyle">avansKeyStyle</string>
+    <string name="note">Заметка</string>
+    <string name="noteKeyStyle">noteKeyStyle</string>
+    <string name="date">Дата</string>
+    <string name="dateKeyStyle">dateKeyStyle</string>
+
+    <string name="key_style_zapisi">styleForZapisi</string>
+    <string name="font_style_zapisi">стиль шрифта в записях</string>
+
+    <string name="font_size_obshee_category">В КАРТОЧКАХ</string>
+    <string name="font_size_obshee">В карточках</string>
+    <string name="font_size_obshee_subtitle">Размер шрифта общей информации в карточках</string>
+
+    <string name="zarplata">Всего</string>
+    <string name="zarplataKeyStyle">zarplataKeyStyle</string>
+    <string name="avans_key_obshee">avansKey</string>
+    <string name="avans_key_obsheeKeyStyle">avans_key_obsheeKeyStyle</string>
+    <string name="Ostatok">Остаток</string>
+    <string name="OstatokKeyStyle">OstatokKeyStyle</string>
+
+    <string name="key_style_obshee">keyStyleObshee</string>
+    <string name="font_style_obshee_subtitle">Стиль шрифта общей информации в карточках</string>
+
+    <string name="backup_Category">РЕЗЕРВНОЕ КОПИРОВАНИЕ</string>
+    <string name="export_data">Сохранить данные</string>
+    <string name="export_data_subtitle">Сохранить настройки и базу данных</string>
+    <string name="import_data">Восстановить данные</string>
+    <string name="import_data_subtitle">Восстановить настройки и базу данных</string>
+
+    <string name="author">Автор</string>
+    <string name="name_author">Ramazan</string>
+    <string name="version">Версия</string>
+    <string name="version_numb">2.2.93</string>
+    <string name="donatinfo">Если вам нравится это приложение,\nвы можете выразить вашу благодарность\nодним из 2-х способов.
+    </string>
+    <string name="webmany">WebMoney:</string>
+    <string name="sberbank">Сбербанк:</string>
+    <string name="telefon">Телефон:</string>
+    <string name="webmanyinfo">R992912946923</string>
+    <string name="cardinfi">4276860026590634</string>
+    <string name="telinfo">+79896551234</string>
+    <string name="toast_copy_donat">Номер скопирован</string>
+
+    <string name="spravka">СПРАВКА</string>
+    <string name="TapForCopy">Тап по номеру для копирования.</string>
+    <string name="divider_zero">На ноль делить нельзя!</string>
+    <string name="add_info_add_card">Добавьте карточку</string>
+    <string name="add_info_add_zapis">Добавьте запись</string>
+    <string name="move_last">В конец</string>
+    <string name="move_one">В начало</string>
+    <string name="warning">Восстановить</string>
+    <string name="warning_message">Удалить старую базу данных?</string>
+    <string name="cancel">Отмена</string>
+    <string name="delete_all_data">Очистка данных</string>
+    <string name="warning_messege_delete_all_data">Выберите действие</string>
+    <string name="default_setting">Вернуть стандартные настройки</string>
+    <string name="delete_all_database">Удалить все карточки</string>
+    <string name="clear_all">Очистить все</string>
+    <string name="delete_preferences_only">Только настройки</string>
+    <string name="to_date_create">По дате создания</string>
+    <string name="to_date_modify">По дате изменения</string>
+    <string name="reset">Сброс</string>
+    <string name="check_import_db">База данных</string>
+    <string name="check_import_set">Настройки</string>
+
+    <string name="up_of_stroke">Выше строки</string>
+    <string name="down_of_stroke">Ниже строки</string>
+    <string name="name">Название</string>
+    <string name="name_man">Имя</string>
+    <string name="last_name">фамилия</string>
+    <string name="phone">Номер</string>
+    <string name="organization">Организация</string>
+    <string name="color">Цвет</string>
+    <string name="press_element">Нажать на элементы для настройки</string>
+    <string name="pass_in_open">Пароль на вход</string>
+    <string name="security">БЕЗОПАСНОСТЬ</string>
+    <string name="date_period">Дневной период</string>
+    <string name="date_period_key">date_period</string>
+    <string name="period">Период</string>
+    <string name="name_header">Имена заголовков</string>
+    <string name="send">Поделиться</string>
+    <string name="telegram">Telegram</string>
+    <string name="thank">Спасибо!</string>
+
+
+        <string name="name_card">Название карточки</string>
+        <string name="set_name_card">Введите название карточки</string>
+        <string name="sample_of_card">Шаблон карточки</string>
+        <string name="name_sample">Имя шаблона</string>
+        <string name="visual_setting">Настройка внешнего вида</string>
+        <string name="change_valuta">Выберите валюту</string>
+        <string name="enable_horizontal_scroll">Разрешить горизонтальную прокрутку</string>
+        <string name="enable_some_stroke">Разрешить перенос строки</string>
+        <string name="dynamic_height_of_row">Динамическая высота записи</string>
+</resources>

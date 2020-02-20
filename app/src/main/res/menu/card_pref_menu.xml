@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+    <item
+        android:id="@+id/deleteColumn"
+        android:icon="@drawable/ic_delete_forever_red"
+        android:title="@string/setting"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/moveToLeft"
+        android:icon="@drawable/ic_move_to_left"
+        android:title="@string/setting"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/moveToRight"
+        android:icon="@drawable/ic_move_to_right"
+        android:title="@string/setting"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/elementSetting"
+        android:icon="@drawable/ic_font_setting"
+        android:title="@string/setting"
+        app:showAsAction="always" />
+    <item
+
+        android:id="@+id/addColumn"
+        android:enabled="true"
+        android:icon="@drawable/ic_add_column"
+        android:title="@string/add_column"
+        android:visible="true"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/basicPref"
+        android:icon="@drawable/ic_more_setting"
+        android:title="@string/general_pref"
+        app:showAsAction="always" />
+</menu>

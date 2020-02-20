@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/id_new_zapis"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/shape_sort"
+              android:gravity="center"
+              android:orientation="vertical"
+              android:paddingBottom="20dp"
+              android:paddingTop="10dp"
+              android:theme="@style/Base.AlertDialog.AppCompat">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:id="@+id/title_new_zapis_summa"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="10"
+            android:gravity="center"
+            android:text="@string/SUMMASMALL"
+            android:textColor="@color/centDark"
+            android:textSize="14sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/title_new_zapis_avans"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="10"
+            android:gravity="center"
+            android:text="@string/cash_advance_small"
+            android:textColor="@color/centDark"
+            android:textSize="14sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/title_new_zapis_date"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="13"
+            android:gravity="center"
+            android:text="@string/DATESMALL"
+            android:textColor="@color/centDark"
+            android:textSize="14sp"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_marginBottom="3dp"
+            android:layout_marginEnd="3dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:layout_marginStart="3dp"
+            android:layout_weight="10">
+
+            <EditText
+                android:id="@+id/id_edit_new_zapis_1"
+                android:layout_width="0dp"
+                android:layout_height="33dp"
+                android:background="@drawable/shape_new_zapis"
+                android:ems="7"
+                android:gravity="center"
+                android:inputType="numberDecimal|phone"
+                android:textAlignment="center"
+                android:textColor="@color/text"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+        </android.support.constraint.ConstraintLayout>
+
+        <EditText
+            android:id="@+id/id_edit_new_avans"
+            android:layout_width="0dp"
+            android:layout_height="33dp"
+            android:layout_marginStart="3dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginEnd="3dp"
+            android:layout_marginRight="3dp"
+            android:layout_marginBottom="3dp"
+            android:layout_weight="10"
+            android:background="@drawable/shape_new_zapis"
+            android:ems="7"
+            android:gravity="center"
+            android:inputType="numberDecimal|phone"
+            android:textAlignment="center"
+            android:textColor="@color/text"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:id="@+id/id_edit_new_date"
+            android:layout_width="0dp"
+            android:layout_height="33dp"
+            android:layout_marginBottom="3dp"
+            android:layout_marginEnd="3dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:layout_marginStart="3dp"
+            android:layout_weight="13"
+            android:background="@drawable/shape_new_zapis"
+            android:ems="10"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:textColor="@color/text"
+            android:textSize="13sp"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/title_new_zapis_note"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-19dp"
+        android:gravity="center"
+        android:text="@string/NOTESMALL"
+        android:textColor="@color/centDark"
+        android:textSize="14sp"
+        android:textStyle="bold"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp">
+
+        <EditText
+            android:id="@+id/id_comment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_weight="1"
+            android:background="@drawable/shape_new_zapis"
+            android:gravity="bottom|center_horizontal"
+            android:inputType=""
+            android:maxHeight="90dp"
+            android:paddingBottom="6dp"
+            android:paddingTop="6dp"
+            android:textColor="@color/text"
+            android:textSize="14sp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingTop="10dp">
+
+        <TextView
+            android:id="@+id/id_button_new_zapis_cansel"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/CANCEL"
+            android:textAlignment="gravity"
+            android:textColor="@color/redButton"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/calc_run"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:layout_margin="5dp"
+            android:layout_marginBottom="1dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:background="@mipmap/calc_ic"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/id_edit_new_zapis_1"
+            app:layout_constraintTop_toBottomOf="@+id/id_edit_new_zapis_1"/>
+
+        <TextView
+            android:id="@+id/id_button_new_zapis_OK"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/OK"
+            android:textAlignment="gravity"
+            android:textColor="@color/greenButton"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
+
+</LinearLayout>

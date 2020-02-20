@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@drawable/gradient_shadow"
+        android:elevation="0dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/centDark"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="@string/selected_element_pref"
+            android:textColor="@color/gray_1"
+            android:textSize="16sp" />
+
+<!--        <ImageButton-->
+<!--            android:id="@+id/deleteColumn"-->
+<!--            android:layout_width="48dp"-->
+<!--            android:layout_height="48dp"-->
+<!--            android:background="?android:attr/selectableItemBackground"-->
+<!--            android:tint="@color/md_red_400"-->
+<!--            android:visibility="gone"-->
+<!--            app:srcCompat="@drawable/ic_delete_forever_button" />-->
+
+<!--        <ImageButton-->
+<!--            android:id="@+id/moveToLeft"-->
+<!--            android:layout_width="48dp"-->
+<!--            android:layout_height="48dp"-->
+<!--            android:background="?android:attr/selectableItemBackground"-->
+<!--            android:visibility="gone"-->
+<!--            app:srcCompat="@drawable/ic_move_to_left_equal_line" />-->
+
+<!--        <ImageButton-->
+<!--            android:id="@+id/moveToRight"-->
+<!--            android:layout_width="48dp"-->
+<!--            android:layout_height="48dp"-->
+<!--            android:background="?android:attr/selectableItemBackground"-->
+<!--            android:visibility="gone"-->
+<!--            app:srcCompat="@drawable/ic_move_to_right_equal_line" />-->
+
+        <ImageButton
+            android:id="@+id/defaultPref"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:tint="@color/blue"
+            app:srcCompat="@drawable/ic_scale_default" />
+
+    </LinearLayout>
+
+</LinearLayout>

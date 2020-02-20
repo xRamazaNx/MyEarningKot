@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/id_edit_item"
+        android:title="@string/EDIT"/>
+    <item
+        android:id="@+id/id_dublicate_item"
+        android:title="@string/DUBLICATE"/>
+    <item
+        android:id="@+id/id_copy_item"
+        android:title="@string/COPY"/>
+    <item
+        android:id="@+id/id_paste_item"
+        android:title="@string/PASTE"/>
+    <item
+        android:id="@+id/id_delete_item"
+        android:title="@string/DELETE"/>
+</menu>

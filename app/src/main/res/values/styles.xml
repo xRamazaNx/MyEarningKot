@@ -1,0 +1,63 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/cent</item>
+        <item name="colorPrimaryDark">@color/centDark</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="colorControlNormal">@color/color_normal</item>
+        <item name="colorControlActivated">@color/color_activated</item>
+        <!--<item name="android:popupBackground">@color/cent</item>-->
+        <item name="titleTextColor">@color/white</item>
+        <item name="material_drawer_divider">@color/centDark</item>
+        <item name="appBarLayoutStyle">@style/Widget.Design.AppBarLayout</item>
+        <item name="android:colorBackground">@color/light_gray</item>
+        <item name="android:textColor">@color/textColor</item>
+        <!--        <item name="android:actionMenuTextColor">@color/greenButton</item>-->
+        <!--        <item name="actionMenuTextColor">@color/greenButton</item>-->
+        <item name="android:itemTextAppearance">@style/myCustomMenuTextAppearance</item>
+    </style>
+
+    <style name="myCustomMenuTextAppearance" parent="@android:style/TextAppearance.Widget.IconMenu.Item">
+        <item name="android:textColor">@color/light_gray</item>
+    </style>
+
+<!--    <style name="ToolbarTheme" parent="Theme.AppCompat.Light.NoActionBar">-->
+<!--        <item name="android:textColorPrimary">@color/white</item>-->
+<!--        <item name="android:textColorSecondary">@color/light_gray</item>-->
+<!--        <item name="android:textColor">@color/light_gray</item>-->
+<!--        <item name="android:background">@color/cent</item>-->
+<!--    </style>-->
+
+    <style name="prosmotr" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowBackground">@android:color/transparent</item>
+
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="switch_style" parent="@style/Theme.AppCompat">
+        <item name="colorSwitchThumbNormal">@color/color_polosa_razdelitel</item>
+        <item name="colorControlActivated">@color/color_activated</item>
+        <item name="android:colorForeground">@color/color_normal</item>
+
+    </style>
+
+    <style name="MySwitch" parent="@style/Widget.AppCompat.CompoundButton.Switch">
+        <item name="android:textColorPrimaryDisableOnly">#b71c1c</item>
+        <item name="android:colorControlActivated">#1b5e20</item>
+        <item name="android:colorForeground">#f57f17</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+</resources>

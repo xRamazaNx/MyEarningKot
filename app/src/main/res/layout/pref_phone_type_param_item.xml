@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:background="@color/cent"
+
+    android:layout_height="wrap_content">
+
+    <CheckBox
+        android:id="@+id/phoneParamCheckBox"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:text="param check"
+        android:textColor="@color/light_gray" />
+
+   <LinearLayout
+       android:paddingStart="16dp"
+       android:paddingEnd="16dp"
+       android:orientation="vertical"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content">
+
+
+       <ImageView
+           android:rotation="180"
+           android:layout_weight="1"
+           android:layout_width="match_parent"
+           android:layout_height="0dp"
+           app:srcCompat="@drawable/ic_drop_down" />
+       <ImageView
+           android:layout_weight="1"
+           android:layout_width="match_parent"
+           android:layout_height="0dp"
+           app:srcCompat="@drawable/ic_drop_down" />
+   </LinearLayout>
+
+
+</LinearLayout>

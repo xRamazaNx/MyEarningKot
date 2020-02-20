@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <array name="valuta_list">
+        <item>RUB</item>
+        <item>UAH</item>
+        <item>USD</item>
+        <item>EUR</item>
+        <item>Без валюты</item>
+    </array>
+    <string name="search">Поиск</string>
+    <string name="click_to_pref_element">Кликните по элементу для его настройки</string>
+    <string name="general_pref">Основные настройки</string>
+    <string name="structure_and_visual_pref">Структура и внешний вид</string>
+    <string name="selected_element_pref">Настройка выбранного элемента</string>
+    <string name="set_name_element">Введите название элемента</string>
+    <string name="add_column">Добавить колону</string>
+    <string name="text_size">Размер шрифта</string>
+    <string name="text_color">Цвет текста</string>
+    <string name="set_name">Введите название</string>
+    <string name="new_sample">Новый шаблон</string>
+    <string name="set_the_element">Выберите элемент</string>
+    <string name="change_sample_of_card">Выберите шаблон учетной карточки</string>
+    <string name="setting_sample">Настройка шаблона</string>
+    <string name="setting_card">Настройка карточки</string>
+    <string name="setting">Настройка</string>
+    <string name="setting_column">Настройка столбца</string>
+    <string name="column_name">Название столбца</string>
+    <string name="visual">Внешний вид</string>
+    <string name="digits_count">Количество десятичных знаков</string>
+    <string name="group_number">Группировка тысячных</string>
+    <string name="width">Ширина</string>
+    <string name="show_time">Показывать время</string>
+    <string name="date_type">Форматирование даты</string>
+    <string name="save">Сохранить</string>
+    <string name="change_type_data">Выберите тип данных</string>
+    <string name="color_frame_type">Форма рамки</string>
+    <string name="list">Список</string>
+    <string name="change_list">Выберите Список</string>
+    <string name="new_list">Новый список</string>
+    <string name="create">Создать</string>
+    <string name="moving_not_available">Перемещенение не доступно</string>
+    <string name="useTextSwitch">Использовать текстовый переключатель</string>
+    <string name="switchTextEnable">Текст (вкл)</string>
+    <string name="switchTextDisable">Текст (выкл)</string>
+    <string name="switchColorEnable">Цвет (вкл)</string>
+    <string name="switchDisableColor">Цвет (выкл)</string>
+    <string name="cross_row">Зачеркивать запись</string>
+    <string name="acceptRow">Управлять учетом в общей сумме</string>
+    <string name="behavior_switch_setting">Настройка поведения</string>
+    <string name="save_changes">Сохранить изменения?</string>
+</resources>

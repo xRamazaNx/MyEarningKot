@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    >
+
+    <ProgressBar
+        android:elevation="1dp"
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme"
+        app:elevation="0dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:theme="@style/Theme.MaterialComponents.NoActionBar" />
+
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!--    backgraund of columns-->
+    <FrameLayout
+        android:id="@+id/backGroundOfColumns"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/column_height"
+        android:layout_gravity="bottom"
+        android:background="@color/cent"
+        app:layout_anchor="@id/toolbar"
+        app:layout_anchorGravity="bottom">
+
+    </FrameLayout>
+
+    <ru.developer.press.myearningkot.ScrollContainer
+        android:id="@+id/tableView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+
+        <LinearLayout
+            android:id="@+id/columnDisableScrollContainer"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/column_height"
+            android:background="@color/cent"
+            android:orientation="horizontal">
+
+        </LinearLayout>
+
+
+        <ru.developer.press.myearningkot.HorScrollView
+            android:id="@+id/horizontalScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/columnScrollContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/column_height"
+                    android:background="@color/cent"
+                    android:orientation="horizontal" />
+
+
+                <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
+                    android:id="@+id/recycler"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+
+                    />
+<!--                    android:background="@drawable/shape_table_view"-->
+
+            </LinearLayout>
+
+        </ru.developer.press.myearningkot.HorScrollView>
+    </ru.developer.press.myearningkot.ScrollContainer>
+
+
+    <include
+        android:id="@+id/totalAmountView"
+        layout="@layout/card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="-3dp"
+        android:layout_marginEnd="-3dp"
+        app:layout_anchor="@id/tableView"
+        app:layout_anchorGravity="bottom" />
+
+
+    <uk.co.markormesher.android_fab.FloatingActionButton
+        android:id="@+id/fbAddRow"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:buttonBackgroundColour="@color/greenButton"
+        app:buttonIcon="@drawable/ic_add_not_ring"
+        app:fabSize="normal"
+        app:layout_anchor="@id/totalAmountView" />
+
+
+    <ru.developer.press.myearningkot.otherHelpers.PrefLayouts.WidthLineDrawer
+        android:id="@+id/widthDrawer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

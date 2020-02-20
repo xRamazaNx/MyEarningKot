@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/transparent"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar_pref" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <include layout="@layout/width_seek_bar_layout" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/cent"
+                android:orientation="vertical">
+
+                <Switch
+                    android:id="@+id/enableTextSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:padding="16dp"
+                    android:text="@string/useTextSwitch"
+                    android:textColor="@color/light_gray" />
+
+                <FrameLayout
+                    android:id="@+id/switchTextSettingContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:foreground="@color/cent_opacity">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+
+                        <RelativeLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+
+                            android:orientation="horizontal"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp">
+
+
+                            <TextView
+                                android:id="@+id/enableInfo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentStart="true"
+                                android:layout_alignParentTop="true"
+                                android:text="@string/switchTextEnable"
+                                android:textColor="@color/gray_1"
+                                android:textSize="12sp" />
+
+                            <EditText
+                                android:layout_toStartOf="@id/enabledTextSetting"
+                                android:textSize="14sp"
+                                android:id="@+id/enableEditText"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:layout_below="@id/enableInfo"
+                                android:importantForAutofill="no"
+                                android:inputType="text"
+                                android:maxLines="1"
+                                android:textColor="@color/light_gray" />
+
+
+                            <ImageButton
+                                android:id="@+id/enabledTextSetting"
+                                android:layout_width="40dp"
+                                android:layout_height="match_parent"
+                                android:layout_alignTop="@id/enableEditText"
+                                android:layout_alignBottom="@id/enableEditText"
+                                android:layout_alignParentEnd="true"
+                                android:background="@color/cent"
+                                android:elevation="1dp"
+                                android:src="@drawable/ic_font_setting" />
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+
+                            android:orientation="horizontal"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp">
+
+
+                            <TextView
+                                android:id="@+id/disableInfo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentStart="true"
+                                android:layout_alignParentTop="true"
+                                android:text="@string/switchTextDisable"
+                                android:textColor="@color/gray_1"
+                                android:textSize="12sp" />
+
+                            <EditText
+                                android:layout_toStartOf="@id/disableTextSetting"
+                                android:textSize="14sp"
+                                android:id="@+id/disableEditText"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:layout_below="@id/disableInfo"
+                                android:importantForAutofill="no"
+                                android:inputType="text"
+                                android:maxLines="1"
+                                android:textColor="@color/light_gray" />
+
+
+                            <ImageButton
+                                android:id="@+id/disableTextSetting"
+                                android:layout_width="40dp"
+                                android:layout_height="match_parent"
+                                android:layout_alignTop="@id/disableEditText"
+                                android:layout_alignBottom="@id/disableEditText"
+                                android:layout_alignParentEnd="true"
+                                android:background="@color/transparent"
+                                android:elevation="1dp"
+                                    android:src="@drawable/ic_font_setting" />
+                        </RelativeLayout>
+
+                    </LinearLayout>
+                </FrameLayout>
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:paddingStart="8dp"
+                    android:paddingTop="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="@string/behavior_switch_setting"
+                    android:textColor="@color/gray_1"
+                    android:textSize="16sp" />
+
+                <Switch
+                    android:id="@+id/crossRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:padding="16dp"
+                    android:text="@string/cross_row"
+                    android:textColor="@color/light_gray" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:alpha="0.5"
+                    android:background="@color/color_normal" />
+
+                <Switch
+                    android:id="@+id/acceptRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:padding="16dp"
+                    android:text="@string/acceptRow"
+                    android:textColor="@color/light_gray" />
+
+            </LinearLayout>
+
+            <!--    <TextView-->
+            <!--        android:layout_width="match_parent"-->
+            <!--        android:layout_height="wrap_content"-->
+            <!--        android:textColor="@color/light_gray"-->
+            <!--        android:padding="16dp"-->
+            <!--        android:background="@color/cent"-->
+            <!--        android:text="@string/color_frame_type"-->
+            <!--        android:drawablePadding="16dp"-->
+            <!--        android:drawableEnd="@drawable/ic_setting"-->
+            <!--        />-->
+
+        </LinearLayout>
+    </ScrollView>
+
+
+</LinearLayout>
