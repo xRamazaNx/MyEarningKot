@@ -1,13 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <full-backup-content>
-    <exclude
-        domain="database"
-        path="zarplataDataBase.db"/>
-    <!-- Exclude the shared preferences file that contains the GCM registrationId -->
-    <exclude
-        domain="sharedpref"
-        path="oldsizeitem.xml"/>
-    <exclude
-        domain="sharedpref"
-        path="preferences.xml"/>
+
 </full-backup-content>
