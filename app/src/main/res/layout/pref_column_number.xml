@@ -16,7 +16,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-
             <include layout="@layout/width_seek_bar_layout" />
 
             <include layout="@layout/prefs_text_view" />
@@ -101,6 +100,45 @@
                     android:padding="16dp"
                     android:text="@string/group_number"
                     android:textColor="@color/light_gray" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:paddingStart="12dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="16dp"
+                    android:text="Вести счет в:"
+                    android:textColor="@color/gray_1"
+                    android:textSize="16sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
+
+                    <androidx.appcompat.widget.AppCompatCheckBox
+                        android:id="@+id/sumTotalCheck"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="sum"
+                        android:textColor="@color/light_gray" />
+
+                    <androidx.appcompat.widget.AppCompatCheckBox
+                        android:id="@+id/avansTotalCheck"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="avans"
+                        android:textColor="@color/light_gray" />
+                </LinearLayout>
 
             </LinearLayout>
         </LinearLayout>

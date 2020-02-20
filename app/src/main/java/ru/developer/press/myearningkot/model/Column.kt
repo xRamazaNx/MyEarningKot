@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.View
 import com.google.gson.annotations.SerializedName
 import ru.developer.press.myearningkot.*
-import ru.developer.press.myearningkot.adapters.PhoneParamModel
+import ru.developer.press.myearningkot.adapters.ParamModel
 import ru.developer.press.myearningkot.otherHelpers.*
 import java.util.*
 import kotlin.random.Random
@@ -91,6 +91,8 @@ class TextColumn(name: String) : Column(name) {
 class NumberColumn(name: String) : Column(name) {
     @SerializedName("cp")
     var typePref = NumberTypePref()
+    var sumCheck = false
+    var avansCheck = false
 
     override fun updateTypeControl(provideCardProperty: ProvideCardPropertyForCell) {
 
@@ -119,10 +121,10 @@ class PhoneColumn(name: String) : Column(name) {
         typePref.resetPref()
     }
 
-    fun getPhoneParamList(): MutableList<PhoneParamModel> {
+    fun getPhoneParamList(): MutableList<ParamModel> {
         val app = App.instance!!
 
-        return mutableListOf<PhoneParamModel>().apply {
+        return mutableListOf<ParamModel>().apply {
             val name = app.getString(R.string.name_man)
             val lastName = app.getString(R.string.last_name)
             val phone = app.getString(R.string.phone)
@@ -131,21 +133,21 @@ class PhoneColumn(name: String) : Column(name) {
             typePref.sort.forEach { id ->
                 when (id) {
                     0 ->
-                        add(PhoneParamModel(name, typePref.name, 0))
+                        add(ParamModel(name, typePref.name, 0))
                     1 ->
-                        add(PhoneParamModel(lastName, typePref.lastName, 1))
+                        add(ParamModel(lastName, typePref.lastName, 1))
                     2 ->
-                        add(PhoneParamModel(phone, typePref.phone, 2))
+                        add(ParamModel(phone, typePref.phone, 2))
                     3 ->
-                        add(PhoneParamModel(organization, typePref.organization, 3))
+                        add(ParamModel(organization, typePref.organization, 3))
                 }
             }
         }
     }
 
-    fun editPhoneParam(phoneParamModel: PhoneParamModel) {
-        val check = phoneParamModel.isCheck
-        when (phoneParamModel.id) {
+    fun editPhoneParam(paramModel: ParamModel) {
+        val check = paramModel.isCheck
+        when (paramModel.id) {
             0 -> typePref.name = check
             1 -> typePref.lastName = check
             2 -> typePref.phone = check
@@ -153,7 +155,7 @@ class PhoneColumn(name: String) : Column(name) {
         }
     }
 
-    fun sortPositionParam(list: List<PhoneParamModel>) {
+    fun sortPositionParam(list: List<ParamModel>) {
         list.forEachIndexed { index, param ->
             typePref.sort[index] = param.id
         }

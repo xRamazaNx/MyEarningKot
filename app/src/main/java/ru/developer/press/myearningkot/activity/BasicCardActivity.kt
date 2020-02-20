@@ -12,6 +12,11 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import kotlinx.android.synthetic.main.activity_card.*
+import kotlinx.android.synthetic.main.card.view.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.developer.press.myearningkot.App
 import ru.developer.press.myearningkot.CardViewModel
 import ru.developer.press.myearningkot.R
@@ -45,6 +50,8 @@ abstract class BasicCardActivity : AppCompatActivity() {
         totalAmountView.setOnClickListener { }
 
     }
+
+
 
     fun doStart() {
         viewModel?.apply {
@@ -139,4 +146,25 @@ abstract class BasicCardActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        CoroutineScope(Dispatchers.Main).launch {
+            withContext(Dispatchers.IO) {
+                while (true) {
+                    if (viewModel != null) {
+                        break
+                    }
+                }
+            }
+            totalAmountView.setShowTotalInfo(viewModel!!.card.isShowTotalInfo)
+        }
+    }
+
+}
+
+ fun View.setShowTotalInfo(showTotalInfo: Boolean) {
+    if (showTotalInfo)
+        total_container.visibility = View.VISIBLE
+    else
+        total_container.visibility = View.GONE
 }

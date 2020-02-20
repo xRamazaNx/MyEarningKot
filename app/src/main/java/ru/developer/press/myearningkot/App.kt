@@ -12,6 +12,7 @@ import ru.developer.press.myearningkot.activity.ID_UPDATE_CARD
 import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.ColumnType
 import ru.developer.press.myearningkot.model.DataController
+import ru.developer.press.myearningkot.model.NumberColumn
 import ru.developer.press.myearningkot.otherHelpers.CustomExceptionHandler
 import ru.developer.press.myearningkot.otherHelpers.Database
 import ru.developer.press.myearningkot.otherHelpers.SampleJson
@@ -52,8 +53,14 @@ class App : Application() {
                             sampleJsonDao.insert(SampleJson().apply {
                                 json = Gson().toJson(Card(name = "Доход").apply {
                                     deleteColumn()
-                                    addColumn(ColumnType.NUMBER, getString(R.string.summa))
-                                    addColumn(ColumnType.NUMBER, getString(R.string.avans))
+                                    val summaColumn =
+                                        addColumn(ColumnType.NUMBER, getString(R.string.summa)) as NumberColumn
+                                    summaColumn.sumCheck = true
+
+                                    val avansColumn =
+                                        addColumn(ColumnType.NUMBER, getString(R.string.avans)) as NumberColumn
+                                    avansColumn.avansCheck = true
+
                                     addColumn(ColumnType.TEXT, getString(R.string.note)).apply {
                                         width = 450
                                     }
@@ -66,8 +73,13 @@ class App : Application() {
                             sampleJsonDao.insert(SampleJson().apply {
                                 json = Gson().toJson(Card(name = "Расход").apply {
                                     deleteColumn()
-                                    addColumn(ColumnType.NUMBER, "Бюджет")
-                                    addColumn(ColumnType.NUMBER, "Потрачено")
+
+                                    val sumColumn = addColumn(ColumnType.NUMBER, "Бюджет") as NumberColumn
+                                    sumColumn.sumCheck = true
+
+                                    val avansColumn = addColumn(ColumnType.NUMBER, "Потрачено") as NumberColumn
+                                    avansColumn.avansCheck = true
+
                                     addColumn(ColumnType.LIST, "Категория").apply {
                                         width = 430
                                     }
@@ -83,8 +95,13 @@ class App : Application() {
                             sampleJsonDao.insert(SampleJson().apply {
                                 json = Gson().toJson(Card(name = "Мои долги").apply {
                                     deleteColumn()
-                                    addColumn(ColumnType.NUMBER, "Должен")
-                                    addColumn(ColumnType.NUMBER, "Оплатил")
+
+                                    val sumColumn = addColumn(ColumnType.NUMBER, "Должен") as NumberColumn
+                                    sumColumn.sumCheck = true
+
+                                    val avansColumn = addColumn(ColumnType.NUMBER, "Оплатил") as NumberColumn
+                                    avansColumn.avansCheck = true
+
                                     addColumn(ColumnType.LIST, "Кому").apply {
                                         width = 430
                                     }

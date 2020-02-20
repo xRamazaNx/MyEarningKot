@@ -57,7 +57,6 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         // он должен быть тут первым а то статусбар внизу оказывается из за поздей инициализации
         drawer = initDrawer()
         toolbar.setTitleTextColor(Color.WHITE)

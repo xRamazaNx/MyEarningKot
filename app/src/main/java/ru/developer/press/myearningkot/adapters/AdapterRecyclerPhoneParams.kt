@@ -9,10 +9,10 @@ import kotlinx.android.synthetic.main.pref_phone_type_param_item.view.*
 import ru.developer.press.myearningkot.R
 
 class AdapterRecyclerPhoneParams(
-    list: MutableList<PhoneParamModel>,
-    val clickListener: (PhoneParamModel) -> Unit
+    list: MutableList<ParamModel>,
+    val clickListener: (ParamModel) -> Unit
 ) :
-    DragDropSwipeAdapter<PhoneParamModel, PhoneParamHolder>(list) {
+    DragDropSwipeAdapter<ParamModel, PhoneParamHolder>(list) {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhoneParamHolder {
@@ -42,7 +42,7 @@ class AdapterRecyclerPhoneParams(
     можно пробовать все это
      */
     override fun getViewToTouchToStartDraggingItem(
-        item: PhoneParamModel,
+        item: ParamModel,
         viewHolder: PhoneParamHolder,
         position: Int
     ): View? {
@@ -50,7 +50,7 @@ class AdapterRecyclerPhoneParams(
     }
 
     override fun onBindViewHolder(
-        item: PhoneParamModel,
+        item: ParamModel,
         viewHolder: PhoneParamHolder,
         position: Int
     ) {
@@ -59,23 +59,23 @@ class AdapterRecyclerPhoneParams(
 }
 
 
-class PhoneParamHolder(view: View, var clickListener: (PhoneParamModel) -> Unit) :
+class PhoneParamHolder(view: View, var clickListener: (ParamModel) -> Unit) :
     DragDropSwipeAdapter.ViewHolder(view) {
-    private lateinit var phoneParamModel: PhoneParamModel
+    private lateinit var paramModel: ParamModel
     private val checkBox = view.phoneParamCheckBox.apply {
         setOnCheckedChangeListener { _, b ->
             itemView.phoneParamCheckBox.isChecked = b
-            phoneParamModel.isCheck = b
-            clickListener(phoneParamModel)
+            paramModel.isCheck = b
+            clickListener(paramModel)
         }
     }
 
-    fun bind(phoneParamModel: PhoneParamModel) {
-        this.phoneParamModel = phoneParamModel
-        checkBox.text = phoneParamModel.name
-        checkBox.isChecked = phoneParamModel.isCheck
+    fun bind(paramModel: ParamModel) {
+        this.paramModel = paramModel
+        checkBox.text = paramModel.name
+        checkBox.isChecked = paramModel.isCheck
     }
 
 }
 
-class PhoneParamModel(val name: String, var isCheck: Boolean, val id: Int)
+class ParamModel(val name: String, var isCheck: Boolean, val id: Int)

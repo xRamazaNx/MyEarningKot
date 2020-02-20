@@ -49,4 +49,5 @@
     <string name="acceptRow">Управлять учетом в общей сумме</string>
     <string name="behavior_switch_setting">Настройка поведения</string>
     <string name="save_changes">Сохранить изменения?</string>
+    <string name="show_total_info">Включить панель с данными</string>
 </resources>

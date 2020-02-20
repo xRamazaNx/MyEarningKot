@@ -20,6 +20,10 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_card.*
 import kotlinx.android.synthetic.main.card.*
+import kotlinx.android.synthetic.main.card.datePeriodCard
+import kotlinx.android.synthetic.main.card.divide_line
+import kotlinx.android.synthetic.main.card.nameCard
+import kotlinx.android.synthetic.main.card.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -261,6 +265,7 @@ class PrefCardActivity : BasicCardActivity() {
                             updateHorizontalScrollSwitched()
                             recycler.adapter = adapter
                             clickPrefToAdapter()
+                            totalAmountView.setShowTotalInfo(card.isShowTotalInfo)//
                         }
 
 
@@ -610,6 +615,7 @@ class PrefCardActivity : BasicCardActivity() {
                                                     }
                                                 }
                                                 adapter.notifyAdapter()
+                                                viewModel?.cardLiveData?.value = card
                                             }
                                         }
 

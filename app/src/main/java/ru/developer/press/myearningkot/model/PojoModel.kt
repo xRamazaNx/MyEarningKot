@@ -3,22 +3,22 @@ package ru.developer.press.myearningkot.model
 import android.graphics.Color
 import android.telephony.PhoneNumberUtils
 import android.view.View
+import androidx.core.util.toRange
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.synthetic.main.card.view.*
 import org.jetbrains.anko.dimen
-import ru.developer.press.myearningkot.App
-import ru.developer.press.myearningkot.CellTypeControl
-import ru.developer.press.myearningkot.ProvideCardPropertyForCell
-import ru.developer.press.myearningkot.R
+import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.otherHelpers.*
 import java.util.*
+import kotlin.random.Random
 
 // каточка
 class Card(var name: String = "") : ProvideCardPropertyForCell {
 
     var idPage = -1L
     var id = -1L
+    var isShowTotalInfo = true
     val cardPref = PrefForCard().initDefault()
 
     var dateType = 0
@@ -35,8 +35,10 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
     val rows = mutableListOf<Row>()
     var columns = mutableListOf<Column>()
     // ид колон которые суммируются
-    val sumColumnId = mutableListOf<Long>()
-    val avansColumnId = mutableListOf<Long>()
+    val sumColumnId = mutableSetOf<Long>()
+    val avansColumnId = mutableSetOf<Long>()
+
+    var visibleDate: Boolean = false
 
     val dateOfPeriod: String
         get() = " date"
@@ -114,7 +116,7 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
                 )
 
             is DateColumn -> Date().time.toString()
-            is NumberColumn -> 12345.98765.toString()
+            is NumberColumn -> Random.nextDouble(100.987644, 15956.9999999).toString()
             else -> {
                 "текст который может быть таким длинным что он просто не помещается на экране"
             }
@@ -124,7 +126,7 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
 
     fun deleteColumn(column: Column? = null): Boolean {
         // если колоны пусты то ни чего не делаем
-        if (column is NumerationColumn)
+        if (column is NumerationColumn || columns.size == 1)
             return false
 
         // ищем колону по параметрам и без
@@ -166,13 +168,25 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
         return null
     }
 
-    private fun fillTotalAmount() {
+    fun fillTotalAmount() {
         if (rows.isEmpty())
             return
 
         var tempSum = 0.0
         var tempAvans = 0.0
-
+        // anyTime
+        sumColumnId.clear()
+        avansColumnId.clear()
+        columns.forEach { column ->
+            if (column is NumberColumn) {
+                if (column.sumCheck) {
+                    sumColumnId.add(column.id)
+                }
+                if (column.avansCheck) {
+                    avansColumnId.add(column.id)
+                }
+            }
+        }
         sumColumnId.forEach { idColumn ->
             columns.forEachIndexed { indexColumn, column ->
                 if (idColumn == column.id) {
@@ -273,11 +287,16 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
 
         nameCard.text = name
         datePeriodCard.text = dateOfPeriod
+        datePeriodCard.visibility = if (visibleDate) View.VISIBLE else View.GONE
+
+        //anyTime
+        fillTotalAmount()
+
         // назначаем значения
         val totalAmount = totalAmount
-        sum.text = totalAmount.sum.toString()
-        avans.text = totalAmount.avans.toString()
-        balance.text = totalAmount.balance.toString()
+        sum.text = getDecimalFormatNumber(totalAmount.sum)
+        avans.text = getDecimalFormatNumber(totalAmount.avans)
+        balance.text = getDecimalFormatNumber(totalAmount.balance)
 
         //имена
         sumTitle.text = cardPref.sumTitle
@@ -362,14 +381,6 @@ class PrefForCard(
         }
         return this
     }
-
-    val visibilityOfDate: Int
-        get() {
-            return if (true) //  будет браться значение из настроек
-                View.VISIBLE
-            else
-                View.GONE
-        }
 }
 
 
@@ -458,17 +469,12 @@ class Row {
 
 class TotalAmountOfCard {
     var sum: Double = 0.0
-        get() {
-            return getDecimalFormatNumber(field).toDouble()
-        }
+
     var avans = 0.0
-        get() {
-            return getDecimalFormatNumber(field).toDouble()
-        }
+
     val balance: Double
         get() {
-            val value = (sum - avans)
-            return getDecimalFormatNumber(value).toDouble()
+            return (sum - avans)
         }
 }
 

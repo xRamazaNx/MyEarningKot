@@ -76,15 +76,24 @@ class DialogBasicPrefCard(
                         updateCard()
                     })
             }
-            view.switchEnableHorizontalScroll.isChecked = card.enableHorizontalScroll
-            view.switchEnableSomeStroke.isChecked = card.enableSomeStroke
+            val switchEnableHorizontalScroll = view.switchEnableHorizontalScroll
+            val switchEnableSomeStroke = view.switchEnableSomeStroke
+            val switchShowTotalInfo = view.switchShowTotalInfo
 
-            view.switchEnableHorizontalScroll.setOnCheckedChangeListener { _, b ->
+            switchEnableHorizontalScroll.isChecked = card.enableHorizontalScroll
+            switchEnableSomeStroke.isChecked = card.enableSomeStroke
+            switchShowTotalInfo.isChecked = card.isShowTotalInfo
+
+            switchEnableHorizontalScroll.setOnCheckedChangeListener { _, b ->
                 card.enableHorizontalScroll = b
                 updateCard()
             }
-            view.switchEnableSomeStroke.setOnCheckedChangeListener { _, b ->
+            switchEnableSomeStroke.setOnCheckedChangeListener { _, b ->
                 card.enableSomeStroke = b
+                updateCard()
+            }
+            switchShowTotalInfo.setOnCheckedChangeListener { _, isChecked ->
+                card.isShowTotalInfo = isChecked
                 updateCard()
             }
             setView(view)

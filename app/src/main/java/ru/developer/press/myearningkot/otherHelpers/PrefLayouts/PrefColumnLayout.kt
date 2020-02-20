@@ -16,12 +16,10 @@ import kotlinx.android.synthetic.main.pref_column_switch.view.*
 import kotlinx.android.synthetic.main.toolbar_pref.view.*
 import kotlinx.android.synthetic.main.width_seek_bar_layout.view.*
 import kotlinx.coroutines.*
-import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.backgroundColorResource
 import org.jetbrains.anko.layoutInflater
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.adapters.AdapterRecyclerPhoneParams
-import ru.developer.press.myearningkot.adapters.PhoneParamModel
+import ru.developer.press.myearningkot.adapters.ParamModel
 import ru.developer.press.myearningkot.model.*
 import ru.developer.press.myearningkot.otherHelpers.getColorFromRes
 import ru.developer.press.myearningkot.otherHelpers.getDate
@@ -29,7 +27,6 @@ import ru.developer.press.myearningkot.otherHelpers.getDateTypeList
 import ru.developer.press.myearningkot.otherHelpers.showItemChangeDialog
 import splitties.alertdialog.appcompat.alertDialog
 import java.util.*
-import java.util.logging.Handler
 
 fun Context.getPrefColumnLayout(
     columns: MutableList<Column>,
@@ -181,7 +178,8 @@ class PrefNumberColumnLayout(
 
     override fun initPref(view: View) {
         initSeekBarAndToolbarButtons(view)
-        val typePref = (columnList[0] as NumberColumn).typePref
+        val numberColumn = columnList[0] as NumberColumn
+        val typePref = numberColumn.typePref
 
         textPrefButtonsInit(view, getPrefForTextViewList()) {
             prefColumnChangedCallback.prefChanged()
@@ -220,6 +218,23 @@ class PrefNumberColumnLayout(
         digitUp.setOnClickListener {
             editDigit(1)
         }
+
+        val sumTotalCheck = view.sumTotalCheck
+        val avansTotalCheck = view.avansTotalCheck
+
+        sumTotalCheck.isChecked = numberColumn.sumCheck
+        avansTotalCheck.isChecked = numberColumn.avansCheck
+
+        sumTotalCheck.setOnCheckedChangeListener { _, isChecked ->
+            numberColumn.sumCheck = isChecked
+            prefColumnChangedCallback.prefChanged()
+        }
+        avansTotalCheck.setOnCheckedChangeListener { _, isChecked ->
+            numberColumn.avansCheck = isChecked
+            prefColumnChangedCallback.prefChanged()
+
+        }
+
     }
 
     override fun getPrefColumnView(context: Context): View {
@@ -256,11 +271,11 @@ class PrefPhoneColumnLayout(
             }
         recycler.adapter =
             adapterRecyclerPhoneParams
-        recycler.dragListener = object : OnItemDragListener<PhoneParamModel> {
+        recycler.dragListener = object : OnItemDragListener<ParamModel> {
             override fun onItemDragged(
                 previousPosition: Int,
                 newPosition: Int,
-                item: PhoneParamModel
+                item: ParamModel
             ) {
 
             }
@@ -268,7 +283,7 @@ class PrefPhoneColumnLayout(
             override fun onItemDropped(
                 initialPosition: Int,
                 finalPosition: Int,
-                item: PhoneParamModel
+                item: ParamModel
             ) {
                 columnList.filterIsInstance(PhoneColumn::class.java).forEach {
                     it.sortPositionParam(adapterRecyclerPhoneParams.dataSet)

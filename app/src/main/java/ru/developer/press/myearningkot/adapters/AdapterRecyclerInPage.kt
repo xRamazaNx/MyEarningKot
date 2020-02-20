@@ -2,12 +2,16 @@ package ru.developer.press.myearningkot.adapters
 
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.activity_card.view.*
 import kotlinx.android.synthetic.main.card.view.*
 import ru.developer.press.myearningkot.CardClickListener
 import ru.developer.press.myearningkot.R
+import ru.developer.press.myearningkot.activity.setShowTotalInfo
 import ru.developer.press.myearningkot.model.Card
 
 class AdapterRecyclerInPage(
@@ -72,29 +76,32 @@ class AdapterRecyclerInPage(
 
 
         fun bind(card: Card) {
-            card.cardPref.namePref.customize(nameCard)
-            card.cardPref.dateOfPeriodPref.customize(dateOfPeriod)
 
-            card.cardPref.sumTitlePref.customize(sumTitle)
-            card.cardPref.sumPref.customize(sum)
-
-            card.cardPref.avansTitlePref.customize(avansTitle)
-            card.cardPref.avansPref.customize(avans)
-
-            card.cardPref.balanceTitlePref.customize(balanceTitle)
-            card.cardPref.balancePref.customize(balance)
-
-            nameCard.text = card.name
-            dateOfPeriod.visibility = card.cardPref.visibilityOfDate
-            dateOfPeriod.text =
-                card.dateOfPeriod //  предполагается что вся инфа о дате в бизнес логике ставится
-
-            sum.text = card.totalAmount.sum.toString()
-            avans.text = card.totalAmount.avans.toString()
-            balance.text = card.totalAmount.balance.toString()
+            card.customizeTotalAmount(itemView)
+//            card.cardPref.namePref.customize(nameCard)
+//            card.cardPref.dateOfPeriodPref.customize(dateOfPeriod)
+//
+//            card.cardPref.sumTitlePref.customize(sumTitle)
+//            card.cardPref.sumPref.customize(sum)
+//
+//            card.cardPref.avansTitlePref.customize(avansTitle)
+//            card.cardPref.avansPref.customize(avans)
+//
+//            card.cardPref.balanceTitlePref.customize(balanceTitle)
+//            card.cardPref.balancePref.customize(balance)
+//
+//            nameCard.text = card.name
+//            dateOfPeriod.visibility = if (card.visibleDate) VISIBLE else GONE
+//            dateOfPeriod.text =
+//                card.dateOfPeriod //  предполагается что вся инфа о дате в бизнес логике ставится
+//
+//            sum.text = card.totalAmount.sum.toString()
+//            avans.text = card.totalAmount.avans.toString()
+//            balance.text = card.totalAmount.balance.toString()
 
             idCard = card.id
 
+            itemView.setShowTotalInfo(card.isShowTotalInfo)
 
         }
 
