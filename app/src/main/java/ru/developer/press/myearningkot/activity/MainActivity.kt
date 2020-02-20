@@ -44,6 +44,7 @@ import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.DataController
 import ru.developer.press.myearningkot.otherHelpers.getColorFromRes
 
+// GITHUB
 const val RESULT_OUT_CARD = 11
 const val ID_UPDATE_CARD = "id_card"
 
