@@ -78,7 +78,7 @@ class PhoneTypePref : TextTypePref() {
 }
 
 class DateTypePref(
-    var type: Int = 0,
+    var type: Int = 1,
     var enableTime: Boolean = true
 ) : TextTypePref() {
     override fun resetPref() {

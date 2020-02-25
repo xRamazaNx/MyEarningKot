@@ -18,6 +18,7 @@
 
             <include layout="@layout/width_seek_bar_layout" />
 
+
             <include layout="@layout/prefs_text_view" />
 
             <LinearLayout
@@ -101,43 +102,68 @@
                     android:text="@string/group_number"
                     android:textColor="@color/light_gray" />
 
+                <FrameLayout
+                    android:layout_marginBottom="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:alpha="0.5"
+                    android:background="@color/color_normal" />
+
                 <TextView
+                    android:textAllCaps="true"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="?android:attr/selectableItemBackground"
+                    android:background="@color/cent"
                     android:paddingStart="12dp"
                     android:paddingTop="8dp"
                     android:paddingEnd="16dp"
-                    android:text="Вести счет в:"
-                    android:textColor="@color/gray_1"
-                    android:textSize="16sp" />
+                    android:text="@string/input_type"
+                    android:textColor="@color/color_activated"
+                    android:textSize="14sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@color/cent"
                     android:orientation="horizontal"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp">
+                    android:padding="12dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp">
 
-                    <androidx.appcompat.widget.AppCompatCheckBox
-                        android:id="@+id/sumTotalCheck"
+                    <TextView
+                        android:id="@+id/manualInput"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
                         android:layout_weight="1"
+                        android:background="@drawable/shape_new_zapis"
                         android:ellipsize="end"
+                        android:gravity="center"
                         android:maxLines="1"
-                        android:text="sum"
-                        android:textColor="@color/light_gray" />
+                        android:padding="8dp"
+                        android:singleLine="true"
+                        android:text="@string/manual_input"
+                        android:textColor="@color/blue" />
 
-                    <androidx.appcompat.widget.AppCompatCheckBox
-                        android:id="@+id/avansTotalCheck"
+                    <TextView
+                        android:background="?android:attr/selectableItemBackground"
+                        android:id="@+id/formula"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
                         android:layout_weight="1"
                         android:ellipsize="end"
+                        android:gravity="center"
                         android:maxLines="1"
-                        android:text="avans"
+                        android:padding="8dp"
+                        android:singleLine="true"
+                        android:text="@string/formula"
                         android:textColor="@color/light_gray" />
+
                 </LinearLayout>
 
             </LinearLayout>

@@ -102,7 +102,12 @@ class DialogCreateCard(val createCard: (Card) -> Unit) : DialogFragment() {
             setPositiveButton("Создать") { _: DialogInterface, _: Int ->
                 card?.let {
                     it.name = editTextCardName.text.toString()
-                    createCard(it)
+                    createCard(it.apply {
+                        // ВАЖНО включить в код когда надо реально работать с прогой
+//                        repeat(rows.size) {
+//                            deleteRow()
+//                        }
+                    })
                 }
             }
             setNegativeButton("Отменить") { dialogInterface: DialogInterface, _: Int ->

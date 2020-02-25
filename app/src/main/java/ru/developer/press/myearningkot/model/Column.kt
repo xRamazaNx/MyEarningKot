@@ -94,6 +94,9 @@ class NumberColumn(name: String) : Column(name) {
     var sumCheck = false
     var avansCheck = false
 
+    var formula: Formula? = Formula()
+    var inputType: InputTypeNumberColumn = InputTypeNumberColumn.MANUAL
+
     override fun updateTypeControl(provideCardProperty: ProvideCardPropertyForCell) {
 
         columnTypeControl = NumberTypeControl(getProvideProperty(provideCardProperty)).apply {
@@ -103,6 +106,7 @@ class NumberColumn(name: String) : Column(name) {
 
     override fun setDefaultPref() {
         typePref.resetPref()
+
     }
 }
 

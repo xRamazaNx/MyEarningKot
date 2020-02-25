@@ -5,6 +5,8 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.view.View
 import android.widget.SeekBar
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnItemDragListener
@@ -16,15 +18,13 @@ import kotlinx.android.synthetic.main.pref_column_switch.view.*
 import kotlinx.android.synthetic.main.toolbar_pref.view.*
 import kotlinx.android.synthetic.main.width_seek_bar_layout.view.*
 import kotlinx.coroutines.*
-import org.jetbrains.anko.layoutInflater
+import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.adapters.AdapterRecyclerPhoneParams
 import ru.developer.press.myearningkot.adapters.ParamModel
+import ru.developer.press.myearningkot.dpsToPixels
 import ru.developer.press.myearningkot.model.*
-import ru.developer.press.myearningkot.otherHelpers.getColorFromRes
-import ru.developer.press.myearningkot.otherHelpers.getDate
-import ru.developer.press.myearningkot.otherHelpers.getDateTypeList
-import ru.developer.press.myearningkot.otherHelpers.showItemChangeDialog
+import ru.developer.press.myearningkot.otherHelpers.*
 import splitties.alertdialog.appcompat.alertDialog
 import java.util.*
 
@@ -86,6 +86,7 @@ interface PrefColumnChangedCallback {
     fun prefChanged()
     fun widthProgress()
     fun recreateView()
+    fun getNumberColumns(): MutableList<NumberColumn>
 }
 
 abstract class PrefColumnLayout(
@@ -179,6 +180,8 @@ class PrefNumberColumnLayout(
     override fun initPref(view: View) {
         initSeekBarAndToolbarButtons(view)
         val numberColumn = columnList[0] as NumberColumn
+        val numberColumns = columnList.filterIsInstance(NumberColumn::class.java)
+
         val typePref = numberColumn.typePref
 
         textPrefButtonsInit(view, getPrefForTextViewList()) {
@@ -193,7 +196,7 @@ class PrefNumberColumnLayout(
         digitsSizeTextView.text = typePref.digitsCount.toString()
         grouping.isChecked = typePref.isGrouping
         grouping.setOnCheckedChangeListener { _, b ->
-            columnList.filterIsInstance(NumberColumn::class.java).forEach {
+            numberColumns.forEach {
                 it.typePref.isGrouping = b
             }
             prefColumnChangedCallback.prefChanged()
@@ -206,7 +209,7 @@ class PrefNumberColumnLayout(
             if (digit < 0)
                 digit = 0
 
-            columnList.filterIsInstance(NumberColumn::class.java).forEach {
+            numberColumns.forEach {
                 it.typePref.digitsCount = digit
             }
             prefColumnChangedCallback.prefChanged()
@@ -219,20 +222,50 @@ class PrefNumberColumnLayout(
             editDigit(1)
         }
 
-        val sumTotalCheck = view.sumTotalCheck
-        val avansTotalCheck = view.avansTotalCheck
+        //inputType
+        val manualInput = view.manualInput
+        val formulaInput = view.formula
+        fun select(textView: TextView) {
+            textView.backgroundResource = R.drawable.shape_new_zapis
+            textView.textColor = Color.YELLOW
+        }
 
-        sumTotalCheck.isChecked = numberColumn.sumCheck
-        avansTotalCheck.isChecked = numberColumn.avansCheck
+        fun unSelect(textView: TextView) {
+            textView.backgroundColor = Color.TRANSPARENT
+            textView.textColorResource = R.color.light_gray
+        }
+        if (numberColumn.inputType == InputTypeNumberColumn.MANUAL) {
+            select(manualInput)
+            unSelect(formulaInput)
+        } else {
+            select(formulaInput)
+            unSelect(manualInput)
+        }
 
-        sumTotalCheck.setOnCheckedChangeListener { _, isChecked ->
-            numberColumn.sumCheck = isChecked
+        manualInput.setOnClickListener {
+            select(manualInput)
+            unSelect(formulaInput)
+
+            numberColumns.forEach {
+                it.inputType = InputTypeNumberColumn.MANUAL
+            }
             prefColumnChangedCallback.prefChanged()
         }
-        avansTotalCheck.setOnCheckedChangeListener { _, isChecked ->
-            numberColumn.avansCheck = isChecked
-            prefColumnChangedCallback.prefChanged()
+        val context = view.context
+        formulaInput.setOnClickListener {
 
+            formulaDialogShow(context, prefColumnChangedCallback.getNumberColumns().apply {
+                removeAll(numberColumns)
+            }) { formula ->
+                select(formulaInput)
+                unSelect(manualInput)
+
+                numberColumns.forEach {
+                    it.inputType = InputTypeNumberColumn.FORMULA
+                    it.formula = formula
+                }
+                prefColumnChangedCallback.prefChanged()
+            }
         }
 
     }

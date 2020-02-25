@@ -11,7 +11,6 @@ import android.view.View.GONE
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView.ItemAnimator.ItemAnimatorFinishedListener
-import com.bugsnag.android.Bugsnag
 import com.google.android.material.appbar.AppBarLayout
 import kotlinx.android.synthetic.main.activity_card.*
 import kotlinx.android.synthetic.main.activity_card.view.*
@@ -27,7 +26,6 @@ import ru.developer.press.myearningkot.adapters.AdapterRecyclerInCard
 import ru.developer.press.myearningkot.dialogs.startPrefActivity
 import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.DataController
-import java.lang.RuntimeException
 
 
 open class CardActivity : BasicCardActivity() {
@@ -79,7 +77,7 @@ open class CardActivity : BasicCardActivity() {
                                 val card = DataController().getCard(id)
                                 // потому что вьюможель не умирает и не создается занового
                                 viewModel!!.updateCard(card)
-                                createTitlesFromCard()
+                                createTitles()
                                 updateHorizontalScrollSwitched()
                                 createRecyclerView()
                             }
@@ -170,6 +168,7 @@ open class CardActivity : BasicCardActivity() {
             datePeriodCard.visibility = GONE
             divide_line.visibility = GONE
             nameCard.visibility = GONE
+            this@CardActivity.prefButtonContainer.visibility = GONE
         }
     }
 

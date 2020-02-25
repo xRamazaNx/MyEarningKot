@@ -86,9 +86,10 @@ fun getValutaTypeList(): MutableList<String> {
 
 fun getDateTypeList(): MutableList<String> {
     return mutableListOf<String>().apply {
-        add(getDate(0, enableTime = false))
+        add("Не показывать")
         add(getDate(1, enableTime = false))
         add(getDate(2, enableTime = false))
+        add(getDate(3, enableTime = false))
     }
 }
 
@@ -138,9 +139,9 @@ fun getDate(variantDate: Int, time: Long = Date().time, enableTime: Boolean): St
     val dayName: String = sDayOfWeek[calendar.get(Calendar.DAY_OF_WEEK) - 1]
     var timeFormat = ""
     when (variantDate) {
-        0 -> timeFormat = "dd.MM.yy"
-        1 -> timeFormat = "dd.MM.yyyy"
-        2 -> timeFormat = "dd MMMM yyyy"
+        1 -> timeFormat = "dd.MM.yy"
+        2 -> timeFormat = "dd.MM.yyyy"
+        3 -> timeFormat = "dd MMMM yyyy"
     }
     if (enableTime)
         timeFormat += " hh:mm"

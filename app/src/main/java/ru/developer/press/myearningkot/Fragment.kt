@@ -16,8 +16,8 @@ import ru.developer.press.myearningkot.model.Card
 
 class PageFragment: Fragment() {
     var cards: MutableList<Card> = mutableListOf()
-    lateinit var cardClickListener: CardClickListener
-    private lateinit var adapterRecyclerInPage: AdapterRecyclerInPage
+    private lateinit var cardClickListener: CardClickListener
+    private var adapterRecyclerInPage: AdapterRecyclerInPage? = null
     private var recycler: RecyclerView? = null
 
     @SuppressLint("InflateParams")
@@ -49,11 +49,10 @@ class PageFragment: Fragment() {
 
     fun scrollToPosition(cardPosition: Int) {
         recycler?.smoothScrollToPosition(cardPosition)
-        adapterRecyclerInPage.animateCardUpdated(cardPosition)
+        adapterRecyclerInPage?.animateCardUpdated(cardPosition)
     }
 
     fun notifyCardInRecycler(positionCard: Int) {
-//       adapterRecyclerInPage.notifyItemChanged(positionCard)
         scrollToPosition(positionCard)
     }
 

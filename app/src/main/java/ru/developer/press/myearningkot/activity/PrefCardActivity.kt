@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.ScrollView
 import android.widget.TextView
@@ -21,9 +22,12 @@ import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_card.*
 import kotlinx.android.synthetic.main.card.*
 import kotlinx.android.synthetic.main.card.datePeriodCard
-import kotlinx.android.synthetic.main.card.divide_line
 import kotlinx.android.synthetic.main.card.nameCard
 import kotlinx.android.synthetic.main.card.view.*
+import kotlinx.android.synthetic.main.total_item.view.*
+import kotlinx.android.synthetic.main.total_item.view.totalValue
+import kotlinx.android.synthetic.main.total_item_layout.view.*
+import kotlinx.android.synthetic.main.total_item_value.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -36,6 +40,7 @@ import ru.developer.press.myearningkot.CardViewModel
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.ViewModelCardFactory
 import ru.developer.press.myearningkot.dialogs.DialogBasicPrefCard
+import ru.developer.press.myearningkot.dialogs.DialogBasicPrefPlate
 import ru.developer.press.myearningkot.model.*
 import ru.developer.press.myearningkot.otherHelpers.PrefCardInfo
 import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.*
@@ -44,7 +49,6 @@ import ru.developer.press.myearningkot.otherHelpers.showItemChangeDialog
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.negativeButton
 import splitties.alertdialog.appcompat.positiveButton
-import java.lang.Thread.sleep
 
 
 val CARD_ID = "card_id"
@@ -53,6 +57,14 @@ val TITLE_PREF_ACTIVITY = "title_pref_activity"
 val CARD_EDIT_JSON_REQ_CODE = 0
 
 class PrefCardActivity : BasicCardActivity() {
+    private val totalContainer: LinearLayout
+        get() {
+            return if (totalContainerDisableScroll.childCount > 0)
+                totalContainerDisableScroll.getChildAt(0) as LinearLayout
+            else
+                totalContainerScroll.getChildAt(0) as LinearLayout
+
+        }
     private lateinit var prefCardInfo: PrefCardInfo
     private val selectedControl = PrefSelectedControl()
     lateinit var prefWindow: PopupWindow
@@ -176,61 +188,64 @@ class PrefCardActivity : BasicCardActivity() {
             )
         }
 
-        sumTitle.setOnClickListener {
-            selectedControl.select(
-                SelectedElement.ElementTextView(
-                    sumTitle.background,
-                    ElementType.SUM_TITLE
-                )
-            )
+        initClickTotals(card)
 
-        }
-        sum.setOnClickListener {
-            selectedControl.select(
-                SelectedElement.ElementTextView(
-                    sum.background,
-                    ElementType.SUM
-                )
-            )
+        plateSetting.setOnClickListener {
+            viewModel?.card.let { card ->
+                val dialogBasicPrefCard = DialogBasicPrefPlate(card!!) {
 
-        }
-        avansTitle.setOnClickListener {
-            selectedControl.select(
-                SelectedElement.ElementTextView(
-                    avansTitle.background,
-                    ElementType.AVANS_TITLE
-                )
-            )
+                    // ps покрывает обновление всех четырех настроек которые настраиваются в диалоге
+                    CoroutineScope(Dispatchers.Main).launch {
+                        withContext(Dispatchers.IO) {
+                            adapter = getAdapterForRecycler()
+                        }
+                        updateHorizontalScrollSwitched()
+                        recycler.adapter = adapter
+                        clickPrefToAdapter()
+                        updatePlate()
+                        setShowTotalInfo(card.isShowTotalInfo)//
+                        initElementClick()
+                        if (card.isShowTotalInfo)
+                            selectedControl.updateSelected()
+                        else
+                            selectedControl.unSelectAll()
+                    }
 
-        }
-        avans.setOnClickListener {
-            selectedControl.select(
-                SelectedElement.ElementTextView(
-                    avans.background,
-                    ElementType.AVANS
-                )
-            )
 
-        }
-        balanceTitle.setOnClickListener {
-            selectedControl.select(
-                SelectedElement.ElementTextView(
-                    balanceTitle.background,
-                    ElementType.BALANCE_TITLE
-                )
-            )
-
-        }
-        balance.setOnClickListener {
-            selectedControl.select(
-                SelectedElement.ElementTextView(
-                    balance.background,
-                    ElementType.BALANCE
-                )
-            )
-
+                }
+                dialogBasicPrefCard.show(supportFragmentManager, "dialogBasicPrefCard")
+            }
         }
 
+    }
+
+    private fun initClickTotals(card: Card?) {
+        card?.totals?.forEachIndexed { index, _ ->
+            // как в колоне надо сделать
+            val titleContainer = totalContainer.totalTitleContainer
+            val valueContainer = totalContainer.totalValueContainer
+            // клик по значению
+            valueContainer.getChildAt(index).totalValue.setOnClickListener {
+                selectedControl.select(
+                    SelectedElement.ElementTotal(
+                        index,
+                        it.background,
+                        ElementType.TOTAL
+                    )
+                )
+            }
+            // клик по заголовку
+            titleContainer.getChildAt(index).setOnClickListener {
+                selectedControl.select(
+                    SelectedElement.ElementTotal(
+                        index,
+                        it.background,
+                        ElementType.TOTAL_TITLE
+                    )
+                )
+            }
+
+        }
     }
 
     private fun visibleHideElements() {
@@ -240,9 +255,6 @@ class PrefCardActivity : BasicCardActivity() {
             divide_line.visibility = VISIBLE
             nameCard.visibility = VISIBLE
         }
-//        elementPrefContainerScrollView.visibility = VISIBLE
-//        elementPrefContainer.layoutParams.height = resources.displayMetrics.heightPixels / 3
-//        elementPrefContainerScrollView.requestLayout()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -265,7 +277,7 @@ class PrefCardActivity : BasicCardActivity() {
                             updateHorizontalScrollSwitched()
                             recycler.adapter = adapter
                             clickPrefToAdapter()
-                            totalAmountView.setShowTotalInfo(card.isShowTotalInfo)//
+                            updatePlate()
                         }
 
 
@@ -279,7 +291,7 @@ class PrefCardActivity : BasicCardActivity() {
                     val columnType = getColumnTypeEnumList()[it]
                     viewModel?.addColumn(columnType, list[it])
 
-                    createTitlesFromCard()
+                    createTitles()
                     updateHorizontalScrollSwitched()
                     createRecyclerView()
                     // после создания адаптера надо зановго заложить умение выделяться
@@ -347,6 +359,7 @@ class PrefCardActivity : BasicCardActivity() {
                     SampleHelper().updateSample(card!!)
             }
             val data = Intent()
+
             data.putExtra(CARD_ID, prefCardInfo.idCard)
             setResult(Activity.RESULT_OK, data)
             finish()
@@ -391,35 +404,25 @@ class PrefCardActivity : BasicCardActivity() {
                             setSelectBackground(datePeriodCard)
 
                         }
-                        ElementType.SUM -> {
+                        ElementType.TOTAL -> {
                             isSelectTotalAmountElement = true
-                            setSelectBackground(sum)
+                            val selectTotalItem = selectedElement as SelectedElement.ElementTotal
+                            val index = selectTotalItem.index
+                            val totalView = totalContainer.totalValueContainer.getChildAt(index).totalValue
+                            setSelectBackground(totalView)
                         }
-                        ElementType.SUM_TITLE -> {
+                        ElementType.TOTAL_TITLE -> {
                             isSelectTotalAmountElement = true
-                            setSelectBackground(sumTitle)
-                        }
-                        ElementType.AVANS -> {
-                            isSelectTotalAmountElement = true
-                            setSelectBackground(avans)
-                        }
-                        ElementType.AVANS_TITLE -> {
-                            isSelectTotalAmountElement = true
-                            setSelectBackground(avansTitle)
-                        }
-                        ElementType.BALANCE -> {
-                            isSelectTotalAmountElement = true
-                            setSelectBackground(balance)
-                        }
-                        ElementType.BALANCE_TITLE -> {
-                            isSelectTotalAmountElement = true
-                            setSelectBackground(balanceTitle)
+                            val selectTotalItem = selectedElement as SelectedElement.ElementTotal
+                            val index = selectTotalItem.index
+                            val totalView = totalContainer.totalTitleContainer.getChildAt(index)
+                            setSelectBackground(totalView)
                         }
                     }
                 }
 
                 private fun changedCard() {
-                    viewModel?.cardLiveData?.value = card
+                    updatePlate()
                 }
 
                 override fun unSelect(selectedElement: SelectedElement?) {
@@ -433,35 +436,30 @@ class PrefCardActivity : BasicCardActivity() {
                             // удаление вью для настройки
                         }
                         ElementType.COLUMN_TITLE -> {
-                            val elementColumn = selectedElement as SelectedElement.ElementColumnTitle
+                            val elementColumn =
+                                selectedElement as SelectedElement.ElementColumnTitle
                             val columnIndex = elementColumn.columnIndex
                             columnContainer.getChildAt(columnIndex).background =
                                 elementColumn.oldDrawable
 
-                        }
-                        ElementType.SUM -> {
-                            sum.background = selectedElement.oldDrawable
-                        }
-                        ElementType.SUM_TITLE -> {
-                            sumTitle.background = selectedElement.oldDrawable
-                        }
-                        ElementType.AVANS -> {
-                            avans.background = selectedElement.oldDrawable
-                        }
-                        ElementType.AVANS_TITLE -> {
-                            avansTitle.background = selectedElement.oldDrawable
-                        }
-                        ElementType.BALANCE -> {
-                            balance.background = selectedElement.oldDrawable
-                        }
-                        ElementType.BALANCE_TITLE -> {
-                            balanceTitle.background = selectedElement.oldDrawable
                         }
                         ElementType.NAME -> {
                             nameCard.background = selectedElement.oldDrawable
                         }
                         ElementType.DATE -> {
                             datePeriodCard.background = selectedElement.oldDrawable
+                        }
+                        ElementType.TOTAL -> {
+                            val selectTotalItem = selectedElement as SelectedElement.ElementTotal
+                            val index = selectTotalItem.index
+                            val totalView = totalContainer.totalValueContainer.getChildAt(index).totalValue
+                            totalView.background = selectedElement.oldDrawable
+                        }
+                        ElementType.TOTAL_TITLE -> {
+                            val selectTotalItem = selectedElement as SelectedElement.ElementTotal
+                            val index = selectTotalItem.index
+                            val totalView = totalContainer.totalTitleContainer.getChildAt(index)
+                            totalView.background = selectedElement.oldDrawable
                         }
                     }
 
@@ -473,74 +471,63 @@ class PrefCardActivity : BasicCardActivity() {
                         when (elementPref.elementPrefType) {
                             ElementPrefType.TEXT_VIEW -> {
                                 var isWorkAlignPanel = true
-                                var name: String? = null
+                                val name: String?
 
-                                when (elementPref.selectedElementList[0].elementType) {
+                                // проверка имени
+                                val firstSelected = elementPref.selectedElementList[0]
+                                when (firstSelected.elementType) {
                                     ElementType.COLUMN_TITLE -> {
                                         val elementColumn =
-                                            elementPref.selectedElementList[0] as SelectedElement.ElementColumn
+                                            firstSelected as SelectedElement.ElementColumnTitle
                                         val column = card.columns[elementColumn.columnIndex]
                                         name = column.name
                                     }
                                     ElementType.NAME -> {
                                         name = card.name
                                     }
-                                    ElementType.SUM_TITLE -> {
-                                        name = card.cardPref.sumTitle
+                                    ElementType.TOTAL_TITLE -> {
+                                        val selectTotalItem =
+                                            firstSelected as SelectedElement.ElementTotal
+                                        val index = selectTotalItem.index
+                                        name = card.totals[index].title
                                     }
-                                    ElementType.AVANS_TITLE -> {
-                                        name = card.cardPref.avansTitle
-                                    }
-                                    ElementType.BALANCE_TITLE -> {
-                                        name = card.cardPref.balanceTitle
-                                    }
-
                                     else -> {
+                                        name = null
                                     }
                                 }
 
+                                // проверка для настройки выравнивания
                                 elementPref.selectedElementList.forEach {
                                     val elementType = it.elementType
                                     if (elementType == ElementType.NAME
                                         || elementType == ElementType.DATE
-                                        || elementType == ElementType.SUM
-                                        || elementType == ElementType.SUM_TITLE
-                                        || elementType == ElementType.AVANS
-                                        || elementType == ElementType.AVANS_TITLE
-                                        || elementType == ElementType.BALANCE
-                                        || elementType == ElementType.BALANCE_TITLE
+                                        || elementType == ElementType.TOTAL_TITLE
                                     )
                                         isWorkAlignPanel = false
-                                    if (elementType == ElementType.DATE
-                                        || elementType == ElementType.SUM
-                                        || elementType == ElementType.AVANS
-                                        || elementType == ElementType.BALANCE
-                                    )
-                                        name = null
                                 }
 
                                 val prefList = mutableListOf<PrefForTextView>()
+
+                                // сбор настроек
                                 elementPref.selectedElementList.forEach {
                                     val prefForTextView = when (it.elementType) {
                                         ElementType.COLUMN_TITLE -> {
                                             val elementColumn =
-                                                it as SelectedElement.ElementColumn
+                                                it as SelectedElement.ElementColumnTitle
                                             val column = card.columns[elementColumn.columnIndex]
                                             column.titlePref
                                         }
                                         ElementType.NAME -> card.cardPref.namePref
 
                                         ElementType.DATE -> card.cardPref.dateOfPeriodPref
-                                        ElementType.SUM -> card.cardPref.sumPref
-                                        ElementType.SUM_TITLE -> card.cardPref.sumTitlePref
 
-                                        ElementType.AVANS -> card.cardPref.avansPref
-                                        ElementType.AVANS_TITLE -> card.cardPref.avansTitlePref
+                                        ElementType.TOTAL_TITLE -> {
+                                            val totalItem =
+                                                card.totals[(it as SelectedElement.ElementTotal).index]
+                                            totalItem.titlePref
+                                        }
+                                        else -> null
 
-                                        ElementType.BALANCE -> card.cardPref.balancePref
-                                        ElementType.BALANCE_TITLE -> card.cardPref.balanceTitlePref
-
-                                        ElementType.COLUMN -> null
                                     }
                                     if (prefForTextView != null) {
                                         prefList.add(prefForTextView)
@@ -551,8 +538,7 @@ class PrefCardActivity : BasicCardActivity() {
                                         override fun nameEdit(text: String) {
                                             elementPref.selectedElementList.forEach {
                                                 when (it.elementType) {
-                                                    ElementType.COLUMN -> {
-                                                    }
+
                                                     ElementType.COLUMN_TITLE -> {
                                                         val elementColumn =
                                                             it as SelectedElement.ElementColumn
@@ -563,22 +549,13 @@ class PrefCardActivity : BasicCardActivity() {
                                                     ElementType.NAME -> {
                                                         card.name = text
                                                     }
-                                                    ElementType.DATE -> {
+                                                    ElementType.TOTAL_TITLE -> {
+                                                        val elementTotal =
+                                                            it as SelectedElement.ElementTotal
+                                                        card.totals[elementTotal.index].title = text
                                                     }
-                                                    ElementType.SUM -> {
-                                                    }
-                                                    ElementType.SUM_TITLE -> {
-                                                        card.cardPref.sumTitle = text
-                                                    }
-                                                    ElementType.AVANS -> {
-                                                    }
-                                                    ElementType.AVANS_TITLE -> {
-                                                        card.cardPref.avansTitle = text
-                                                    }
-                                                    ElementType.BALANCE -> {
-                                                    }
-                                                    ElementType.BALANCE_TITLE -> {
-                                                        card.cardPref.balanceTitle = text
+                                                    else -> {
+
                                                     }
                                                 }
                                             }
@@ -591,13 +568,40 @@ class PrefCardActivity : BasicCardActivity() {
                                         }
                                     })
                             }
+
+                            ElementPrefType.TOTAL -> {
+                                val listTotal = mutableListOf<TotalItem>().apply {
+                                    elementPref.selectedElementList.filterIsInstance(SelectedElement.ElementTotal::class.java)
+                                        .forEach {
+                                            add(card.totals[it.index])
+                                        }
+                                }
+                                getPrefTotalLayout(listTotal, object : PrefTotalChangedCallBack {
+                                    override fun prefChanged() {
+                                        updatePlate()
+                                    }
+
+                                    override fun calcFormula() {
+                                        card.totals.forEach {
+                                            it.calcFormula(card)
+                                        }
+                                        prefChanged()
+                                    }
+
+                                    override fun getNumberColumns(): MutableList<NumberColumn> {
+                                        return card.columns.filterIsInstance<NumberColumn>()
+                                            .toMutableList()
+                                    }
+                                })
+                            }
+
                             else -> {
                                 val columnList =
                                     getColumnsFromSelectedElements(elementPref.selectedElementList)
                                 getPrefColumnLayout(columnList, elementPref.columnType,
                                     object : PrefColumnChangedCallback {
                                         override fun widthChanged() {
-                                            createTitlesFromCard()
+                                            createTitles()
                                             createRecyclerView()
                                             clickPrefToAdapter()
                                             initElementClick()
@@ -615,7 +619,7 @@ class PrefCardActivity : BasicCardActivity() {
                                                     }
                                                 }
                                                 adapter.notifyAdapter()
-                                                viewModel?.cardLiveData?.value = card
+                                                updatePlate()
                                             }
                                         }
 
@@ -649,6 +653,13 @@ class PrefCardActivity : BasicCardActivity() {
                                                 recycler.adapter = adapter
                                                 clickPrefToAdapter()
                                             }
+                                        }
+
+                                        override fun getNumberColumns(): MutableList<NumberColumn> {
+                                            val filterIsInstance =
+                                                card.columns.filterIsInstance<NumberColumn>()
+                                            return filterIsInstance.toMutableList()
+
                                         }
                                     })
                             }
@@ -690,7 +701,7 @@ class PrefCardActivity : BasicCardActivity() {
                         if (!it)
                             toast(getString(R.string.moving_not_available))
                         else {
-                            createTitlesFromCard()
+                            createTitles()
                             createRecyclerView()
                             clickPrefToAdapter()
                             initElementClick()
@@ -704,7 +715,7 @@ class PrefCardActivity : BasicCardActivity() {
                     viewModel?.moveToLeft(columnList) {
                         if (!it) toast(getString(R.string.moving_not_available))
                         else {
-                            createTitlesFromCard()
+                            createTitles()
                             createRecyclerView()
                             clickPrefToAdapter()
                             initElementClick()
@@ -723,7 +734,7 @@ class PrefCardActivity : BasicCardActivity() {
                             toast("Нельзя удалить столбец для нумерации")
                         }
                     }
-                    createTitlesFromCard()
+                    createTitles()
                     createRecyclerView()
                     clickPrefToAdapter()
                     initElementClick()
@@ -748,5 +759,12 @@ class PrefCardActivity : BasicCardActivity() {
         toolbar.menu.findItem(R.id.moveToLeft).isVisible = isVisible
         toolbar.menu.findItem(R.id.deleteColumn).isVisible = isVisible
     }
+
+    private fun updatePlate(){
+        viewModel?.updatePlateChanged()
+        selectedControl.updateSelected()
+        initClickTotals(viewModel?.card)
+    }
+
 
 }

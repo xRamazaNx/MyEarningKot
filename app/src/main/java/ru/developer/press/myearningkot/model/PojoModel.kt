@@ -2,14 +2,26 @@ package ru.developer.press.myearningkot.model
 
 import android.graphics.Color
 import android.telephony.PhoneNumberUtils
+import android.view.Gravity
 import android.view.View
-import androidx.core.util.toRange
+import android.view.View.GONE
+import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.TextView
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.synthetic.main.card.view.*
+import kotlinx.android.synthetic.main.total_item.view.*
+import kotlinx.android.synthetic.main.total_item_layout.view.*
 import org.jetbrains.anko.dimen
+import org.jetbrains.anko.layoutInflater
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.wrapContent
 import ru.developer.press.myearningkot.*
+import ru.developer.press.myearningkot.activity.CardActivity
+import ru.developer.press.myearningkot.model.Formula.Companion.COLUMN_ID
 import ru.developer.press.myearningkot.otherHelpers.*
+import java.lang.Exception
 import java.util.*
 import kotlin.random.Random
 
@@ -28,30 +40,47 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
     val sortPref = SortPref()
     @SerializedName("ehs")
     var enableHorizontalScroll = false
+    var enableHorizontalScrollTotal = false
     @SerializedName("hc")
     var heightCells = App.instance?.dimen(R.dimen.column_height) ?: 50
     var dateCreated = Date().time
     var dateModify = dateCreated
     val rows = mutableListOf<Row>()
     var columns = mutableListOf<Column>()
-    // ид колон которые суммируются
-    val sumColumnId = mutableSetOf<Long>()
-    val avansColumnId = mutableSetOf<Long>()
+    var totals = mutableListOf<TotalItem>()
 
-    var visibleDate: Boolean = false
 
-    val dateOfPeriod: String
-        get() = " date"
-    @Transient
-    val totalAmount: TotalAmountOfCard = TotalAmountOfCard()
+//    // ид колон которые суммируются
+//    val sumColumnId = mutableSetOf<Long>()
+//    val avansColumnId = mutableSetOf<Long>()
+
+    private val dateOfPeriod: String
+        get() {
+            val first = getDate(dateType, dateCreated, false)
+            val last = getDate(dateType, dateModify, false)
+            return "$first - $last"
+        }
 
     init {
         addColumn(ColumnType.NUMERATION, "№").apply {
             width = App.instance?.dimen(R.dimen.column_height) ?: 50
         }
+        addTotal()
         // временная суета
-        addColumn(ColumnType.NUMBER, "Столбец")
-        fillTotalAmount()
+//        addColumn(ColumnType.NUMBER, "Столбец")
+//        fillTotalAmount()
+    }
+
+    fun addTotal() {
+        totals.add(TotalItem())
+    }
+
+    fun deleteTotal(index: Int): Boolean {
+        return if (totals.size > 1) {
+            totals.removeAt(index)
+            true
+        } else
+            false
     }
 
     fun addRow(
@@ -142,21 +171,21 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
         rows.forEach {
             it.cellList.removeAt(index)
         }
-        // удаляем ид колоны из списка суммируемых если он есть в нем
-        sumColumnId.forEach {
-            if (it == col.id) {
-                sumColumnId.remove(it)
-                return true
-            }
-        }
-        // удаляем ид колоны из списка авансируемых если он есть в нем
-        avansColumnId.forEach {
-            if (it == col.id) {
-                avansColumnId.remove(it)
-                return true
-            }
-
-        }
+//        // удаляем ид колоны из списка суммируемых если он есть в нем
+//        sumColumnId.forEach {
+//            if (it == col.id) {
+//                sumColumnId.remove(it)
+//                return true
+//            }
+//        }
+//        // удаляем ид колоны из списка авансируемых если он есть в нем
+//        avansColumnId.forEach {
+//            if (it == col.id) {
+//                avansColumnId.remove(it)
+//                return true
+//            }
+//
+//        }
         return true
     }
 
@@ -168,48 +197,48 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
         return null
     }
 
-    fun fillTotalAmount() {
-        if (rows.isEmpty())
-            return
-
-        var tempSum = 0.0
-        var tempAvans = 0.0
-        // anyTime
-        sumColumnId.clear()
-        avansColumnId.clear()
-        columns.forEach { column ->
-            if (column is NumberColumn) {
-                if (column.sumCheck) {
-                    sumColumnId.add(column.id)
-                }
-                if (column.avansCheck) {
-                    avansColumnId.add(column.id)
-                }
-            }
-        }
-        sumColumnId.forEach { idColumn ->
-            columns.forEachIndexed { indexColumn, column ->
-                if (idColumn == column.id) {
-                    rows.forEach { row ->
-                        //                        if (  если в карте в записях есть переключатель то проыерить регулирует ли он участвование в общей сумме)
-                        tempSum += row.cellList[indexColumn].sourceValue.toDouble()
-                    }
-                }
-            }
-        }
-        avansColumnId.forEach { idColumn ->
-            columns.forEachIndexed { indexColumn, column ->
-                if (idColumn == column.id) {
-                    rows.forEach {
-                        tempAvans += it.cellList[indexColumn].sourceValue.toDouble()
-                    }
-                }
-            }
-        }
-
-        totalAmount.sum = tempSum
-        totalAmount.avans = tempAvans
-    }
+//    fun fillTotalAmount() {
+//        if (rows.isEmpty())
+//            return
+//
+//        var tempSum = 0.0
+//        var tempAvans = 0.0
+//        // anyTime
+//        sumColumnId.clear()
+//        avansColumnId.clear()
+//        columns.forEach { column ->
+//            if (column is NumberColumn) {
+//                if (column.sumCheck) {
+//                    sumColumnId.add(column.id)
+//                }
+//                if (column.avansCheck) {
+//                    avansColumnId.add(column.id)
+//                }
+//            }
+//        }
+//        sumColumnId.forEach { idColumn ->
+//            columns.forEachIndexed { indexColumn, column ->
+//                if (idColumn == column.id) {
+//                    rows.forEach { row ->
+//                        //                        if (  если в карте в записях есть переключатель то проыерить регулирует ли он участвование в общей сумме)
+//                        tempSum += row.cellList[indexColumn].sourceValue.toDouble()
+//                    }
+//                }
+//            }
+//        }
+//        avansColumnId.forEach { idColumn ->
+//            columns.forEachIndexed { indexColumn, column ->
+//                if (idColumn == column.id) {
+//                    rows.forEach {
+//                        tempAvans += it.cellList[indexColumn].sourceValue.toDouble()
+//                    }
+//                }
+//            }
+//        }
+//
+//        totalAmount.sum = tempSum
+//        totalAmount.avans = tempAvans
+//    }
 
 
     private fun getCellOfSample(position: Int): Cell {
@@ -253,7 +282,7 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
         columns.forEach { column ->
             updateTypeControlColumn(column)
         }
-        fillTotalAmount()
+//        fillTotalAmount()
     }
 
     fun addSampleRow() {
@@ -276,44 +305,70 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
     override fun getValutaType(): Int = valuta
 
     fun customizeTotalAmount(totalAmountView: View) {
+        val context = totalAmountView.context
         val nameCard = totalAmountView.nameCard
         val datePeriodCard = totalAmountView.datePeriodCard
-        val sum = totalAmountView.sum
-        val avans = totalAmountView.avans
-        val balance = totalAmountView.balance
-        val sumTitle = totalAmountView.sumTitle
-        val avansTitle = totalAmountView.avansTitle
-        val balanceTitle = totalAmountView.balanceTitle
 
         nameCard.text = name
+        val isCardActivity = context is CardActivity
+        datePeriodCard.visibility = if (dateType > 0 && !isCardActivity) View.VISIBLE else View.GONE
         datePeriodCard.text = dateOfPeriod
-        datePeriodCard.visibility = if (visibleDate) View.VISIBLE else View.GONE
 
-        //anyTime
-        fillTotalAmount()
-
-        // назначаем значения
-        val totalAmount = totalAmount
-        sum.text = getDecimalFormatNumber(totalAmount.sum)
-        avans.text = getDecimalFormatNumber(totalAmount.avans)
-        balance.text = getDecimalFormatNumber(totalAmount.balance)
-
-        //имена
-        sumTitle.text = cardPref.sumTitle
-        avansTitle.text = cardPref.avansTitle
-        balanceTitle.text = cardPref.balanceTitle
         // визуальная настройка
         cardPref.namePref.customize(nameCard)
         cardPref.dateOfPeriodPref.customize(datePeriodCard)
 
-        cardPref.sumPref.customize(sum)
-        cardPref.sumTitlePref.customize(sumTitle)
+        //главный контейнер для заголовков и значений
+        val totalContainer: LinearLayout =
+            context.layoutInflater.inflate(
+                R.layout.total_item_layout,
+                null
+            ) as LinearLayout
+        totalContainer.layoutParams = ViewGroup.LayoutParams(matchParent, wrapContent)
 
-        cardPref.avansPref.customize(avans)
-        cardPref.avansTitlePref.customize(avansTitle)
+        //удаляем где бы не были
+        totalAmountView.totalContainerDisableScroll.removeAllViews()
+        totalAmountView.totalContainerScroll.removeAllViews()
+        // добавляем в главный лейаут
+        if (enableHorizontalScrollTotal) {
+            totalAmountView.totalContainerScroll.addView(totalContainer)
+        } else {
+            totalAmountView.totalContainerDisableScroll.addView(totalContainer)
+        }
+        // контейнер для всех значений
+        val totalValueLayout = totalContainer.totalValueContainer
+        // кнтейнер для всех заголовков
+        val totalTitleLayout = totalContainer.totalTitleContainer
 
-        cardPref.balancePref.customize(balance)
-        cardPref.balanceTitlePref.customize(balanceTitle)
+        totals.forEachIndexed { index, totalItem ->
+            // лайот где валуе и линия
+            val valueLayout =
+                context.layoutInflater.inflate(R.layout.total_item_value, null)
+            val layoutParams = LinearLayout.LayoutParams(totalItem.width, matchParent).apply {
+                weight = 1f
+            }
+            valueLayout.layoutParams = layoutParams
+            if (index == totals.size - 1) {
+                valueLayout._verLine.visibility = GONE
+            }
+
+            val title = TextView(context).apply {
+                this.layoutParams = layoutParams
+                gravity = Gravity.CENTER
+            }
+            val value = valueLayout.totalValue
+
+            title.text = totalItem.title
+            totalItem.titlePref.customize(title)
+
+            totalItem.totalPref.prefForTextView.customize(value)
+            totalItem.calcFormula(this)
+            value.text = getDecimalFormatNumber(totalItem.value, totalItem.totalPref)
+
+            totalTitleLayout.addView(title)
+            totalValueLayout.addView(valueLayout)
+        }
+
     }
 
     fun updateTypeControlColumn(column: Column) {
@@ -351,33 +406,15 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
 }
 
 class PrefForCard(
-    var sumTitle: String = "СУММА",
-    var avansTitle: String = "АВАНС",
-    var balanceTitle: String = "ОСТАТОК",
-
     var namePref: PrefForTextView = PrefForTextView(),
-    var dateOfPeriodPref: PrefForTextView = PrefForTextView(),
+    var dateOfPeriodPref: PrefForTextView = PrefForTextView()
 
-    var sumTitlePref: PrefForTextView = PrefForTextView(),
-    var sumPref: PrefForTextView = PrefForTextView(),
-    var avansTitlePref: PrefForTextView = PrefForTextView(),
-    var avansPref: PrefForTextView = PrefForTextView(),
-    var balanceTitlePref: PrefForTextView = PrefForTextView(),
-    var balancePref: PrefForTextView = PrefForTextView()
 ) {
     fun initDefault(): PrefForCard {
         namePref.color = Color.WHITE
         val app = App.instance
         if (app != null) {
             dateOfPeriodPref.color = app.getColorFromRes(R.color.gray)
-            val titcleColor = app.getColorFromRes(R.color.light_gray)
-            sumTitlePref.color = titcleColor
-            avansTitlePref.color = titcleColor
-            balanceTitlePref.color = titcleColor
-
-            sumPref.color = app.getColorFromRes(R.color.color_sum)
-            avansPref.color = app.getColorFromRes(R.color.color_avans)
-            balancePref.color = app.getColorFromRes(R.color.color_balance)
         }
         return this
     }
@@ -461,21 +498,59 @@ class Cell(
     }
 }
 
+class TotalItem {
+
+    var width = 250
+    var formula: Formula = Formula()
+    var title: String = "ИТОГ"
+    var value = 0.0
+    var titlePref: PrefForTextView = PrefForTextView().apply {
+        color = Color.WHITE
+    }
+    var totalPref: NumberTypePref = NumberTypePref().apply {
+        prefForTextView.color = Color.WHITE
+    }
+
+    fun calcFormula(card: Card) {
+        val string = java.lang.StringBuilder()
+        formula.formulaElements.forEach {
+            if (it.type == COLUMN_ID) {
+                string.append(card.getSumFromColumn(it.value.toLong()))
+            } else
+                string.append(it.value)
+        }
+        value = try {
+            Calc().evaluate(string.toString())
+        } catch (exception: Exception) {
+            0.0
+        }
+    }
+
+    private fun Card.getSumFromColumn(id: Long): String {
+        var index = -1
+        columns.forEachIndexed { i, column ->
+            if (column.id == id) {
+                index = i
+                return@forEachIndexed
+            }
+        }
+        val calc = Calc()
+        var value = 0.0
+        if (index > -1)
+            rows.forEach {
+                val cell = it.cellList[index]
+                value += calc.evaluate(cell.sourceValue)
+            }
+
+        return value.toString()
+
+    }
+}
+
 class Row {
     val dateCreated = Date().time
     var dateModify = Date().time
     var cellList = mutableListOf<Cell>()
-}
-
-class TotalAmountOfCard {
-    var sum: Double = 0.0
-
-    var avans = 0.0
-
-    val balance: Double
-        get() {
-            return (sum - avans)
-        }
 }
 
 //
@@ -524,4 +599,19 @@ class PhoneTypeValue(
 class ListType {
     var listName: String = ""
     var list: MutableList<String> = mutableListOf()
+}
+
+class Formula {
+    internal companion object {
+        val OTHER = 0
+        val COLUMN_ID = 1
+    }
+
+    val formulaElements = mutableListOf<FormulaElement>()
+
+    class FormulaElement {
+        var type = 0
+        var value: String = ""
+    }
+
 }

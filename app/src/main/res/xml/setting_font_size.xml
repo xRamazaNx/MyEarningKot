@@ -52,7 +52,7 @@
             android:entries="@array/font_size"
             android:entryValues="@array/font_size"
             android:key="@string/date_period_key"
-            android:title="@string/date_period"/>
+            android:title="@string/day_period"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:title="@string/font_size_obshee_category">

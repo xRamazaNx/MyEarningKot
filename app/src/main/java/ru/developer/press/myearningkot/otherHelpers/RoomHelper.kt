@@ -170,6 +170,7 @@ class SampleHelper {
 
 }
 
+// чтобы узнать мы открыли в настройках карточку или шаблон
 class PrefCardInfo(
     var idCard: Long,
     var cardCategory: CardCategory

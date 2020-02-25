@@ -10,7 +10,8 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/cent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -19,38 +20,99 @@
 
             <include layout="@layout/prefs_text_view" />
 
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:alpha="0.5"
+                android:background="@color/color_normal" />
+
+
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/cent"
-                android:orientation="vertical">
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:alpha="0.5"
-                    android:background="@color/color_normal" />
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
                 <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:drawablePadding="16dp"
+                    android:ellipsize="end"
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:padding="16dp"
+                    android:singleLine="true"
+                    android:text="@string/digits_count"
+                    android:textColor="@color/light_gray" />
+
+                <ImageButton
+
+                    android:id="@+id/digitsCountDown"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:src="@drawable/ic_down" />
+
+                <TextView
+                    android:id="@+id/digitsSize"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="16dp"
-                    android:paddingTop="16dp"
-                    android:paddingEnd="16dp"
-                    android:paddingBottom="4dp"
-                    android:text="Выберите колоны для суммирования"
-                    android:textColor="@color/gray_1" />
+                    android:padding="8dp"
+                    android:text="size"
+                    android:textColor="@color/light_gray" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/totalRecycler"
-                    android:layout_width="match_parent"
+                <ImageButton
+
+                    android:id="@+id/digitsCountUp"
+                    android:layout_width="40dp"
                     android:layout_height="match_parent"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:paddingBottom="16dp" />
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:rotation="180"
+                    android:src="@drawable/ic_down" />
+
             </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:alpha="0.5"
+                android:background="@color/color_normal" />
+
+            <Switch
+                android:id="@+id/groupNumberSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="16dp"
+                android:text="@string/group_number"
+                android:textColor="@color/light_gray" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:alpha="0.5"
+                android:background="@color/color_normal" />
+
+            <TextView
+                android:id="@+id/formulaTotal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableEnd="@drawable/ic_show_total_info"
+                android:drawablePadding="16dp"
+                android:padding="16dp"
+                android:text="@string/formula"
+                android:textColor="@color/light_gray"
+                android:textSize="14sp" />
 
         </LinearLayout>
     </ScrollView>

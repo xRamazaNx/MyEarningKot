@@ -7,11 +7,11 @@
     >
 
     <ProgressBar
-        android:elevation="1dp"
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        android:elevation="1dp" />
 
 
     <com.google.android.material.appbar.AppBarLayout
@@ -88,7 +88,7 @@
                     android:layout_weight="1"
 
                     />
-<!--                    android:background="@drawable/shape_table_view"-->
+                <!--                    android:background="@drawable/shape_table_view"-->
 
             </LinearLayout>
 
@@ -96,16 +96,66 @@
     </ru.developer.press.myearningkot.ScrollContainer>
 
 
-    <include
-        android:id="@+id/totalAmountView"
-        layout="@layout/card"
+    <LinearLayout
+        android:id="@+id/_container_plate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_marginStart="-3dp"
-        android:layout_marginEnd="-3dp"
+        android:orientation="horizontal"
         app:layout_anchor="@id/tableView"
-        app:layout_anchorGravity="bottom" />
+        app:layout_anchorGravity="bottom">
+
+
+        <include
+            android:id="@+id/totalAmountView"
+            layout="@layout/card"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="-3dp"
+            android:layout_marginEnd="-3dp"
+            android:layout_weight="1" />
+
+        <FrameLayout
+            android:background="@color/cent_light"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"/>
+
+
+        <RelativeLayout
+            android:id="@+id/prefButtonContainer"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:background="@color/cent"
+            android:gravity="end"
+            android:orientation="vertical">
+
+
+            <ImageButton
+                android:id="@+id/plateSetting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:background="?android:attr/selectableItemBackground"
+                android:contentDescription="@string/setting_total"
+                android:padding="8dp"
+                android:src="@drawable/ic_setting_build" />
+
+            <ImageButton
+                android:id="@+id/addTotal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:background="?android:attr/selectableItemBackground"
+                android:contentDescription="@string/setting_total"
+                android:padding="4dp"
+                android:src="@drawable/ic_add_column"
+                />
+        </RelativeLayout>
+    </LinearLayout>
 
 
     <uk.co.markormesher.android_fab.FloatingActionButton
@@ -115,7 +165,7 @@
         app:buttonBackgroundColour="@color/greenButton"
         app:buttonIcon="@drawable/ic_add_not_ring"
         app:fabSize="normal"
-        app:layout_anchor="@id/totalAmountView" />
+        app:layout_anchor="@id/_container_plate" />
 
 
     <ru.developer.press.myearningkot.otherHelpers.PrefLayouts.WidthLineDrawer

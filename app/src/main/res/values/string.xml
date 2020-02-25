@@ -274,7 +274,7 @@
     <string name="press_element">Нажать на элементы для настройки</string>
     <string name="pass_in_open">Пароль на вход</string>
     <string name="security">БЕЗОПАСНОСТЬ</string>
-    <string name="date_period">Дневной период</string>
+    <string name="day_period">Дневной период</string>
     <string name="date_period_key">date_period</string>
     <string name="period">Период</string>
     <string name="name_header">Имена заголовков</string>

@@ -56,17 +56,17 @@ class AdapterRecyclerInPage(
     ) : RecyclerView.ViewHolder(view) {
         private var idCard: Long = -1
 
-        private val nameCard = itemView.nameCard
-        private val dateOfPeriod = itemView.datePeriodCard
-
-        private val sumTitle = itemView.sumTitle
-        private val sum = itemView.sum
-
-        private val avansTitle = itemView.avansTitle
-        private val avans = itemView.avans
-
-        private val balanceTitle = itemView.balanceTitle
-        private val balance = itemView.balance
+//        private val nameCard = itemView.nameCard
+//        private val dateOfPeriod = itemView.datePeriodCard
+//
+//        private val sumTitle = itemView.sumTitle
+//        private val sum = itemView.sum
+//
+//        private val avansTitle = itemView.avansTitle
+//        private val avans = itemView.avans
+//
+//        private val balanceTitle = itemView.balanceTitle
+//        private val balance = itemView.balance
 
         init {
             itemView.setOnClickListener {

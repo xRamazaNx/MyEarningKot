@@ -47,33 +47,51 @@ class PrefSelectedControl {
                             return
                         }
                     }
+                } else if (it is SelectedElement.ElementTotal &&
+                    _selectedElement is SelectedElement.ElementTotal
+                ) {
+                    if (it.index == _selectedElement.index) {
+                        unSelect(it)
+                        return
+                    }
                 } else {
                     unSelect(it)
-                    return
                 }
             }
         }
 
         // если нажали на колону
-        if (_selectedElement.elementType == ElementType.COLUMN) {
-            // если до этого было выделено другое
-            if (selectedElementList.any { it.elementType != ElementType.COLUMN }) {
-                // убираем все выделения
-                unSelectAll()
+        when (_selectedElement.elementType) {
+            ElementType.COLUMN -> {
+                // если до этого было выделено другое
+                if (selectedElementList.any { it.elementType != ElementType.COLUMN }) {
+                    // убираем все выделения
+                    unSelectAll()
+                }
+                selectedElementList.add(_selectedElement)
+                selectCallback?.select(_selectedElement)
+
             }
-            selectedElementList.add(_selectedElement)
-            selectCallback?.select(_selectedElement)
+            ElementType.TOTAL -> {
+                // если нажали на не колону и в нем присутсвует колона
+                // и проверяем что это не колона заголовок а именно колона по типу
+                if (selectedElementList.any { it.elementType != ElementType.TOTAL }) {
+                    unSelectAll()
+                }
 
-        } else {
-            // если нажали на не колону и в нем присутсвует колона
-            // и проверяем что это не колона заголовок а именно колона по типу
-            if (selectedElementList.any { it.elementType == ElementType.COLUMN }) {
-                unSelectAll()
+                selectedElementList.add(_selectedElement)
+                selectCallback?.select(_selectedElement)
+
             }
+            else -> {
 
-            selectedElementList.add(_selectedElement)
-            selectCallback?.select(_selectedElement)
-
+                if (selectedElementList.any { it.elementType == ElementType.TOTAL }
+                    || selectedElementList.any { it.elementType == ElementType.COLUMN }) {
+                    unSelectAll()
+                }
+                selectedElementList.add(_selectedElement)
+                selectCallback?.select(_selectedElement)
+            }
         }
         selectCallback?.setVisiblePrefButton(isSelect)
     }
@@ -110,6 +128,9 @@ class PrefSelectedControl {
 
             if (it.elementType == ElementType.COLUMN) {
                 elementPref.elementPrefType = ElementPrefType.COLUMN
+                return@forEach
+            } else if (it.elementType == ElementType.TOTAL){
+                elementPref.elementPrefType = ElementPrefType.TOTAL
                 return@forEach
             }
         }
@@ -261,14 +282,18 @@ class PrefSelectedControl {
     fun deleteColumns() {
         selectCallback?.deleteColumns(selectedElementList)
     }
+
+    fun updateSelected() {
+        selectedElementList.forEach {
+            selectCallback?.select(it)
+        }
+    }
 }
 
 abstract class SelectedElement(
     var oldDrawable: Drawable?,
     var elementType: ElementType
 ) {
-    @SerializedName(column_type_gson)
-    var className = javaClass.name
 
     class ElementTextView(oldDrawable: Drawable?, elementType: ElementType) :
         SelectedElement(oldDrawable, elementType)
@@ -277,13 +302,18 @@ abstract class SelectedElement(
         var columnIndex: Int,
         elementType: ElementType,
         drawable: Drawable?
-    ) :
-        SelectedElement(drawable, elementType)
+    ) : SelectedElement(drawable, elementType)
 
     class ElementColumn(columnIndex: Int, elementType: ElementType, drawable: Drawable?) :
         ElementColumnTitle(columnIndex, elementType, drawable) {
         var columnType = ColumnType.TEXT
     }
+
+    class ElementTotal(
+        val index: Int,
+        oldDrawable: Drawable?,
+        elementType: ElementType
+    ) : SelectedElement(oldDrawable, elementType)
 }
 
 interface SelectCallback {
@@ -298,8 +328,8 @@ interface SelectCallback {
 
 enum class ElementType {
     COLUMN, COLUMN_TITLE,
-    NAME, DATE,
-    SUM, SUM_TITLE, AVANS, AVANS_TITLE, BALANCE, BALANCE_TITLE
+    TOTAL, TOTAL_TITLE,
+    NAME, DATE
 }
 
 class ElementPref {
@@ -309,7 +339,7 @@ class ElementPref {
 }
 
 enum class ElementPrefType {
-    COLUMN, TEXT_VIEW
+    COLUMN, TEXT_VIEW, TOTAL
 }
 
 fun setSelectBackground(view: View) {

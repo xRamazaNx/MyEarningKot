@@ -10,6 +10,7 @@ import androidx.core.widget.addTextChangedListener
 import com.jaredrummler.android.colorpicker.ColorPickerDialog
 import com.jaredrummler.android.colorpicker.ColorPickerDialogListener
 import kotlinx.android.synthetic.main.prefs_text_view.view.*
+import kotlinx.android.synthetic.main.prefs_total.view.*
 import kotlinx.android.synthetic.main.prefs_with_name.view.*
 import kotlinx.android.synthetic.main.toolbar_pref.view.*
 import org.jetbrains.anko.backgroundResource
@@ -17,7 +18,9 @@ import org.jetbrains.anko.image
 import org.jetbrains.anko.layoutInflater
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.activity.BasicCardActivity
+import ru.developer.press.myearningkot.model.NumberColumn
 import ru.developer.press.myearningkot.model.PrefForTextView
+import ru.developer.press.myearningkot.model.TotalItem
 import ru.developer.press.myearningkot.otherHelpers.getColorFromRes
 
 fun Context.getPrefTextLayout(
@@ -39,7 +42,7 @@ fun Context.getPrefTextLayout(
     } else
         layoutInflater.inflate(R.layout.prefs_no_name, null)
 
-    fun init (){
+    fun init() {
         textPrefButtonsInit(view, prefForTextView, isWorkAlignPanel) {
             callback?.prefChanged()
         }
@@ -51,12 +54,55 @@ fun Context.getPrefTextLayout(
             it.color = Color.LTGRAY
         }
         callback?.prefChanged()
-         init()
+        init()
     }
 
 
     return view
 }
+
+
+fun Context.getPrefTotalLayout(
+    totals: MutableList<TotalItem>,
+    callback: PrefTotalChangedCallBack
+): View {
+
+    val view = layoutInflater.inflate(R.layout.prefs_total, null)
+
+    val prefList = mutableListOf<PrefForTextView>().apply {
+        totals.forEach {
+            add(it.totalPref.prefForTextView)
+        }
+    }
+
+    fun init() {
+        textPrefButtonsInit(view, prefList, false) {
+            callback.prefChanged()
+        }
+    }
+    init()
+    view.defaultPref.setOnClickListener {
+        totals.forEach {
+            it.totalPref.resetPref()
+            it.totalPref.prefForTextView.color = Color.LTGRAY
+        }
+        callback.prefChanged()
+        init()
+    }
+
+    view.formulaTotal.setOnClickListener {
+        formulaDialogShow(this, callback.getNumberColumns()) { formula ->
+            totals.forEach {
+                it.formula = formula
+            }
+            callback.calcFormula()
+        }
+    }
+
+
+    return view
+}
+
 
 fun textPrefButtonsInit(
     view: View,
@@ -139,7 +185,7 @@ fun textPrefButtonsInit(
         alignCenter.setOnClickListener {
             prefForTextViewList.forEach {
 
-            it.align = TextView.TEXT_ALIGNMENT_CENTER
+                it.align = TextView.TEXT_ALIGNMENT_CENTER
             }
             initAlign()
             prefChanged()
@@ -147,7 +193,7 @@ fun textPrefButtonsInit(
         alignRight.setOnClickListener {
             prefForTextViewList.forEach {
 
-            it.align = TextView.TEXT_ALIGNMENT_TEXT_END
+                it.align = TextView.TEXT_ALIGNMENT_TEXT_END
             }
             initAlign()
             prefChanged()
@@ -246,6 +292,12 @@ private fun setPressedBackground(boldButton: ImageButton) {
 interface PrefTextChangedCallback {
     fun nameEdit(text: String)
     fun prefChanged()
+}
+
+interface PrefTotalChangedCallBack {
+    fun prefChanged()
+    fun calcFormula()
+    fun getNumberColumns(): MutableList<NumberColumn>
 }
 /*
 класс который помогает выделять и убирать вылеление

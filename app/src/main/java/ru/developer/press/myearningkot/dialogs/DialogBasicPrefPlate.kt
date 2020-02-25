@@ -9,6 +9,8 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.card_basic_pref_layout.view.*
+import kotlinx.android.synthetic.main.card_basic_pref_layout.view.switchEnableHorizontalScroll
+import kotlinx.android.synthetic.main.plate_basic_pref_layout.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -22,7 +24,7 @@ import ru.developer.press.myearningkot.otherHelpers.getDateTypeList
 import ru.developer.press.myearningkot.otherHelpers.getValutaTypeList
 import ru.developer.press.myearningkot.otherHelpers.showItemChangeDialog
 
-class DialogBasicPrefCard(
+class DialogBasicPrefPlate(
     val card: Card,
     val basicPrefEvent: () -> Unit
 ) : DialogFragment() {
@@ -37,43 +39,40 @@ class DialogBasicPrefCard(
                 setPadding(dp24, dp24, dp24, dp8)
                 textSize = 22f
             })
-            val view = context.layoutInflater.inflate(R.layout.card_basic_pref_layout, null)
+            val view = context.layoutInflater.inflate(R.layout.plate_basic_pref_layout, null)
 
-            // выбор валюты
-            val textViewValutaType = view.textViewValutaType
-            val listValutaType = getValutaTypeList()
-            textViewValutaType.text =
-                "${getString(R.string.change_valuta)} (${listValutaType[card.valuta]})"
-            textViewValutaType.setOnClickListener {
+            // выбор типа даты
+            val textViewDateType = view.textViewDateType
+            val listDateType = getDateTypeList()
+            textViewDateType.text =
+                "${getString(R.string.date_type)} (${listDateType[card.dateType]})"
+            textViewDateType.setOnClickListener {
                 context.showItemChangeDialog(
-                    "Выберите валюту",
-                    listValutaType,
-                    card.valuta,
+                    "Выберите тип даты",
+                    listDateType,
+                    card.dateType,
                     null,
                     fun(selected) {
-                        card.valuta = selected
-                        textViewValutaType.text =
-                            "${getString(R.string.change_valuta)} (${listValutaType[selected]})"
+                        card.dateType = selected
+                        textViewDateType.text =
+                            "${getString(R.string.date_type)} (${listDateType[selected]})"
                         updateCard()
                     })
             }
-
-
             val switchEnableHorizontalScroll = view.switchEnableHorizontalScroll
-            val switchEnableSomeStroke = view.switchEnableSomeStroke
+            val switchShowTotalInfo = view.switchShowTotalInfo
 
             switchEnableHorizontalScroll.isChecked = card.enableHorizontalScroll
-            switchEnableSomeStroke.isChecked = card.enableSomeStroke
+            switchShowTotalInfo.isChecked = card.isShowTotalInfo
 
             switchEnableHorizontalScroll.setOnCheckedChangeListener { _, b ->
-                card.enableHorizontalScroll = b
+                card.enableHorizontalScrollTotal = b
                 updateCard()
             }
-            switchEnableSomeStroke.setOnCheckedChangeListener { _, b ->
-                card.enableSomeStroke = b
+            switchShowTotalInfo.setOnCheckedChangeListener { _, isChecked ->
+                card.isShowTotalInfo = isChecked
                 updateCard()
             }
-
             setView(view)
             setPositiveButton(" ") { dialogInterface: DialogInterface, _: Int ->
                 dialogInterface.dismiss()

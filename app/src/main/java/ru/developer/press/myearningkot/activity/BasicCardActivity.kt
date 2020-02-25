@@ -4,7 +4,10 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.contains
@@ -12,7 +15,11 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import kotlinx.android.synthetic.main.activity_card.*
+import kotlinx.android.synthetic.main.card.*
 import kotlinx.android.synthetic.main.card.view.*
+import kotlinx.android.synthetic.main.formula_layout.view.*
+import kotlinx.android.synthetic.main.title_column.view.*
+import kotlinx.android.synthetic.main.total_item.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,6 +34,7 @@ import ru.developer.press.myearningkot.otherHelpers.bindTitleOfColumn
 @SuppressLint("Registered")
 abstract class BasicCardActivity : AppCompatActivity() {
     protected lateinit var adapter: AdapterRecyclerInCard
+    val totalViewList = mutableListOf<View>()
     val columnContainer = LinearLayout(App.instance!!.applicationContext).also {
         it.layoutParams =
             LinearLayout.LayoutParams(
@@ -52,7 +60,6 @@ abstract class BasicCardActivity : AppCompatActivity() {
     }
 
 
-
     fun doStart() {
         viewModel?.apply {
             val diametric = resources.displayMetrics
@@ -60,7 +67,7 @@ abstract class BasicCardActivity : AppCompatActivity() {
             displayParam.height = diametric.heightPixels
 
             // создаем заголовки колон и подписываемся
-            createTitlesFromCard()
+            createTitles()
             // подписываем
             observeTotalAmount()
         }
@@ -99,7 +106,6 @@ abstract class BasicCardActivity : AppCompatActivity() {
                     columnDisableScrollContainer.addView(columnContainer)
             }
         }
-
     }
 
     protected open fun createRecyclerView() {
@@ -113,7 +119,6 @@ abstract class BasicCardActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(this@BasicCardActivity)
 
             this@BasicCardActivity.adapter = getAdapterForRecycler()
-
 
             adapter = this@BasicCardActivity.adapter
 
@@ -134,7 +139,7 @@ abstract class BasicCardActivity : AppCompatActivity() {
         }, viewModel!!, viewModel!!.card.rows)
     }
 
-    fun createTitlesFromCard() {
+    fun createTitles() {
         columnContainer.removeAllViews()
         viewModel?.columnLDList?.forEach { column ->
             val title: TextView =
@@ -156,15 +161,25 @@ abstract class BasicCardActivity : AppCompatActivity() {
                     }
                 }
             }
-            totalAmountView.setShowTotalInfo(viewModel!!.card.isShowTotalInfo)
+            setShowTotalInfo(viewModel!!.card.isShowTotalInfo)
         }
     }
 
+    protected fun setShowTotalInfo(showTotalInfo: Boolean){
+        totalAmountView.setShowTotalInfo(showTotalInfo)
+        if (showTotalInfo)
+            addTotal.visibility = VISIBLE
+        else
+            addTotal.visibility = GONE
+    }
 }
 
- fun View.setShowTotalInfo(showTotalInfo: Boolean) {
-    if (showTotalInfo)
-        total_container.visibility = View.VISIBLE
-    else
-        total_container.visibility = View.GONE
+fun View.setShowTotalInfo(showTotalInfo: Boolean) {
+    if (showTotalInfo) {
+        totalContainerDisableScroll.visibility = View.VISIBLE
+        totalContainerScroll.visibility = View.VISIBLE
+    } else {
+        totalContainerDisableScroll.visibility = View.GONE
+        totalContainerScroll.visibility = View.GONE
+    }
 }

@@ -56,9 +56,9 @@ class PageViewModel(private val pageList: MutableList<Page> = mutableListOf()) :
         updateView: (position: Int) -> Unit
     ) {
         // временная суета...
-        repeat(100) {
-            card.addRow()
-        }
+//        repeat(100) {
+//            card.addRow()
+//        }
         // добавляем в базу данных новую Card присовение ид очень важно
         val page = pageList[indexPage]
         card.idPage = page.id
@@ -139,6 +139,10 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
             }
 
         }
+    }
+
+    fun updatePlateChanged(){
+        cardLiveData.value = card
     }
 
     private fun updateTypeControl() {

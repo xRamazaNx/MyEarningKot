@@ -81,6 +81,7 @@ dependencies {
     implementation 'org.greenrobot:eventbus:3.1.1'
 
     implementation 'com.bugsnag:bugsnag-android:4.22.3'
+
 //    implementation 'com.github.tiper:MaterialSpinner:1.4.0'
 //    implementation 'com.android.support:design:android.design.version.here'
 
@@ -88,4 +89,7 @@ dependencies {
 
 //    implementation "com.mikepenz:materialdrawer:8.0.0-a01"
 //    implementation "com.mikepenz:materialdrawer-nav:8.0.0-a01"
+
+
+//    implementation 'com.github.ZieIony:Calc:e2fa48c599'
 }

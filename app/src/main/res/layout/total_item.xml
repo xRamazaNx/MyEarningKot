@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/cent">
+
+    <TextView
+        android:id="@+id/totalTitle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="0dp"
+        android:gravity="center"
+        android:padding="4dp"
+        android:text="TextView"
+        android:textColor="@color/white" />
+
+    <FrameLayout
+        android:id="@+id/_horLine"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_below="@id/totalTitle"
+        android:background="@color/color_polosa_razdelitel">
+
+    </FrameLayout>
+
+    <TextView
+        android:textColor="@color/white"
+        android:id="@+id/totalValue"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/_horLine"
+        android:gravity="center"
+        android:padding="4dp"
+        android:text="TextView" />
+
+    <FrameLayout
+        android:layout_alignBottom="@id/totalValue"
+        android:layout_marginBottom="4dp"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/_verLine"
+        android:layout_width="1px"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/totalTitle"
+        android:background="@color/color_polosa_razdelitel">
+
+    </FrameLayout>
+
+</RelativeLayout>

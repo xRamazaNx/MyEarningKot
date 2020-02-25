@@ -52,7 +52,7 @@ class App : Application() {
                         CoroutineScope(Dispatchers.IO).launch {
                             sampleJsonDao.insert(SampleJson().apply {
                                 json = Gson().toJson(Card(name = "Доход").apply {
-                                    deleteColumn()
+//                                    deleteColumn()
                                     val summaColumn =
                                         addColumn(ColumnType.NUMBER, getString(R.string.summa)) as NumberColumn
                                     summaColumn.sumCheck = true
@@ -67,6 +67,14 @@ class App : Application() {
                                     addColumn(ColumnType.DATE, getString(R.string.date)).apply {
                                         width = 430
                                     }
+
+                                    // временная суета...
+                                    repeat(30) {
+                                        addRow()
+                                    }
+
+                                    addTotal()
+                                    addTotal()
                                 })
                             })
                             // расход
@@ -89,6 +97,12 @@ class App : Application() {
                                     addColumn(ColumnType.DATE, getString(R.string.date)).apply {
                                         width = 430
                                     }
+                                    // временная суета...
+                                    repeat(30) {
+                                        addRow()
+                                    }
+                                    addTotal()
+                                    addTotal()
                                 })
                             })
                             //долги
@@ -111,6 +125,12 @@ class App : Application() {
                                     addColumn(ColumnType.DATE, getString(R.string.date)).apply {
                                         width = 430
                                     }
+                                    // временная суета...
+                                    repeat(30) {
+                                        addRow()
+                                    }
+                                    addTotal()
+                                    addTotal()
                                 })
                             })
 //

@@ -73,3 +73,7 @@ enum class SetNameOf {
     PAGE,
     OTHER
 }
+
+enum class InputTypeNumberColumn{
+    MANUAL, FORMULA
+}
