@@ -14,7 +14,6 @@ import org.jetbrains.anko.textColor
 import org.jetbrains.anko.wrapContent
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.dpsToPixels
-import ru.developer.press.myearningkot.model.Column
 import ru.developer.press.myearningkot.model.Formula
 import ru.developer.press.myearningkot.model.Formula.Companion.COLUMN_ID
 import ru.developer.press.myearningkot.model.Formula.Companion.OTHER
@@ -26,16 +25,22 @@ import java.lang.Exception
 import java.lang.StringBuilder
 
 
-class FormulaLayout(val view: View, columns: List<NumberColumn>) {
-    private val subtractChar = "−"
-    private val multiplyChar = "×"
-    private val formula = Formula()
-    private val columnList = mutableListOf<Column>()
+    val subtractChar = "−"
+    val multiplyChar = "×"
+class FormulaLayout(
+    val view: View,
+    filterNColumns: List<NumberColumn>,
+    private val allNColumns: List<NumberColumn> = filterNColumns,
+    _formula: Formula
+) {
+    private var formula = Formula()
+    private val columnList = mutableListOf<NumberColumn>()
     private val displayTextView: TextView = view.formulaTextView
 
     init {
 
-        columnList.addAll(columns)
+        formula.copyFrom(_formula)
+        columnList.addAll(filterNColumns)
 
         initClickNumbers()
         initClickOperation()
@@ -49,6 +54,8 @@ class FormulaLayout(val view: View, columns: List<NumberColumn>) {
                 }
             }
         }
+
+        displayFormula()
     }
 
     private fun initClickColumns() {
@@ -145,24 +152,7 @@ class FormulaLayout(val view: View, columns: List<NumberColumn>) {
     }
 
     private fun displayFormula() {
-        val strBuilder = StringBuilder()
-        formula.formulaElements.forEach { element ->
-            if (element.type == COLUMN_ID) {
-                columnList.forEach {
-                    if (it.id == element.value.toLong()) {
-                        strBuilder.append(it.name)
-                    }
-                }
-            } else {
-                var value = element.value
-                if (value == "-")
-                    value = subtractChar
-                if (value == "*")
-                    value = multiplyChar
-                strBuilder.append(value)
-            }
-        }
-        displayTextView.text = strBuilder
+        displayTextView.text = formula.getFormulaString(allNColumns)
         displayTextView.textColor = Color.GRAY
     }
 
@@ -200,12 +190,14 @@ class FormulaLayout(val view: View, columns: List<NumberColumn>) {
 
 
 fun formulaDialogShow(
+    formula: Formula,
     context: Context,
-    columns: MutableList<NumberColumn>,
+    filterNColumns: List<NumberColumn>,
+    allNColumns: List<NumberColumn> = filterNColumns,
     positiveClick: (Formula) -> Unit
 ) {
     val inflate = View.inflate(context, R.layout.formula_layout, null)
-    val formulaLayout = FormulaLayout(inflate, columns)
+    val formulaLayout = FormulaLayout(inflate, filterNColumns, allNColumns, formula)
 
     val dialog = context.alertDialog {
         setCustomTitle(TextView(context).apply {

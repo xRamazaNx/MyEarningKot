@@ -24,10 +24,8 @@ import kotlinx.android.synthetic.main.card.*
 import kotlinx.android.synthetic.main.card.datePeriodCard
 import kotlinx.android.synthetic.main.card.nameCard
 import kotlinx.android.synthetic.main.card.view.*
-import kotlinx.android.synthetic.main.total_item.view.*
 import kotlinx.android.synthetic.main.total_item.view.totalValue
 import kotlinx.android.synthetic.main.total_item_layout.view.*
-import kotlinx.android.synthetic.main.total_item_value.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -541,7 +539,7 @@ class PrefCardActivity : BasicCardActivity() {
 
                                                     ElementType.COLUMN_TITLE -> {
                                                         val elementColumn =
-                                                            it as SelectedElement.ElementColumn
+                                                            it as SelectedElement.ElementColumnTitle
                                                         val column =
                                                             card.columns[elementColumn.columnIndex]
                                                         column.name = text

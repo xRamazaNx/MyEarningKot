@@ -53,13 +53,9 @@ class App : Application() {
                             sampleJsonDao.insert(SampleJson().apply {
                                 json = Gson().toJson(Card(name = "Доход").apply {
 //                                    deleteColumn()
-                                    val summaColumn =
-                                        addColumn(ColumnType.NUMBER, getString(R.string.summa)) as NumberColumn
-                                    summaColumn.sumCheck = true
+                                        addColumn(ColumnType.NUMBER, getString(R.string.summa))
 
-                                    val avansColumn =
-                                        addColumn(ColumnType.NUMBER, getString(R.string.avans)) as NumberColumn
-                                    avansColumn.avansCheck = true
+                                        addColumn(ColumnType.NUMBER, getString(R.string.avans))
 
                                     addColumn(ColumnType.TEXT, getString(R.string.note)).apply {
                                         width = 450
@@ -82,11 +78,9 @@ class App : Application() {
                                 json = Gson().toJson(Card(name = "Расход").apply {
                                     deleteColumn()
 
-                                    val sumColumn = addColumn(ColumnType.NUMBER, "Бюджет") as NumberColumn
-                                    sumColumn.sumCheck = true
+                                    addColumn(ColumnType.NUMBER, "Бюджет") as NumberColumn
 
-                                    val avansColumn = addColumn(ColumnType.NUMBER, "Потрачено") as NumberColumn
-                                    avansColumn.avansCheck = true
+                                    addColumn(ColumnType.NUMBER, "Потрачено") as NumberColumn
 
                                     addColumn(ColumnType.LIST, "Категория").apply {
                                         width = 430
@@ -110,11 +104,9 @@ class App : Application() {
                                 json = Gson().toJson(Card(name = "Мои долги").apply {
                                     deleteColumn()
 
-                                    val sumColumn = addColumn(ColumnType.NUMBER, "Должен") as NumberColumn
-                                    sumColumn.sumCheck = true
+                                    addColumn(ColumnType.NUMBER, "Должен") as NumberColumn
 
-                                    val avansColumn = addColumn(ColumnType.NUMBER, "Оплатил") as NumberColumn
-                                    avansColumn.avansCheck = true
+                                    addColumn(ColumnType.NUMBER, "Оплатил") as NumberColumn
 
                                     addColumn(ColumnType.LIST, "Кому").apply {
                                         width = 430

@@ -91,7 +91,7 @@ fun Context.getPrefTotalLayout(
     }
 
     view.formulaTotal.setOnClickListener {
-        formulaDialogShow(this, callback.getNumberColumns()) { formula ->
+        formulaDialogShow(totals[0].formula, this, callback.getNumberColumns()) { formula ->
             totals.forEach {
                 it.formula = formula
             }

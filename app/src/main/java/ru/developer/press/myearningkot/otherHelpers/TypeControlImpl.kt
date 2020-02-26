@@ -97,7 +97,11 @@ class NumerationTypeControl(
 class NumberTypeControl(
     provideValueProperty: ProvideValueProperty
 
-) : TextTypeControl(provideValueProperty)
+) : TextTypeControl(provideValueProperty){
+    override fun display(view: View, value: String) {
+        super.display(view, value)
+    }
+}
 
 class DateTypeControl(
     provideValueProperty: ProvideValueProperty

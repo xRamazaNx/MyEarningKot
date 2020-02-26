@@ -6,7 +6,6 @@ import android.graphics.drawable.ColorDrawable
 import android.view.View
 import android.widget.SeekBar
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnItemDragListener
@@ -22,7 +21,6 @@ import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.adapters.AdapterRecyclerPhoneParams
 import ru.developer.press.myearningkot.adapters.ParamModel
-import ru.developer.press.myearningkot.dpsToPixels
 import ru.developer.press.myearningkot.model.*
 import ru.developer.press.myearningkot.otherHelpers.*
 import splitties.alertdialog.appcompat.alertDialog
@@ -254,9 +252,37 @@ class PrefNumberColumnLayout(
         val context = view.context
         formulaInput.setOnClickListener {
 
-            formulaDialogShow(context, prefColumnChangedCallback.getNumberColumns().apply {
+            val allColumns = prefColumnChangedCallback.getNumberColumns()
+
+            val filterColumns = mutableListOf<NumberColumn>().apply {
+                addAll(allColumns)
+                // удаляем сами выбранные колоны
                 removeAll(numberColumns)
-            }) { formula ->
+                //удаляем те колоны которые указывают в формуле на выбранные колоны
+                // цикл по всем нумберколонам
+                mutableListOf<NumberColumn>().also { listToFind ->
+                    listToFind.addAll(this)
+                }.forEach {
+                    // если колона настроена на формулу
+                    if (it.inputType == InputTypeNumberColumn.FORMULA) {
+                        // достаем из этой колоны все ид колон задействованных в формуле
+                        val columnIdList = it.formula.getColumnIdList()
+                        // смотрим в цикле встречаются ли в них те колоны которые выделены
+                        columnIdList.forEach { id ->
+                            // проверяем у всех выделенных
+                            numberColumns.forEach { selectColumn ->
+                                // одна из выбранных колон учавствует в формуле в не выделеной колоне(все выделенные и так не попадают в список в формуле)
+                                if (selectColumn.id == id) {
+                                    // удаляем в алл эту колону
+                                    this.remove(it)
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+            formulaDialogShow(numberColumn.formula, context, filterColumns, allColumns) { formula ->
                 select(formulaInput)
                 unSelect(manualInput)
 

@@ -6,6 +6,7 @@ import com.google.gson.annotations.SerializedName
 import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.adapters.ParamModel
 import ru.developer.press.myearningkot.otherHelpers.*
+import java.lang.Exception
 import java.util.*
 import kotlin.random.Random
 
@@ -91,10 +92,8 @@ class TextColumn(name: String) : Column(name) {
 class NumberColumn(name: String) : Column(name) {
     @SerializedName("cp")
     var typePref = NumberTypePref()
-    var sumCheck = false
-    var avansCheck = false
 
-    var formula: Formula? = Formula()
+    var formula: Formula = Formula()
     var inputType: InputTypeNumberColumn = InputTypeNumberColumn.MANUAL
 
     override fun updateTypeControl(provideCardProperty: ProvideCardPropertyForCell) {
@@ -107,6 +106,41 @@ class NumberColumn(name: String) : Column(name) {
     override fun setDefaultPref() {
         typePref.resetPref()
 
+    }
+
+    fun calcFormula(rowIndex: Int, card: Card): String {
+        val string = java.lang.StringBuilder()
+        return try {
+            formula.formulaElements.forEach {
+                if (it.type == Formula.COLUMN_ID) {
+                    var index = -1
+                    card.columns.forEachIndexed { i, column ->
+                        if (column.id == it.value.toLong()) {
+                            index = i
+                            return@forEachIndexed
+                        }
+                    }
+                    if (index == -1) {
+                        formula.formulaElements.remove(it)
+                        calcFormula(rowIndex, card)
+                    } else {
+
+                        val numberColumn = card.columns[index] as NumberColumn
+                        val value =
+                            // проверяем колона работает по формуле или ручной ввод
+                            if (numberColumn.inputType == InputTypeNumberColumn.FORMULA) {
+                                numberColumn.calcFormula(rowIndex, card)
+                            } else
+                                card.rows[rowIndex].cellList[index].sourceValue
+                        string.append(value)
+                    }
+                } else
+                    string.append(it.value)
+            }
+            Calc().evaluate(string.toString()).toString()
+        } catch (exception: Exception) {
+            "Error formula"
+        }
     }
 }
 

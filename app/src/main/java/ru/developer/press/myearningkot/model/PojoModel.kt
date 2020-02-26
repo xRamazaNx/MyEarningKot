@@ -21,6 +21,8 @@ import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.activity.CardActivity
 import ru.developer.press.myearningkot.model.Formula.Companion.COLUMN_ID
 import ru.developer.press.myearningkot.otherHelpers.*
+import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.multiplyChar
+import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.subtractChar
 import java.lang.Exception
 import java.util.*
 import kotlin.random.Random
@@ -363,7 +365,7 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
 
             totalItem.totalPref.prefForTextView.customize(value)
             totalItem.calcFormula(this)
-            value.text = getDecimalFormatNumber(totalItem.value, totalItem.totalPref)
+            value.text = totalItem.value
 
             totalTitleLayout.addView(title)
             totalValueLayout.addView(valueLayout)
@@ -374,7 +376,7 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
     fun updateTypeControlColumn(column: Column) {
         column.updateTypeControl(this)
         val indexOf = columns.indexOf(column)
-        rows.forEach { row ->
+        rows.forEachIndexed { rowIndex, row ->
             row.cellList[indexOf].also {
                 it.cellTypeControl = column.columnTypeControl
                 when (column) {
@@ -382,8 +384,12 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
                         it.updateTypeValue(column.typePref)
                     is TextColumn ->
                         it.updateTypeValue(column.typePref)
-                    is NumberColumn ->
+                    is NumberColumn -> {
+                        if (column.inputType == InputTypeNumberColumn.FORMULA) {
+                            it.sourceValue = column.calcFormula(rowIndex, this)
+                        }
                         it.updateTypeValue(column.typePref)
+                    }
                     is PhoneColumn ->
                         it.updateTypeValue(column.typePref)
                     is DateColumn ->
@@ -396,7 +402,6 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
                         it.updateTypeValue(column.typePref)
                     is ListColumn ->
                         it.updateTypeValue(column.typePref)
-
                 }
 
             }
@@ -433,12 +438,12 @@ class Cell(
     fun updateTypeValue(typePref: Prefs) {
         when (typePref) {
             is NumberTypePref -> {
-                val double = try {
-                    sourceValue.toDouble()
+                displayValue = try {
+                    val double = sourceValue.toDouble()
+                    getDecimalFormatNumber(double, typePref)
                 } catch (exception: NumberFormatException) {
-                    0.0
+                    "Error numbers"
                 }
-                displayValue = getDecimalFormatNumber(double, typePref)
             }
             is DateTypePref -> {
                 val timeML: Long = sourceValue.toLong()
@@ -503,7 +508,7 @@ class TotalItem {
     var width = 250
     var formula: Formula = Formula()
     var title: String = "ИТОГ"
-    var value = 0.0
+    var value: String = "0"
     var titlePref: PrefForTextView = PrefForTextView().apply {
         color = Color.WHITE
     }
@@ -513,20 +518,28 @@ class TotalItem {
 
     fun calcFormula(card: Card) {
         val string = java.lang.StringBuilder()
-        formula.formulaElements.forEach {
-            if (it.type == COLUMN_ID) {
-                string.append(card.getSumFromColumn(it.value.toLong()))
+        formula.formulaElements.forEach { element ->
+            if (element.type == COLUMN_ID) {
+                if (card.columns.any { it.id == element.value.toLong() }) {
+                    string.append(card.getSumFromColumn(element.value.toLong()))
+                } else{
+                    formula.formulaElements.remove(element)
+                    calcFormula(card)
+                    return
+                }
             } else
-                string.append(it.value)
+                string.append(element.value)
         }
         value = try {
-            Calc().evaluate(string.toString())
+            val d = Calc().evaluate(string.toString())
+            getDecimalFormatNumber(d, totalPref)
         } catch (exception: Exception) {
-            0.0
+            "Error formula"
         }
     }
 
     private fun Card.getSumFromColumn(id: Long): String {
+
         var index = -1
         columns.forEachIndexed { i, column ->
             if (column.id == id) {
@@ -536,14 +549,14 @@ class TotalItem {
         }
         val calc = Calc()
         var value = 0.0
-        if (index > -1)
+        return if (index > -1) {
             rows.forEach {
                 val cell = it.cellList[index]
                 value += calc.evaluate(cell.sourceValue)
             }
-
-        return value.toString()
-
+            value.toString()
+        } else
+            "Error"
     }
 }
 
@@ -602,6 +615,44 @@ class ListType {
 }
 
 class Formula {
+    fun getFormulaString(columnList: List<NumberColumn>): String {
+        val strBuilder = java.lang.StringBuilder()
+        formulaElements.forEach { element ->
+            if (element.type == COLUMN_ID) {
+                columnList.forEach {
+                    if (it.id == element.value.toLong()) {
+                        strBuilder.append(it.name)
+                    }
+                }
+            } else {
+                var value = element.value
+                if (value == "-")
+                    value = subtractChar
+                if (value == "*")
+                    value = multiplyChar
+                strBuilder.append(value)
+            }
+        }
+        return strBuilder.toString()
+    }
+
+    fun copyFrom(_formula: Formula) {
+        formulaElements.clear()
+        _formula.formulaElements.forEach { element ->
+            formulaElements.add(element.copy())
+        }
+    }
+
+    fun getColumnIdList(): MutableList<Long> {
+        val list = mutableListOf<Long>()
+
+        formulaElements.forEach {
+            if (it.type == COLUMN_ID)
+                list.add(it.value.toLong())
+        }
+        return list
+    }
+
     internal companion object {
         val OTHER = 0
         val COLUMN_ID = 1
@@ -609,9 +660,6 @@ class Formula {
 
     val formulaElements = mutableListOf<FormulaElement>()
 
-    class FormulaElement {
-        var type = 0
-        var value: String = ""
-    }
+    data class FormulaElement(var type: Int = 0, var value: String = "")
 
 }
