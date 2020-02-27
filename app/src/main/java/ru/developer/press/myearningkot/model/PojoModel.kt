@@ -2,12 +2,17 @@ package ru.developer.press.myearningkot.model
 
 import android.graphics.Color
 import android.telephony.PhoneNumberUtils
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import android.view.Gravity
 import android.view.View
 import android.view.View.GONE
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.text.toSpannable
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.synthetic.main.card.view.*
@@ -20,6 +25,7 @@ import org.jetbrains.anko.wrapContent
 import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.activity.CardActivity
 import ru.developer.press.myearningkot.model.Formula.Companion.COLUMN_ID
+import ru.developer.press.myearningkot.model.Formula.Companion.TOTAL_ID
 import ru.developer.press.myearningkot.otherHelpers.*
 import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.multiplyChar
 import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.subtractChar
@@ -505,6 +511,7 @@ class Cell(
 
 class TotalItem {
 
+    val id = Date().time
     var width = 250
     var formula: Formula = Formula()
     var title: String = "ИТОГ"
@@ -517,23 +524,40 @@ class TotalItem {
     }
 
     fun calcFormula(card: Card) {
+        val calc = Calc()
         val string = java.lang.StringBuilder()
         formula.formulaElements.forEach { element ->
+            val elementVal = element.value
             if (element.type == COLUMN_ID) {
-                if (card.columns.any { it.id == element.value.toLong() }) {
-                    string.append(card.getSumFromColumn(element.value.toLong()))
-                } else{
+                val elementId = elementVal.toLong()
+                if (card.columns.any { it.id == elementId }) {
+                    string.append(card.getSumFromColumn(elementId))
+                } else {
+                    formula.formulaElements.remove(element)
+                    calcFormula(card)
+                    return
+                }
+            }
+            if (element.type == TOTAL_ID) {
+                val elementId = elementVal.toLong()
+                if (card.totals.any { it.id == elementId }) {
+                    val findTotal = card.totals.find { it.id == elementId }!!
+                    findTotal.calcFormula(card)
+//                    logD(findTotal.value)
+                    string.append(findTotal.value)
+                } else {
                     formula.formulaElements.remove(element)
                     calcFormula(card)
                     return
                 }
             } else
-                string.append(element.value)
+                string.append(elementVal)
         }
         value = try {
-            val d = Calc().evaluate(string.toString())
+            val d = calc.evaluate(string.toString())
             getDecimalFormatNumber(d, totalPref)
         } catch (exception: Exception) {
+
             "Error formula"
         }
     }
@@ -541,14 +565,14 @@ class TotalItem {
     private fun Card.getSumFromColumn(id: Long): String {
 
         var index = -1
+        val calc = Calc()
+        var value = 0.0
         columns.forEachIndexed { i, column ->
             if (column.id == id) {
                 index = i
                 return@forEachIndexed
             }
         }
-        val calc = Calc()
-        var value = 0.0
         return if (index > -1) {
             rows.forEach {
                 val cell = it.cellList[index]
@@ -615,25 +639,64 @@ class ListType {
 }
 
 class Formula {
-    fun getFormulaString(columnList: List<NumberColumn>): String {
+    fun getFormulaString(columnList: List<NumberColumn>, totalList: List<TotalItem>?): Spannable {
+        val spannable = SpannableStringBuilder()
         val strBuilder = java.lang.StringBuilder()
+        val instance = App.instance!!
         formulaElements.forEach { element ->
-            if (element.type == COLUMN_ID) {
-                columnList.forEach {
-                    if (it.id == element.value.toLong()) {
-                        strBuilder.append(it.name)
+            when (element.type) {
+                COLUMN_ID -> {
+                    columnList.forEach {
+                        if (it.id == element.value.toLong()) {
+                            val name = it.name
+                            strBuilder.append(name)
+                            spannable.append(SpannableString(name).apply {
+                                setSpan(
+                                    ForegroundColorSpan(instance.getColorFromRes(R.color.md_green_300)),
+                                    0,
+                                    name.length,
+                                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                                )
+                            })
+                        }
                     }
                 }
-            } else {
-                var value = element.value
-                if (value == "-")
-                    value = subtractChar
-                if (value == "*")
-                    value = multiplyChar
-                strBuilder.append(value)
+                TOTAL_ID -> {
+                    totalList?.forEach {
+                        if (it.id == element.value.toLong()) {
+                            val title = it.title
+                            strBuilder.append(title)
+                            spannable.append(SpannableString(title).apply {
+                                setSpan(
+                                    ForegroundColorSpan(instance.getColorFromRes(R.color.md_blue_200)),
+                                    0,
+                                    title.length,
+                                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                                )
+                            })
+                        }
+                    }
+                }
+                else -> {
+                    var value = element.value
+                    if (value == " - ")
+                        value = subtractChar
+                    if (value == " * ")
+                        value = multiplyChar
+                    strBuilder.append(value)
+                    spannable.append(SpannableString(value).apply {
+                        setSpan(
+                            ForegroundColorSpan(Color.WHITE),
+                            0,
+                            value.length,
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                        )
+                    })
+                }
             }
         }
-        return strBuilder.toString()
+//        return strBuilder.toString()
+        return spannable.toSpannable()
     }
 
     fun copyFrom(_formula: Formula) {
@@ -643,7 +706,7 @@ class Formula {
         }
     }
 
-    fun getColumnIdList(): MutableList<Long> {
+    fun getColumnIdList(): List<Long> {
         val list = mutableListOf<Long>()
 
         formulaElements.forEach {
@@ -653,9 +716,20 @@ class Formula {
         return list
     }
 
+    fun getTotalIdList(): List<Long> {
+        val list = mutableListOf<Long>()
+
+        formulaElements.forEach {
+            if (it.type == TOTAL_ID)
+                list.add(it.value.toLong())
+        }
+        return list
+    }
+
     internal companion object {
         val OTHER = 0
         val COLUMN_ID = 1
+        val TOTAL_ID = 2
     }
 
     val formulaElements = mutableListOf<FormulaElement>()

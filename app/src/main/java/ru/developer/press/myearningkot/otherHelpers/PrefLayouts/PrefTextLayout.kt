@@ -18,6 +18,7 @@ import org.jetbrains.anko.image
 import org.jetbrains.anko.layoutInflater
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.activity.BasicCardActivity
+import ru.developer.press.myearningkot.model.InputTypeNumberColumn
 import ru.developer.press.myearningkot.model.NumberColumn
 import ru.developer.press.myearningkot.model.PrefForTextView
 import ru.developer.press.myearningkot.model.TotalItem
@@ -91,7 +92,39 @@ fun Context.getPrefTotalLayout(
     }
 
     view.formulaTotal.setOnClickListener {
-        formulaDialogShow(totals[0].formula, this, callback.getNumberColumns()) { formula ->
+        val allTotals: List<TotalItem> = callback.getTotals()
+        val filterTotalList = mutableListOf<TotalItem>().apply {
+            addAll(allTotals)
+            // удаляем сами выбранные колоны
+            removeAll(totals)
+            //удаляем те колоны которые указывают в формуле на выбранные колоны
+            // цикл по всем нумберколонам
+            mutableListOf<TotalItem>().also { listToFind ->
+                listToFind.addAll(this)
+            }.forEach {
+                // достаем из этой колоны все ид колон задействованных в формуле
+                val totalIdList = it.formula.getTotalIdList()
+                // смотрим в цикле встречаются ли в них те колоны которые выделены
+                totalIdList.forEach { id ->
+                    // проверяем у всех выделенных
+                    totals.forEach { selectTotal ->
+                        // одна из выбранных колон учавствует в формуле в не выделеной колоне(все выделенные и так не попадают в список в формуле)
+                        if (selectTotal.id == id) {
+                            // удаляем в алл эту колону
+                            this.remove(it)
+                        }
+                    }
+                }
+
+            }
+        }
+        formulaDialogShow(
+            totals[0].formula,
+            this,
+            callback.getNumberColumns(),
+            filterNTotals = filterTotalList,
+            allNTotals = allTotals
+        ) { formula ->
             totals.forEach {
                 it.formula = formula
             }
@@ -298,6 +331,7 @@ interface PrefTotalChangedCallBack {
     fun prefChanged()
     fun calcFormula()
     fun getNumberColumns(): MutableList<NumberColumn>
+    fun getTotals(): List<TotalItem>
 }
 /*
 класс который помогает выделять и убирать вылеление

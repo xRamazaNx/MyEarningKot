@@ -406,7 +406,8 @@ class PrefCardActivity : BasicCardActivity() {
                             isSelectTotalAmountElement = true
                             val selectTotalItem = selectedElement as SelectedElement.ElementTotal
                             val index = selectTotalItem.index
-                            val totalView = totalContainer.totalValueContainer.getChildAt(index).totalValue
+                            val totalView =
+                                totalContainer.totalValueContainer.getChildAt(index).totalValue
                             setSelectBackground(totalView)
                         }
                         ElementType.TOTAL_TITLE -> {
@@ -450,7 +451,8 @@ class PrefCardActivity : BasicCardActivity() {
                         ElementType.TOTAL -> {
                             val selectTotalItem = selectedElement as SelectedElement.ElementTotal
                             val index = selectTotalItem.index
-                            val totalView = totalContainer.totalValueContainer.getChildAt(index).totalValue
+                            val totalView =
+                                totalContainer.totalValueContainer.getChildAt(index).totalValue
                             totalView.background = selectedElement.oldDrawable
                         }
                         ElementType.TOTAL_TITLE -> {
@@ -590,6 +592,8 @@ class PrefCardActivity : BasicCardActivity() {
                                         return card.columns.filterIsInstance<NumberColumn>()
                                             .toMutableList()
                                     }
+
+                                    override fun getTotals(): List<TotalItem> = card.totals
                                 })
                             }
 
@@ -758,7 +762,7 @@ class PrefCardActivity : BasicCardActivity() {
         toolbar.menu.findItem(R.id.deleteColumn).isVisible = isVisible
     }
 
-    private fun updatePlate(){
+    private fun updatePlate() {
         viewModel?.updatePlateChanged()
         selectedControl.updateSelected()
         initClickTotals(viewModel?.card)

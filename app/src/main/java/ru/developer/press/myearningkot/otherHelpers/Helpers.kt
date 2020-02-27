@@ -263,7 +263,7 @@ fun getDecimalFormatNumber(
     }
     val decimalFormat = DecimalFormat(
         format.toString(),
-        DecimalFormatSymbols.getInstance()
+        DecimalFormatSymbols.getInstance(Locale.getDefault())
     ).apply {
         maximumFractionDigits = count
         roundingMode = RoundingMode.HALF_EVEN

@@ -43,7 +43,6 @@ class App : Application() {
                     .sampleJsonDao()
 
             val isFirst = pref!!.getBoolean(prefFirstKey, true)
-            logD("isFirst = $isFirst")
             if (isFirst) {
                 pref!!.edit().putBoolean(prefFirstKey, false).apply()
                 DataController().addPage("Доход")

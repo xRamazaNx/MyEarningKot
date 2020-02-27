@@ -1,6 +1,10 @@
 package ru.developer.press.myearningkot.otherHelpers
 
+import ru.developer.press.myearningkot.logD
+import java.math.RoundingMode
 import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.*
 import kotlin.math.pow
 import kotlin.math.sin
 
@@ -49,12 +53,19 @@ class Calc {
         "cos" to { a -> sin(a / 180 * Math.PI) },
         "tan" to { a -> sin(a / 180 * Math.PI) }
     )
-
-    private var decimalFormat = DecimalFormat()
+    private var decimalFormat = DecimalFormat(
+        "#.#",
+        DecimalFormatSymbols.getInstance(Locale.US)
+    ).apply {
+        roundingMode = RoundingMode.HALF_EVEN
+    }
 
     fun evaluate(e: String): Double {
-        val replacePoints: String = e.replace('.', ',')
-        expr = replacePoints
+        logD(e)
+        val groupingSeparator = DecimalFormatSymbols.getInstance(Locale.getDefault()).groupingSeparator.toString()
+        val substring = e.replace(groupingSeparator, "")
+        logD(substring)
+        expr = substring
         i = 0
         token = StartOfExpression
         nextToken()
@@ -180,9 +191,9 @@ class Calc {
             return
         } else if (Character.isDigit(expr[i])) {
             val start = i
-            while (i < expr.length && (Character.isDigit(expr[i]) || expr[i] == decimalFormat.decimalFormatSymbols.decimalSeparator)) i++
+            while (i < expr.length && (Character.isDigit(expr[i]) || expr[i] == '.')) i++
             val number = decimalFormat.parse(expr.substring(start, i)).toDouble()
-            token = Number(number)
+            token = Number(decimalFormat.format(number).toDouble())
             return
         } else if (Character.isLetter(expr[i])) {
             val start = i

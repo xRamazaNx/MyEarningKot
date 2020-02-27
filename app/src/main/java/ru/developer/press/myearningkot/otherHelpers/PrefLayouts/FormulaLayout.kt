@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.view.View
+import android.view.View.GONE
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -17,7 +18,9 @@ import ru.developer.press.myearningkot.dpsToPixels
 import ru.developer.press.myearningkot.model.Formula
 import ru.developer.press.myearningkot.model.Formula.Companion.COLUMN_ID
 import ru.developer.press.myearningkot.model.Formula.Companion.OTHER
+import ru.developer.press.myearningkot.model.Formula.Companion.TOTAL_ID
 import ru.developer.press.myearningkot.model.NumberColumn
+import ru.developer.press.myearningkot.model.TotalItem
 import ru.developer.press.myearningkot.otherHelpers.Calc
 import ru.developer.press.myearningkot.otherHelpers.getColorFromRes
 import splitties.alertdialog.appcompat.alertDialog
@@ -25,26 +28,34 @@ import java.lang.Exception
 import java.lang.StringBuilder
 
 
-    val subtractChar = "−"
-    val multiplyChar = "×"
+val subtractChar = " − "
+val multiplyChar = " × "
+
 class FormulaLayout(
     val view: View,
     filterNColumns: List<NumberColumn>,
     private val allNColumns: List<NumberColumn> = filterNColumns,
+    filterNTotals: List<TotalItem>? = null,
+    private val allNTotals: List<TotalItem>? = filterNTotals,
     _formula: Formula
 ) {
     private var formula = Formula()
     private val columnList = mutableListOf<NumberColumn>()
+    private val totalList = mutableListOf<TotalItem>()
     private val displayTextView: TextView = view.formulaTextView
 
     init {
 
         formula.copyFrom(_formula)
         columnList.addAll(filterNColumns)
+        filterNTotals?.let {
+            totalList.addAll(it)
+        }
 
         initClickNumbers()
         initClickOperation()
         initClickColumns()
+        initClickTotals()
 
         view.clearElementInFormula.setOnClickListener {
             formula.formulaElements.apply {
@@ -58,15 +69,41 @@ class FormulaLayout(
         displayFormula()
     }
 
+    private fun initClickTotals() {
+        val title = view.totalContainerTitle
+        val container = view.totalsContainerInFormula
+
+        if (totalList.isEmpty()){
+            title.visibility = GONE
+        }
+        val elementList = formula.formulaElements
+        totalList.forEach {total ->
+            val textView = TextView(view.context).apply {
+                initParamTextView()
+                text = total.title
+                textColor = view.context.getColorFromRes(R.color.md_blue_200)
+                setOnClickListener {
+                    elementList.add(Formula.FormulaElement().apply {
+                        type = TOTAL_ID
+                        value = total.id.toString()
+                    })
+
+                    displayFormula()
+                }
+            }
+            container.addView(textView)
+        }
+
+    }
+
     private fun initClickColumns() {
         val container = view.columnContainerInFormula
         val elementList = formula.formulaElements
         columnList.forEach { column ->
             val textView = TextView(view.context).apply {
-                padding = context.dpsToPixels(16)
-                textColor = Color.WHITE
-                layoutParams = LinearLayout.LayoutParams(wrapContent, matchParent)
+                initParamTextView()
                 text = column.name
+                textColor = view.context.getColorFromRes(R.color.md_green_300)
                 setOnClickListener {
                     elementList.add(Formula.FormulaElement().apply {
                         type = COLUMN_ID
@@ -80,6 +117,12 @@ class FormulaLayout(
         }
 
 
+    }
+
+    private fun TextView.initParamTextView() {
+        padding = context.dpsToPixels(16)
+        textColor = Color.WHITE
+        layoutParams = LinearLayout.LayoutParams(wrapContent, matchParent)
     }
 
     private fun initClickOperation() {
@@ -102,7 +145,7 @@ class FormulaLayout(
 
             formula.formulaElements.add(Formula.FormulaElement().apply {
                 type = OTHER
-                value = op
+                value = " $op "
             })
             displayFormula()
         }
@@ -152,8 +195,7 @@ class FormulaLayout(
     }
 
     private fun displayFormula() {
-        displayTextView.text = formula.getFormulaString(allNColumns)
-        displayTextView.textColor = Color.GRAY
+        displayTextView.text = formula.getFormulaString(allNColumns, allNTotals)
     }
 
 
@@ -165,8 +207,9 @@ class FormulaLayout(
 
         formula.formulaElements.forEach {
             when (it.type) {
+                TOTAL_ID,
                 COLUMN_ID -> {
-                    stringBuilder.append(12.345)
+                    stringBuilder.append(1.345)
                 }
                 OTHER -> {
                     stringBuilder.append(it.value)
@@ -194,10 +237,19 @@ fun formulaDialogShow(
     context: Context,
     filterNColumns: List<NumberColumn>,
     allNColumns: List<NumberColumn> = filterNColumns,
+    filterNTotals: List<TotalItem>?,
+    allNTotals: List<TotalItem>?,
     positiveClick: (Formula) -> Unit
 ) {
     val inflate = View.inflate(context, R.layout.formula_layout, null)
-    val formulaLayout = FormulaLayout(inflate, filterNColumns, allNColumns, formula)
+    val formulaLayout = FormulaLayout(
+        view = inflate,
+        filterNColumns = filterNColumns,
+        allNColumns = allNColumns,
+        filterNTotals = filterNTotals,
+        allNTotals = allNTotals,
+        _formula = formula
+    )
 
     val dialog = context.alertDialog {
         setCustomTitle(TextView(context).apply {

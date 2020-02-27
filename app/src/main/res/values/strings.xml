@@ -55,4 +55,6 @@
     <string name="input_type">Ввод данных:</string>
     <string name="formula">Формула</string>
     <string name="setting_total">Настройка таблички</string>
+    <string name="column">Колона:</string>
+    <string name="total">Итог:</string>
 </resources>

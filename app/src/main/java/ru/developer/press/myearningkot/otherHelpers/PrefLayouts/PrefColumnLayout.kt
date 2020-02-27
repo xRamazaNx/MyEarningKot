@@ -282,7 +282,7 @@ class PrefNumberColumnLayout(
                 }
 
             }
-            formulaDialogShow(numberColumn.formula, context, filterColumns, allColumns) { formula ->
+            formulaDialogShow(numberColumn.formula, context, filterColumns, allColumns, null, null) { formula ->
                 select(formulaInput)
                 unSelect(manualInput)
 
