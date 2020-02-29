@@ -97,7 +97,7 @@
 
 
     <LinearLayout
-        android:id="@+id/_container_plate"
+        android:id="@+id/containerPlate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -165,7 +165,7 @@
         app:buttonBackgroundColour="@color/greenButton"
         app:buttonIcon="@drawable/ic_add_not_ring"
         app:fabSize="normal"
-        app:layout_anchor="@id/_container_plate" />
+        app:layout_anchor="@id/containerPlate" />
 
 
     <ru.developer.press.myearningkot.otherHelpers.PrefLayouts.WidthLineDrawer

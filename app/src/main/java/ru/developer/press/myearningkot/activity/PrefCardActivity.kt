@@ -31,6 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
+import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.backgroundColorResource
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.wrapContent
@@ -129,10 +130,10 @@ class PrefCardActivity : BasicCardActivity() {
 //        }
     }
 
-    fun showPrefWindow(view: View) {
+    fun showPrefWindow(view: View, y: Int) {
         view.minimumHeight = (resources.displayMetrics.heightPixels / 3)
         prefWindow.contentView = view
-        prefWindow.showAtLocation(totalAmountView, Gravity.BOTTOM, 0, 0)
+        prefWindow.showAtLocation(totalAmountView, Gravity.BOTTOM, 0, y)
 
     }
 
@@ -221,6 +222,7 @@ class PrefCardActivity : BasicCardActivity() {
             viewModel?.addTotal()
             viewModel?.updatePlateChanged()
             initElementClick()
+            selectedControl.unSelectAll()
             selectTotal(viewModel!!.card.totals.size - 1)
         }
 
@@ -372,7 +374,6 @@ class PrefCardActivity : BasicCardActivity() {
             selectCallback = object : SelectCallback {
                 val card = viewModel!!.card
                 override fun select(selectedElement: SelectedElement) {
-                    var isSelectTotalAmountElement = false
                     when (selectedElement.elementType) {
                         ElementType.COLUMN -> {
                             val selectedColumn = selectedElement as SelectedElement.ElementColumn
@@ -397,16 +398,13 @@ class PrefCardActivity : BasicCardActivity() {
 
                         }
                         ElementType.NAME -> {
-                            isSelectTotalAmountElement = true
                             setSelectBackground(nameCard)
                         }
                         ElementType.DATE -> {
-                            isSelectTotalAmountElement = true
                             setSelectBackground(datePeriodCard)
 
                         }
                         ElementType.TOTAL -> {
-                            isSelectTotalAmountElement = true
                             val selectTotalItem = selectedElement as SelectedElement.ElementTotal
                             val index = selectTotalItem.index
                             val totalView =
@@ -414,7 +412,6 @@ class PrefCardActivity : BasicCardActivity() {
                             setSelectBackground(totalView)
                         }
                         ElementType.TOTAL_TITLE -> {
-                            isSelectTotalAmountElement = true
                             val selectTotalItem = selectedElement as SelectedElement.ElementTotal
                             val index = selectTotalItem.index
                             val totalView = totalContainer.totalTitleContainer.getChildAt(index)
@@ -469,7 +466,7 @@ class PrefCardActivity : BasicCardActivity() {
                 }
 
                 override fun showPref(elementPref: ElementPref) {
-
+                    var yOff = 0
                     val prefLayout =
                         when (elementPref.elementPrefType) {
                             ElementPrefType.TEXT_VIEW -> {
@@ -508,7 +505,9 @@ class PrefCardActivity : BasicCardActivity() {
                                     )
                                         isWorkAlignPanel = false
                                 }
-
+                                if (!isWorkAlignPanel) {
+                                    yOff = containerPlate.height
+                                }
                                 val prefList = mutableListOf<PrefForTextView>()
 
                                 // сбор настроек
@@ -573,6 +572,8 @@ class PrefCardActivity : BasicCardActivity() {
                             }
 
                             TOTAL -> {
+                                yOff = containerPlate.height
+
                                 val listTotal = mutableListOf<TotalItem>().apply {
                                     elementPref.selectedElementList.filterIsInstance(SelectedElement.ElementTotal::class.java)
                                         .forEach {
@@ -597,6 +598,22 @@ class PrefCardActivity : BasicCardActivity() {
                                     }
 
                                     override fun getTotals(): List<TotalItem> = card.totals
+                                    override fun widthProgress() {
+                                        listTotal.forEach { total ->
+
+                                            val index = card.totals.indexOf(total)
+                                            totalContainer.totalValueContainer.getChildAt(index)
+                                                .layoutParams.width =
+                                                total.width
+                                            totalContainer.totalTitleContainer.getChildAt(index)
+                                                .layoutParams.width =
+                                                total.width
+                                        }
+                                        totalContainer.requestLayout()
+                                    }
+
+                                    override fun widthChanged() {
+                                    }
                                 })
                             }
 
@@ -669,9 +686,12 @@ class PrefCardActivity : BasicCardActivity() {
                                     })
                             }
                         }
-                    showPrefWindow(prefLayout.apply {
-                        backgroundColorResource = R.color.cent
-                    })
+                    //
+                    showPrefWindow(
+                        prefLayout.apply {
+                            backgroundColorResource = R.color.cent
+                        }, yOff
+                    )
                 }
 
                 private fun reSelectAfterMove(list: List<Any>) {

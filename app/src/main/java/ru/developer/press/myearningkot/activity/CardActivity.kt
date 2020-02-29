@@ -13,12 +13,12 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView.ItemAnimator.ItemAnimatorFinishedListener
 import com.google.android.material.appbar.AppBarLayout
 import kotlinx.android.synthetic.main.activity_card.*
+import kotlinx.android.synthetic.main.activity_card.appBar
+import kotlinx.android.synthetic.main.activity_card.progressBar
 import kotlinx.android.synthetic.main.activity_card.view.*
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.card.view.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import ru.developer.press.myearningkot.CardViewModel
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.ViewModelCardFactory
@@ -26,6 +26,7 @@ import ru.developer.press.myearningkot.adapters.AdapterRecyclerInCard
 import ru.developer.press.myearningkot.dialogs.startPrefActivity
 import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.DataController
+import java.lang.Runnable
 
 
 open class CardActivity : BasicCardActivity() {
@@ -49,6 +50,22 @@ open class CardActivity : BasicCardActivity() {
             viewModel?.titleLiveData?.observe(this@CardActivity, Observer {
                 title = it
             })
+
+        }
+        fbAddRow.setOnClickListener {
+            viewModel?.apply {
+                CoroutineScope(Dispatchers.Main).launch {
+                    withContext(Dispatchers.IO) {
+                        addRow()
+                    }
+                    val rows = getSortedRows()
+                    adapter.dataSet = rows
+                    appBar.setExpanded(false, true)
+                    recycler.smoothScrollToPosition(rows.size - 1)
+                    updatePlateChanged()
+
+                }
+            }
         }
     }
 
@@ -180,9 +197,9 @@ open class CardActivity : BasicCardActivity() {
             }
 
             override fun onAnimationEnd(p0: Animator?) {
-                if (totalAmountView.translationY == 0f)
+                if (containerPlate.translationY == 0f)
                     fbAddRow.show()
-                if (totalAmountView.translationY == totalAmountView.height.toFloat())
+                if (containerPlate.translationY == containerPlate.height.toFloat())
                     fbAddRow.hide()
             }
 
@@ -194,7 +211,7 @@ open class CardActivity : BasicCardActivity() {
 
 
         }
-        totalAmountView.animate().setListener(animListener)
+        containerPlate.animate().setListener(animListener)
         appBar.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
 
             val heightToolbar = appBarLayout.toolbar.height
@@ -202,7 +219,7 @@ open class CardActivity : BasicCardActivity() {
             val isHide = -verticalOffset == heightToolbar
             val isShow = verticalOffset == 0
 
-            totalAmountView.apply {
+            containerPlate.apply {
                 if (isShow) {
                     animate().translationY(0f)
                 }

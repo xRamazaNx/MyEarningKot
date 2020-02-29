@@ -5,14 +5,21 @@ import android.graphics.Color
 import android.util.TypedValue
 import android.view.View
 import android.widget.ImageButton
+import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
 import com.jaredrummler.android.colorpicker.ColorPickerDialog
 import com.jaredrummler.android.colorpicker.ColorPickerDialogListener
+import kotlinx.android.synthetic.main.pref_column_number.view.*
 import kotlinx.android.synthetic.main.prefs_text_view.view.*
 import kotlinx.android.synthetic.main.prefs_total.view.*
+import kotlinx.android.synthetic.main.prefs_total.view.digitsCountDown
+import kotlinx.android.synthetic.main.prefs_total.view.digitsCountUp
+import kotlinx.android.synthetic.main.prefs_total.view.digitsSize
+import kotlinx.android.synthetic.main.prefs_total.view.groupNumberSwitch
 import kotlinx.android.synthetic.main.prefs_with_name.view.*
 import kotlinx.android.synthetic.main.toolbar_pref.view.*
+import kotlinx.android.synthetic.main.width_seek_bar_layout.view.*
 import org.jetbrains.anko.backgroundResource
 import org.jetbrains.anko.image
 import org.jetbrains.anko.layoutInflater
@@ -62,20 +69,78 @@ fun Context.getPrefTextLayout(
     return view
 }
 
-
 fun Context.getPrefTotalLayout(
     totals: MutableList<TotalItem>,
     callback: PrefTotalChangedCallBack
 ): View {
 
     val view = layoutInflater.inflate(R.layout.prefs_total, null)
+    val total = totals[0]
+
+    val widthColumnSeekBar = view.widthColumnSeekBar
+
+    widthColumnSeekBar.progress = total.width
+    widthColumnSeekBar.setOnSeekBarChangeListener(object :
+        SeekBar.OnSeekBarChangeListener {
+        override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+            val progress = p0!!.progress
+            if (progress > 30) {
+                totals.forEach {
+                    it.width = progress
+                }
+                callback.widthProgress()
+            }
+        }
+
+        override fun onStartTrackingTouch(p0: SeekBar?) {
+        }
+
+        override fun onStopTrackingTouch(p0: SeekBar?) {
+            callback.widthChanged()
+        }
+    })
+
 
     val prefList = mutableListOf<PrefForTextView>().apply {
         totals.forEach {
             add(it.totalPref.prefForTextView)
         }
     }
+    val typePref = total.totalPref
 
+    val digitDown = view.digitsCountDown
+    val digitUp = view.digitsCountUp
+    val digitsSizeTextView = view.digitsSize
+    val grouping = view.groupNumberSwitch
+
+    digitsSizeTextView.text = typePref.digitsCount.toString()
+    grouping.isChecked = typePref.isGrouping
+    grouping.setOnCheckedChangeListener { _, b ->
+        totals.forEach {
+            it.totalPref.isGrouping = b
+        }
+        callback.prefChanged()
+    }
+
+    val editDigit = fun(digitOffset: Int) {
+        var digit = typePref.digitsCount
+        digit += digitOffset
+
+        if (digit < 0)
+            digit = 0
+
+        totals.forEach {
+            it.totalPref.digitsCount = digit
+        }
+        callback.prefChanged()
+        digitsSizeTextView.text = digit.toString()
+    }
+    digitDown.setOnClickListener {
+        editDigit(-1)
+    }
+    digitUp.setOnClickListener {
+        editDigit(1)
+    }
     fun init() {
         textPrefButtonsInit(view, prefList, false) {
             callback.prefChanged()
@@ -119,7 +184,7 @@ fun Context.getPrefTotalLayout(
             }
         }
         formulaDialogShow(
-            totals[0].formula,
+            total.formula,
             this,
             callback.getNumberColumns(),
             filterNTotals = filterTotalList,
@@ -332,6 +397,8 @@ interface PrefTotalChangedCallBack {
     fun calcFormula()
     fun getNumberColumns(): MutableList<NumberColumn>
     fun getTotals(): List<TotalItem>
+    fun widthProgress()
+    fun widthChanged()
 }
 /*
 класс который помогает выделять и убирать вылеление

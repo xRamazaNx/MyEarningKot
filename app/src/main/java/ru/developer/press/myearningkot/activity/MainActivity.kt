@@ -1,9 +1,5 @@
 package ru.developer.press.myearningkot.activity
 
-//import androidx.viewpager2.adapter.FragmentStateAdapter
-//import com.google.android.material.tabs.TabLayoutMediator
-
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -45,12 +41,23 @@ import ru.developer.press.myearningkot.model.DataController
 import ru.developer.press.myearningkot.otherHelpers.getColorFromRes
 
 // GITHUB
-const val RESULT_OUT_CARD = 11
 const val ID_UPDATE_CARD = "id_card"
 
 class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
     private lateinit var drawer: Drawer
     private lateinit var adapterViewPager: AdapterViewPager
+
+    private var initializerViewModel: Job = GlobalScope.launch(Dispatchers.Main) {
+        val pageList = withContext(Dispatchers.IO) {
+            DataController().getPageList()
+        }
+        viewModel = withContext(Dispatchers.IO) {
+            ViewModelProviders.of(this@MainActivity, ViewModelMainFactory(pageList))
+                .get(PageViewModel::class.java)
+        }
+        progressBar.visibility = GONE
+        viewInit()
+    }
 
     private lateinit var viewModel: PageViewModel
 
@@ -61,24 +68,7 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
         drawer = initDrawer()
         toolbar.setTitleTextColor(Color.WHITE)
 
-        initViewModel {
-
-        }
-    }
-
-    private fun initViewModel(function: () -> Unit) {
-        GlobalScope.launch(Dispatchers.Main) {
-            val pageList = withContext(Dispatchers.IO) {
-                DataController().getPageList()
-            }
-            viewModel = withContext(Dispatchers.IO) {
-                ViewModelProviders.of(this@MainActivity, ViewModelMainFactory(pageList))
-                    .get(PageViewModel::class.java)
-            }
-            progressBar.visibility = GONE
-            viewInit()
-            function()
-        }
+        initializerViewModel.start()
     }
 
     private fun viewInit() {
@@ -89,7 +79,6 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
                 Intent(this@MainActivity, CardActivity::class.java).apply {
                     putExtra(CARD_ID, id)
                 }
-//            startActivityForResult(intent, RESULT_OUT_CARD)
             startActivity(intent)
         })
 
@@ -119,7 +108,6 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
         })
         // настройка клика fb
         fbMain.setOnClickListener {
-
 
             val indexPage = tabs.selectedTabPosition
             //            viewModel.addCard(indexPage, Card())
@@ -237,19 +225,6 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
                 }
             }
             //
-
-            switchItem {
-                name = "Показать дату"
-                onSwitchChanged { _, _, isEnabled ->
-                    if (isEnabled)
-                        toast("enable")
-                    else
-                        toast("disable")
-                }
-                selectable = false
-                textColorRes = lightGray
-                iconDrawable = getDrawable(R.drawable.ic_period_dark)!!
-            }
             expandableItem {
                 nameRes = R.string.sort
                 selectable = false
@@ -274,7 +249,7 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
             secondaryItem(getString(R.string.settings_label)) {
                 selectable = false
                 textColorRes = lightGray
-                iconDrawable = getDrawable(R.drawable.ic_setting)!!
+                iconDrawable = getDrawable(R.drawable.ic_setting_table)!!
                 onClick { _ ->
                     drawer.closeDrawer()
                     true
@@ -302,35 +277,6 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (resultCode == Activity.RESULT_OK) {
-//            if (requestCode == RESULT_OUT_CARD) {
-//                val id = data?.getLongExtra(CARD_ID, -111)
-//                if (id != null) {
-//                    if (id > -1) {
-//                        fun updateCard() {
-//                val position = viewModel.updateCardInPage(
-//                    id,
-//                    tabs.selectedTabPosition
-//                )
-//                adapterViewPager.notifyCardInPage(tabs.selectedTabPosition, position)
-//                        }
-//                        if (!::viewModel.isInitialized) {
-////                            initViewModel {
-////                                updateCard()
-////                            }
-//                            recreate()
-//                            updateCard()
-//
-//                        } else
-//                            updateCard()
-//                    }
-//                }
-//            }
-        }
-        super.onActivityResult(requestCode, resultCode, data)
-    }
-
     override fun getCard(position: Int): Card {
         return viewModel.getCardInPage(tabs.selectedTabPosition, position)
     }
@@ -345,25 +291,8 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
 
     override fun onResume() {
         super.onResume()
-        // вся эта суета для того что бы ждать пока инициализация вьюмодель пройдет успешно в тех случаях когда система сама выгруджает все данные
-        CoroutineScope(Dispatchers.Main).launch {
-            var time = System.currentTimeMillis()
-            withContext(Dispatchers.IO) {
-                while (true) {
-                    if (::viewModel.isInitialized) {
-                        break
-                    } else {
-                        val timeMillis = System.currentTimeMillis()
-                        val t = (timeMillis - time)
-                        if (t / 1000 > 3) {
-                            withContext(Dispatchers.Main) {
-                                toast("long download cards")
-                            }
-                            time = timeMillis
-                        }
-                    }
-                }
-            }
+
+        initializerViewModel.invokeOnCompletion {
             val instance = App.instance
             val id = instance?.getUpdateCardId()
             if (id != null && id > -1) {
@@ -374,12 +303,12 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
                 viewPager.post {
                     adapterViewPager.notifyCardInPage(tabs.selectedTabPosition, position)
                 }
-
                 instance.setUpdateCardId(-1)
             }
-
         }
+
     }
+
 }
 
 

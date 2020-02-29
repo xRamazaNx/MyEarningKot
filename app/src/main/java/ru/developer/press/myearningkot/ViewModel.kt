@@ -55,10 +55,9 @@ class PageViewModel(private val pageList: MutableList<Page> = mutableListOf()) :
         card: Card,
         updateView: (position: Int) -> Unit
     ) {
-        // временная суета...
-//        repeat(100) {
-//            card.addRow()
-//        }
+
+        // для того что бы удвлить времянки
+        card.rows.clear()
         // добавляем в базу данных новую Card присовение ид очень важно
         val page = pageList[indexPage]
         card.idPage = page.id
@@ -178,6 +177,7 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
 
 
     init {
+        updateColumnDL()
         updateCardLD()
     }
 
@@ -338,16 +338,11 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
 
     }
 
-    fun setDefaultPrefColumn(column: Column) {
-        column.setDefaultPref()
-        updateTypeControl()
-        updateCardLD()
-    }
-
     fun updateTypeControlColumn(column: Column) {
         card.updateTypeControlColumn(column)
     }
 
+    // тут не создается а обновляется
     fun updateColumnDL() {
         columnLDList.forEachIndexed { index, mutableLiveData ->
             mutableLiveData.value = card.columns[index]
@@ -361,6 +356,16 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
     fun deleteTotal(it: TotalItem) :Boolean{
         return card.deleteTotal(card.totals.indexOf(it))
 
+    }
+
+    fun addRow() {
+        card.addRow()
+        DataController().updateCard(card)
+        updateTypeControl()
+    }
+
+    fun getSortedRows(): List<Row> {
+        return card.rows
     }
 }
 
