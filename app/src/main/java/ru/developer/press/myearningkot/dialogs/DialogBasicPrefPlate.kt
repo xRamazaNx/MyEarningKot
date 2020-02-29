@@ -62,7 +62,7 @@ class DialogBasicPrefPlate(
             val switchEnableHorizontalScroll = view.switchEnableHorizontalScroll
             val switchShowTotalInfo = view.switchShowTotalInfo
 
-            switchEnableHorizontalScroll.isChecked = card.enableHorizontalScroll
+            switchEnableHorizontalScroll.isChecked = card.enableHorizontalScrollTotal
             switchShowTotalInfo.isChecked = card.isShowTotalInfo
 
             switchEnableHorizontalScroll.setOnCheckedChangeListener { _, b ->

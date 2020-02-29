@@ -18,13 +18,11 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.android.synthetic.main.card.view.*
 import kotlinx.android.synthetic.main.total_item.view.*
 import kotlinx.android.synthetic.main.total_item_layout.view.*
-import org.jetbrains.anko.dimen
-import org.jetbrains.anko.layoutInflater
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.wrapContent
+import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.activity.CardActivity
 import ru.developer.press.myearningkot.model.Formula.Companion.COLUMN_ID
+import ru.developer.press.myearningkot.model.Formula.Companion.OTHER
 import ru.developer.press.myearningkot.model.Formula.Companion.TOTAL_ID
 import ru.developer.press.myearningkot.otherHelpers.*
 import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.multiplyChar
@@ -80,7 +78,9 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
     }
 
     fun addTotal() {
-        totals.add(TotalItem())
+        totals.add(TotalItem().apply {
+            formula.formulaElements.add(Formula.FormulaElement(OTHER, "0"))
+        })
     }
 
     fun deleteTotal(index: Int): Boolean {
@@ -352,6 +352,7 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
             // лайот где валуе и линия
             val valueLayout =
                 context.layoutInflater.inflate(R.layout.total_item_value, null)
+
             val layoutParams = LinearLayout.LayoutParams(totalItem.width, matchParent).apply {
                 weight = 1f
             }
@@ -363,6 +364,7 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
             val title = TextView(context).apply {
                 this.layoutParams = layoutParams
                 gravity = Gravity.CENTER
+                padding = 5
             }
             val value = valueLayout.totalValue
 
@@ -511,7 +513,7 @@ class Cell(
 
 class TotalItem {
 
-    val id = Date().time
+    val id = Date().time + Random.nextLong()
     var width = 250
     var formula: Formula = Formula()
     var title: String = "ИТОГ"

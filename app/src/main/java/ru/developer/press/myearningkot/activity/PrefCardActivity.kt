@@ -42,6 +42,8 @@ import ru.developer.press.myearningkot.dialogs.DialogBasicPrefPlate
 import ru.developer.press.myearningkot.model.*
 import ru.developer.press.myearningkot.otherHelpers.PrefCardInfo
 import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.*
+import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.ElementPrefType.COLUMN
+import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.ElementPrefType.TOTAL
 import ru.developer.press.myearningkot.otherHelpers.SampleHelper
 import ru.developer.press.myearningkot.otherHelpers.showItemChangeDialog
 import splitties.alertdialog.appcompat.alertDialog
@@ -215,6 +217,13 @@ class PrefCardActivity : BasicCardActivity() {
             }
         }
 
+        addTotal.setOnClickListener {
+            viewModel?.addTotal()
+            viewModel?.updatePlateChanged()
+            initElementClick()
+            selectTotal(viewModel!!.card.totals.size - 1)
+        }
+
     }
 
     private fun initClickTotals(card: Card?) {
@@ -224,13 +233,7 @@ class PrefCardActivity : BasicCardActivity() {
             val valueContainer = totalContainer.totalValueContainer
             // клик по значению
             valueContainer.getChildAt(index).totalValue.setOnClickListener {
-                selectedControl.select(
-                    SelectedElement.ElementTotal(
-                        index,
-                        it.background,
-                        ElementType.TOTAL
-                    )
-                )
+                selectTotal(index)
             }
             // клик по заголовку
             titleContainer.getChildAt(index).setOnClickListener {
@@ -316,7 +319,7 @@ class PrefCardActivity : BasicCardActivity() {
                 selectedControl.moveToLeft()
             }
             R.id.deleteColumn -> {
-                selectedControl.deleteColumns()
+                selectedControl.delete()
             }
             android.R.id.home -> {
                 setCardOfResult()
@@ -569,7 +572,7 @@ class PrefCardActivity : BasicCardActivity() {
                                     })
                             }
 
-                            ElementPrefType.TOTAL -> {
+                            TOTAL -> {
                                 val listTotal = mutableListOf<TotalItem>().apply {
                                     elementPref.selectedElementList.filterIsInstance(SelectedElement.ElementTotal::class.java)
                                         .forEach {
@@ -671,15 +674,23 @@ class PrefCardActivity : BasicCardActivity() {
                     })
                 }
 
-                private fun reSelectColumnsAfterMove(columnList: MutableList<Column>) {
+                private fun reSelectAfterMove(list: List<Any>) {
+                    val isColumn = selectedControl.selectPrefType == COLUMN
                     selectedControl.unSelectAll()
-                    columnList.forEach { column ->
-                        val columnIndex = card.columns.indexOf(column)
-                        selectColumn(columnIndex)
-                    }
+                    if (isColumn)
+                        list.filterIsInstance<Column>().forEach { column ->
+                            val columnIndex = card.columns.indexOf(column)
+                            selectColumn(columnIndex)
+                        }
+                    else
+                        list.filterIsInstance<TotalItem>().forEach { total ->
+                            val columnIndex = card.totals.indexOf(total)
+                            selectTotal(columnIndex)
+                        }
+
                 }
 
-                private fun getColumnsFromSelectedElements(selectedElementList: MutableList<SelectedElement>): MutableList<Column> {
+                private fun getColumnsFromSelectedElements(selectedElementList: List<SelectedElement>): MutableList<Column> {
                     return mutableListOf<Column>().apply {
                         selectedElementList.filterIsInstance(SelectedElement.ElementColumn::class.java)
                             .forEach {
@@ -692,57 +703,119 @@ class PrefCardActivity : BasicCardActivity() {
 
                 override fun setVisiblePrefButton(isVisible: Boolean) {
                     toolbar.menu.findItem(R.id.elementSetting).isVisible = isVisible
-                    visibleColumnSetButton(selectedControl.isColumnSelect)
+                    visibleButton(selectedControl.selectPrefType)
 
                 }
 
-                override fun moveToRight(selectedElementList: MutableList<SelectedElement>) {
+                override fun moveToRight(selectedElementList: List<SelectedElement>) {
 
-                    val columnList = getColumnsFromSelectedElements(selectedElementList)
-                    viewModel?.moveToRight(columnList) {
-                        if (!it)
-                            toast(getString(R.string.moving_not_available))
-                        else {
-                            createTitles()
-                            createRecyclerView()
-                            clickPrefToAdapter()
-                            initElementClick()
-                            reSelectColumnsAfterMove(columnList)
+                    if (selectedControl.selectPrefType == COLUMN) {
+                        val columnList = getColumnsFromSelectedElements(selectedElementList)
+                        viewModel?.moveToRightColumn(columnList) {
+                            if (!it)
+                                toast(getString(R.string.moving_not_available))
+                            else {
+                                createTitles()
+                                createRecyclerView()
+                                clickPrefToAdapter()
+                                initElementClick()
+                                reSelectAfterMove(columnList)
+                            }
+                        }
+                    } else {
+                        val totalList: List<TotalItem> =
+                            getTotalsFromSelectedElements(selectedElementList)
+                        viewModel?.moveToRightTotal(totalList) {
+                            if (!it)
+                                toast(getString(R.string.moving_not_available))
+                            else {
+                                initElementClick()
+                                reSelectAfterMove(totalList)
+                            }
                         }
                     }
                 }
 
-                override fun moveToLeft(selectedElementList: MutableList<SelectedElement>) {
-                    val columnList = getColumnsFromSelectedElements(selectedElementList)
-                    viewModel?.moveToLeft(columnList) {
-                        if (!it) toast(getString(R.string.moving_not_available))
-                        else {
-                            createTitles()
-                            createRecyclerView()
-                            clickPrefToAdapter()
-                            initElementClick()
-                            selectedControl.unSelectAll()
-                            reSelectColumnsAfterMove(columnList)
+                private fun getTotalsFromSelectedElements(selectedElementList: List<SelectedElement>): List<TotalItem> {
+                    return mutableListOf<TotalItem>().apply {
+                        selectedElementList.filterIsInstance(SelectedElement.ElementTotal::class.java)
+                            .forEach {
+                                val totalIndex = it.index
+                                val total = card.totals[totalIndex]
+                                add(total)
+                            }
+                    }
+                }
+
+                override fun moveToLeft(selectedElementList: List<SelectedElement>) {
+                    if (selectedControl.selectPrefType == COLUMN) {
+
+                        val columnList = getColumnsFromSelectedElements(selectedElementList)
+                        viewModel?.moveToLeftColumn(columnList) {
+                            if (!it) toast(getString(R.string.moving_not_available))
+                            else {
+                                createTitles()
+                                createRecyclerView()
+                                clickPrefToAdapter()
+                                initElementClick()
+                                reSelectAfterMove(columnList)
+                            }
+                        }
+                    } else {
+                        val totalList = getTotalsFromSelectedElements(selectedElementList)
+                        viewModel?.moveToLeftTotal(totalList) {
+                            if (!it) toast(getString(R.string.moving_not_available))
+                            else {
+                                initElementClick()
+                                reSelectAfterMove(totalList)
+                            }
                         }
                     }
                 }
 
-                override fun deleteColumns(selectedElementList: MutableList<SelectedElement>) {
-                    val columnList = getColumnsFromSelectedElements(selectedElementList)
-                    selectedControl.unSelectAll()
-                    columnList.forEach {
-                        val deleteColumnResult: Boolean? = viewModel?.deleteColumn(it)
-                        if (!deleteColumnResult!!) {
-                            toast("Нельзя удалить столбец для нумерации")
+                override fun delete(selectedElementList: List<SelectedElement>) {
+                    if (selectedControl.selectPrefType == COLUMN) {
+
+                        val columnList = getColumnsFromSelectedElements(selectedElementList)
+                        selectedControl.unSelectAll()
+                        columnList.forEach {
+                            val deleteColumnResult: Boolean? = viewModel?.deleteColumn(it)
+                            if (!deleteColumnResult!!) {
+                                toast("Нельзя удалить столбец для нумерации")
+                            }
                         }
+                        createTitles()
+                        createRecyclerView()
+                        clickPrefToAdapter()
+                        initElementClick()
+                    } else {
+                        val totalList = getTotalsFromSelectedElements(selectedElementList)
+                        selectedControl.unSelectAll()
+                        totalList.forEach {
+                            val deleteTotal = viewModel?.deleteTotal(it)
+                            deleteTotal?.let { delTotal ->
+                                if (delTotal) {
+                                    viewModel?.updatePlateChanged()
+                                } else {
+                                    toast("Нельзя удалить единственный итог, если хотите отключить итоговую панель, отключите ее в настройках карточки")
+                                }
+                            }
+                        }
+                        initElementClick()
                     }
-                    createTitles()
-                    createRecyclerView()
-                    clickPrefToAdapter()
-                    initElementClick()
                 }
             }
         }
+    }
+
+    private fun selectTotal(totalIndex: Int) {
+        selectedControl.select(
+            SelectedElement.ElementTotal(
+                totalIndex,
+                totalContainer.totalValueContainer.getChildAt(totalIndex).background,
+                ElementType.TOTAL
+            )
+        )
     }
 
     override fun onResume() {
@@ -751,15 +824,16 @@ class PrefCardActivity : BasicCardActivity() {
         toolbar.post {
             val isVisible = selectedControl.isSelect
             toolbar.menu.findItem(R.id.elementSetting).isVisible = isVisible
-            visibleColumnSetButton(selectedControl.isColumnSelect)
+            visibleButton(selectedControl.selectPrefType)
         }
 
     }
 
-    private fun visibleColumnSetButton(isVisible: Boolean) {
-        toolbar.menu.findItem(R.id.moveToRight).isVisible = isVisible
-        toolbar.menu.findItem(R.id.moveToLeft).isVisible = isVisible
-        toolbar.menu.findItem(R.id.deleteColumn).isVisible = isVisible
+    private fun visibleButton(prefType: ElementPrefType) {
+        val isColumnOrTotal = prefType == TOTAL || prefType == COLUMN
+        toolbar.menu.findItem(R.id.moveToRight).isVisible = isColumnOrTotal
+        toolbar.menu.findItem(R.id.moveToLeft).isVisible = isColumnOrTotal
+        toolbar.menu.findItem(R.id.deleteColumn).isVisible = isColumnOrTotal
     }
 
     private fun updatePlate() {

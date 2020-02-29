@@ -2,18 +2,17 @@ package ru.developer.press.myearningkot.otherHelpers.PrefLayouts
 
 import android.graphics.drawable.Drawable
 import android.view.View
-import com.google.gson.annotations.SerializedName
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.model.ColumnType
-import ru.developer.press.myearningkot.otherHelpers.column_type_gson
 
 class PrefSelectedControl {
-    val isColumnSelect: Boolean
-        get() {
-            return if (isSelect) {
-                selectedElementList.any { it.elementType == ElementType.COLUMN }
-            } else false
-        }
+    val selectPrefType: ElementPrefType
+        get() =
+            when {
+                selectedElementList.any { it.elementType == ElementType.COLUMN } -> ElementPrefType.COLUMN
+                selectedElementList.any { it.elementType == ElementType.TOTAL } -> ElementPrefType.TOTAL
+                else -> ElementPrefType.TEXT_VIEW
+            }
     private val selectedElementList = mutableListOf<SelectedElement>()
     val isSelect: Boolean
         get() {
@@ -121,19 +120,20 @@ class PrefSelectedControl {
 
         val elementPref = ElementPref().apply {
             selectedElementList = this@PrefSelectedControl.selectedElementList
+            elementPrefType = selectPrefType
         }
 
         // определяем какого типа будет лайот
-        selectedElementList.forEach {
-
-            if (it.elementType == ElementType.COLUMN) {
-                elementPref.elementPrefType = ElementPrefType.COLUMN
-                return@forEach
-            } else if (it.elementType == ElementType.TOTAL){
-                elementPref.elementPrefType = ElementPrefType.TOTAL
-                return@forEach
-            }
-        }
+//        selectedElementList.forEach {
+//
+//            if (it.elementType == ElementType.COLUMN) {
+//                elementPref.elementPrefType = ElementPrefType.COLUMN
+//                return@forEach
+//            } else if (it.elementType == ElementType.TOTAL) {
+//                elementPref.elementPrefType = ElementPrefType.TOTAL
+//                return@forEach
+//            }
+//        }
 
         // определяем точно
         if (elementPref.elementPrefType == ElementPrefType.COLUMN) {
@@ -279,8 +279,8 @@ class PrefSelectedControl {
 
     }
 
-    fun deleteColumns() {
-        selectCallback?.deleteColumns(selectedElementList)
+    fun delete() {
+        selectCallback?.delete(selectedElementList)
     }
 
     fun updateSelected() {
@@ -321,9 +321,9 @@ interface SelectCallback {
     fun unSelect(selectedElement: SelectedElement?)
     fun showPref(elementPref: ElementPref)
     fun setVisiblePrefButton(isVisible: Boolean)
-    fun moveToRight(selectedElementList: MutableList<SelectedElement>)
-    fun moveToLeft(selectedElementList: MutableList<SelectedElement>)
-    fun deleteColumns(selectedElementList: MutableList<SelectedElement>)
+    fun moveToRight(selectedElementList: List<SelectedElement>)
+    fun moveToLeft(selectedElementList: List<SelectedElement>)
+    fun delete(selectedElementList: List<SelectedElement>)
 }
 
 enum class ElementType {

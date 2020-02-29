@@ -200,7 +200,36 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
         return deleteResult
     }
 
-    fun moveToRight(selectedColumns: MutableList<Column>, result: (Boolean) -> Unit) {
+    fun moveToRightTotal(selectedTotals:List<TotalItem>, result: (Boolean) -> Unit){
+        val totals = card.totals
+        selectedTotals.forEach {
+            val index = totals.indexOf(it)
+            if (index > totals.size -2){
+                result(false)
+                return
+            }
+        }
+
+        val indexSortedList = mutableListOf<Int>()
+        selectedTotals.forEach {
+            indexSortedList.add(totals.indexOf(it))
+        }
+        indexSortedList.sortDescending()
+
+        indexSortedList.forEach {
+            val indexOfTotal = it
+            val total = totals[it]
+
+            val totalRight = totals[indexOfTotal + 1]
+            totals[indexOfTotal + 1] = total
+            totals[indexOfTotal] = totalRight
+        }
+
+        updatePlateChanged()
+        result(true)
+
+    }
+    fun moveToRightColumn(selectedColumns: MutableList<Column>, result: (Boolean) -> Unit) {
         val columns = card.columns
         selectedColumns.forEach {
 
@@ -239,7 +268,37 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
         result(true)
     }
 
-    fun moveToLeft(selectedColumns: MutableList<Column>, result: (Boolean) -> Unit) {
+    fun moveToLeftTotal(selectedTotals: List<TotalItem>, result: (Boolean) -> Unit) {
+        val totals = card.totals
+
+        selectedTotals.forEach {
+            val index = totals.indexOf(it)
+            if (index < 1) {
+                result(false)
+                return
+            }
+        }
+        val indexSortedList = mutableListOf<Int>()
+
+        selectedTotals.forEach {
+            indexSortedList.add(totals.indexOf(it))
+        }
+        indexSortedList.sort()
+
+        indexSortedList.forEach {
+            val indexOfTotal = it
+
+            val total = totals[it]
+            val totalLeft = totals[indexOfTotal - 1]
+            totals[indexOfTotal - 1] = total
+            totals[indexOfTotal] = totalLeft
+        }
+
+        updatePlateChanged()
+        result(true)
+
+    }
+    fun moveToLeftColumn(selectedColumns: MutableList<Column>, result: (Boolean) -> Unit) {
         val columns = card.columns
 
         selectedColumns.forEach {
@@ -293,6 +352,15 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
         columnLDList.forEachIndexed { index, mutableLiveData ->
             mutableLiveData.value = card.columns[index]
         }
+    }
+
+    fun addTotal() {
+        card.addTotal()
+    }
+
+    fun deleteTotal(it: TotalItem) :Boolean{
+        return card.deleteTotal(card.totals.indexOf(it))
+
     }
 }
 

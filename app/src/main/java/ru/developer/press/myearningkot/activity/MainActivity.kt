@@ -71,9 +71,10 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
             val pageList = withContext(Dispatchers.IO) {
                 DataController().getPageList()
             }
-            viewModel =
+            viewModel = withContext(Dispatchers.IO) {
                 ViewModelProviders.of(this@MainActivity, ViewModelMainFactory(pageList))
                     .get(PageViewModel::class.java)
+            }
             progressBar.visibility = GONE
             viewInit()
             function()
@@ -378,7 +379,6 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
             }
 
         }
-
     }
 }
 

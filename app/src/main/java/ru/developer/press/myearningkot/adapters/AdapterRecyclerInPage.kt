@@ -6,6 +6,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import androidx.core.view.forEach
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_card.view.*
 import kotlinx.android.synthetic.main.card.view.*
@@ -69,35 +70,16 @@ class AdapterRecyclerInPage(
 //        private val balance = itemView.balance
 
         init {
-            itemView.setOnClickListener {
+            val click: (View) -> Unit = {
                 cardClickListener.cardClick(idCard)
             }
+            itemView.setOnClickListener(click)
+            itemView.totalContainerScroll.setOnClickListener(click)
         }
-
 
         fun bind(card: Card) {
 
             card.customizeTotalAmount(itemView)
-//            card.cardPref.namePref.customize(nameCard)
-//            card.cardPref.dateOfPeriodPref.customize(dateOfPeriod)
-//
-//            card.cardPref.sumTitlePref.customize(sumTitle)
-//            card.cardPref.sumPref.customize(sum)
-//
-//            card.cardPref.avansTitlePref.customize(avansTitle)
-//            card.cardPref.avansPref.customize(avans)
-//
-//            card.cardPref.balanceTitlePref.customize(balanceTitle)
-//            card.cardPref.balancePref.customize(balance)
-//
-//            nameCard.text = card.name
-//            dateOfPeriod.visibility = if (card.visibleDate) VISIBLE else GONE
-//            dateOfPeriod.text =
-//                card.dateOfPeriod //  предполагается что вся инфа о дате в бизнес логике ставится
-//
-//            sum.text = card.totalAmount.sum.toString()
-//            avans.text = card.totalAmount.avans.toString()
-//            balance.text = card.totalAmount.balance.toString()
 
             idCard = card.id
 

@@ -43,7 +43,7 @@ class Calc {
         '-' to Delimiter(DelimiterType.ADDSUB) { a: Double, b: Double -> a - b },
         '*' to Delimiter(DelimiterType.MULDIV) { a: Double, b: Double -> a * b },
         '/' to Delimiter(DelimiterType.MULDIV) { a: Double, b: Double -> a / b },
-        '%' to Delimiter(DelimiterType.MULDIV) { a: Double, b: Double -> a /100 * b },
+        '%' to Delimiter(DelimiterType.MULDIV) { a: Double, b: Double -> a / 100 * b },
         '^' to Delimiter(DelimiterType.POW) { a: Double, b: Double -> a.pow(b) },
         '(' to Brace(BraceType.OPENING),
         ')' to Brace(BraceType.CLOSING)
@@ -61,9 +61,13 @@ class Calc {
     }
 
     fun evaluate(e: String): Double {
-        logD(e)
-        val groupingSeparator = DecimalFormatSymbols.getInstance(Locale.getDefault()).groupingSeparator.toString()
-        val substring = e.replace(groupingSeparator, "")
+        val groupingSeparator =
+            DecimalFormatSymbols.getInstance(Locale.getDefault()).groupingSeparator.toString()
+        val substring = e
+            // замена разделителя тысячных на слияние
+            .replace(groupingSeparator, "")
+                // замена плавающей запятой на точку
+            .replace(',', '.')
         logD(substring)
         expr = substring
         i = 0
