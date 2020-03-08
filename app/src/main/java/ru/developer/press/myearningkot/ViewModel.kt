@@ -112,6 +112,9 @@ class PageViewModel(private val pageList: MutableList<Page> = mutableListOf()) :
 // для отображения открытой карточки
 open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
 
+    var isCellSelectMode = MutableLiveData<Boolean>().apply {
+        value = false
+    }
     val titleLiveData = MutableLiveData<String>()
     val displayParam = DisplayParam()
     val cardLiveData = MutableLiveData<Card>()
@@ -140,7 +143,7 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
         }
     }
 
-    fun updatePlateChanged(){
+    fun updatePlateChanged() {
         cardLiveData.value = card
     }
 
@@ -200,11 +203,11 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
         return deleteResult
     }
 
-    fun moveToRightTotal(selectedTotals:List<TotalItem>, result: (Boolean) -> Unit){
+    fun moveToRightTotal(selectedTotals: List<TotalItem>, result: (Boolean) -> Unit) {
         val totals = card.totals
         selectedTotals.forEach {
             val index = totals.indexOf(it)
-            if (index > totals.size -2){
+            if (index > totals.size - 2) {
                 result(false)
                 return
             }
@@ -229,6 +232,7 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
         result(true)
 
     }
+
     fun moveToRightColumn(selectedColumns: MutableList<Column>, result: (Boolean) -> Unit) {
         val columns = card.columns
         selectedColumns.forEach {
@@ -298,6 +302,7 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
         result(true)
 
     }
+
     fun moveToLeftColumn(selectedColumns: MutableList<Column>, result: (Boolean) -> Unit) {
         val columns = card.columns
 
@@ -353,7 +358,7 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
         card.addTotal()
     }
 
-    fun deleteTotal(it: TotalItem) :Boolean{
+    fun deleteTotal(it: TotalItem): Boolean {
         return card.deleteTotal(card.totals.indexOf(it))
 
     }
@@ -366,6 +371,25 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
 
     fun getSortedRows(): List<Row> {
         return card.rows
+    }
+
+    fun cellClicked(rowPosition: Int, cellPosition: Int, function: (Int, Boolean) -> Unit) {
+        val cell = card.rows[rowPosition].cellList[cellPosition]
+        val oldStateSelect = cell.isSelect
+        val oldSelectPosition: Int = card.unSelectCell()
+        cell.isSelect = true
+        function(if (oldSelectPosition > -1) oldSelectPosition else rowPosition, oldStateSelect)
+
+        // присваиваем тру только если не было выделено
+        isCellSelectMode.value?.let {
+            if (!it)
+                isCellSelectMode.value = true
+        }
+    }
+
+    fun unSelect() {
+        card.unSelectCell()
+        isCellSelectMode.value = false
     }
 }
 

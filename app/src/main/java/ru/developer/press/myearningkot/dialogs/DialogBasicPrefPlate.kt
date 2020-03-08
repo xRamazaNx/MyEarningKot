@@ -32,39 +32,27 @@ class DialogBasicPrefPlate(
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = AlertDialog.Builder(context).apply {
             setCustomTitle(TextView(context).apply {
-                text = "Общие настройки"
+                text = "Настройки карточки"
                 textColorResource = R.color.light_gray
                 val dp24 = context.dpsToPixels(24)
                 val dp8 = context.dpsToPixels(8)
                 setPadding(dp24, dp24, dp24, dp8)
-                textSize = 22f
+                textSize = 20f
             })
             val view = context.layoutInflater.inflate(R.layout.plate_basic_pref_layout, null)
 
-            // выбор типа даты
-            val textViewDateType = view.textViewDateType
-            val listDateType = getDateTypeList()
-            textViewDateType.text =
-                "${getString(R.string.date_type)} (${listDateType[card.dateType]})"
-            textViewDateType.setOnClickListener {
-                context.showItemChangeDialog(
-                    "Выберите тип даты",
-                    listDateType,
-                    card.dateType,
-                    null,
-                    fun(selected) {
-                        card.dateType = selected
-                        textViewDateType.text =
-                            "${getString(R.string.date_type)} (${listDateType[selected]})"
-                        updateCard()
-                    })
-            }
+            val switchEnableShowDatePeriod = view.switchEnableDatePeriod
             val switchEnableHorizontalScroll = view.switchEnableHorizontalScroll
             val switchShowTotalInfo = view.switchShowTotalInfo
 
+            switchEnableShowDatePeriod.isChecked = card.isShowDatePeriod
             switchEnableHorizontalScroll.isChecked = card.enableHorizontalScrollTotal
             switchShowTotalInfo.isChecked = card.isShowTotalInfo
 
+            switchEnableShowDatePeriod.setOnCheckedChangeListener { _, isChecked ->
+                card.isShowDatePeriod = isChecked
+                updateCard()
+            }
             switchEnableHorizontalScroll.setOnCheckedChangeListener { _, b ->
                 card.enableHorizontalScrollTotal = b
                 updateCard()

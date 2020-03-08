@@ -43,8 +43,7 @@ import ru.developer.press.myearningkot.dialogs.DialogBasicPrefPlate
 import ru.developer.press.myearningkot.model.*
 import ru.developer.press.myearningkot.otherHelpers.PrefCardInfo
 import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.*
-import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.ElementPrefType.COLUMN
-import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.ElementPrefType.TOTAL
+import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.ElementPrefType.*
 import ru.developer.press.myearningkot.otherHelpers.SampleHelper
 import ru.developer.press.myearningkot.otherHelpers.showItemChangeDialog
 import splitties.alertdialog.appcompat.alertDialog
@@ -125,15 +124,20 @@ class PrefCardActivity : BasicCardActivity() {
         prefWindow.isFocusable = true
         prefWindow.isOutsideTouchable = true
         prefWindow.animationStyle = R.style.popup_window_animation
-//        prefWindow.setOnDismissListener {
-//            selectedControl.unSelect(selectedElement)
-//        }
+        prefWindow.setOnDismissListener {
+            containerPlate.animate().translationY(0f)
+        }
     }
 
     fun showPrefWindow(view: View, y: Int) {
+        if (y > 0) {
+            view.post {
+                containerPlate.animate().translationY(-view.height.toFloat())
+            }
+        }
         view.minimumHeight = (resources.displayMetrics.heightPixels / 3)
         prefWindow.contentView = view
-        prefWindow.showAtLocation(totalAmountView, Gravity.BOTTOM, 0, y)
+        prefWindow.showAtLocation(totalAmountView, Gravity.BOTTOM, 0, 0)
 
     }
 
@@ -174,7 +178,7 @@ class PrefCardActivity : BasicCardActivity() {
         nameCard.setOnClickListener {
             selectedControl.select(
                 SelectedElement.ElementTextView(
-                    nameCard.background,
+                    it.background,
                     ElementType.NAME
                 )
             )
@@ -183,7 +187,7 @@ class PrefCardActivity : BasicCardActivity() {
         datePeriodCard.setOnClickListener {
             selectedControl.select(
                 SelectedElement.ElementTextView(
-                    datePeriodCard.background,
+                    it.background,
                     ElementType.DATE
                 )
             )
@@ -271,7 +275,6 @@ class PrefCardActivity : BasicCardActivity() {
             R.id.basicPref -> {
                 viewModel?.card.let { card ->
                     val dialogBasicPrefCard = DialogBasicPrefCard(card!!) {
-
                         // ps покрывает обновление всех четырех настроек которые настраиваются в диалоге
                         CoroutineScope(Dispatchers.Main).launch {
                             withContext(Dispatchers.IO) {
@@ -282,8 +285,6 @@ class PrefCardActivity : BasicCardActivity() {
                             clickPrefToAdapter()
                             updatePlate()
                         }
-
-
                     }
                     dialogBasicPrefCard.show(supportFragmentManager, "dialogBasicPrefCard")
                 }
@@ -469,7 +470,7 @@ class PrefCardActivity : BasicCardActivity() {
                     var yOff = 0
                     val prefLayout =
                         when (elementPref.elementPrefType) {
-                            ElementPrefType.TEXT_VIEW -> {
+                            TEXT_VIEW -> {
                                 var isWorkAlignPanel = true
                                 val name: String?
 
@@ -521,15 +522,12 @@ class PrefCardActivity : BasicCardActivity() {
                                         }
                                         ElementType.NAME -> card.cardPref.namePref
 
-                                        ElementType.DATE -> card.cardPref.dateOfPeriodPref
-
                                         ElementType.TOTAL_TITLE -> {
                                             val totalItem =
                                                 card.totals[(it as SelectedElement.ElementTotal).index]
                                             totalItem.titlePref
                                         }
                                         else -> null
-
                                     }
                                     if (prefForTextView != null) {
                                         prefList.add(prefForTextView)
@@ -609,12 +607,22 @@ class PrefCardActivity : BasicCardActivity() {
                                                 .layoutParams.width =
                                                 total.width
                                         }
-                                        totalContainer.requestLayout()
+                                        containerPlate.requestLayout()
                                     }
 
                                     override fun widthChanged() {
                                     }
                                 })
+                            }
+
+                            DATE_PERIOD -> {
+                                yOff = containerPlate.height
+                                getPrefDatePeriod(card.cardPref.dateOfPeriodPref,
+                                    object : PrefChangedCallBack {
+                                        override fun prefChanged() {
+                                            changedCard()
+                                        }
+                                    })
                             }
 
                             else -> {
@@ -861,6 +869,5 @@ class PrefCardActivity : BasicCardActivity() {
         selectedControl.updateSelected()
         initClickTotals(viewModel?.card)
     }
-
 
 }

@@ -34,21 +34,23 @@ import kotlin.random.Random
 // каточка
 class Card(var name: String = "") : ProvideCardPropertyForCell {
 
+    var isShowDatePeriod: Boolean = false
     var idPage = -1L
     var id = -1L
     var isShowTotalInfo = true
     val cardPref = PrefForCard().initDefault()
 
-    var dateType = 0
     var valuta = 0
-    @SerializedName("ess")
     var enableSomeStroke = true
     val sortPref = SortPref()
-    @SerializedName("ehs")
     var enableHorizontalScroll = false
     var enableHorizontalScrollTotal = false
-    @SerializedName("hc")
-    var heightCells = App.instance?.dimen(R.dimen.column_height) ?: 50
+    var heightCells = 35
+        set(value) {
+            if (value in 18..70) {
+                field = value
+            }
+        }
     var dateCreated = Date().time
     var dateModify = dateCreated
     val rows = mutableListOf<Row>()
@@ -62,8 +64,10 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
 
     private val dateOfPeriod: String
         get() {
-            val first = getDate(dateType, dateCreated, false)
-            val last = getDate(dateType, dateModify, false)
+            val variantDate = cardPref.dateOfPeriodPref.type
+            val enableTime = cardPref.dateOfPeriodPref.enableTime
+            val first = getDate(variantDate, dateCreated, enableTime)
+            val last = getDate(variantDate, dateModify, enableTime)
             return "$first - $last"
         }
 
@@ -267,7 +271,7 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
                     "Выбранный элемент"
                 }
                 is DateColumn -> {
-                    getDateTypeList()[dateType]
+                    getDateTypeList()[0]
                 }
                 is NumberColumn -> {
                     "12345.987"
@@ -319,12 +323,12 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
 
         nameCard.text = name
         val isCardActivity = context is CardActivity
-        datePeriodCard.visibility = if (dateType > 0 && !isCardActivity) View.VISIBLE else View.GONE
+        datePeriodCard.visibility = if (isShowDatePeriod && !isCardActivity) View.VISIBLE else GONE
         datePeriodCard.text = dateOfPeriod
 
         // визуальная настройка
         cardPref.namePref.customize(nameCard)
-        cardPref.dateOfPeriodPref.customize(datePeriodCard)
+        cardPref.dateOfPeriodPref.prefForTextView.customize(datePeriodCard)
 
         //главный контейнер для заголовков и значений
         val totalContainer: LinearLayout =
@@ -416,18 +420,29 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
         }
     }
 
+    fun unSelectCell() :Int {
+        rows.forEachIndexed {rowIndex, row ->
+            val cell = row.cellList.find { it.isSelect }
+            if (cell != null) {
+                cell.isSelect = false
+                return rowIndex
+            }
+        }
+        return -1
+    }
+
 }
 
 class PrefForCard(
     var namePref: PrefForTextView = PrefForTextView(),
-    var dateOfPeriodPref: PrefForTextView = PrefForTextView()
+    var dateOfPeriodPref: DateTypePref = DateTypePref()
 
 ) {
     fun initDefault(): PrefForCard {
         namePref.color = Color.WHITE
         val app = App.instance
         if (app != null) {
-            dateOfPeriodPref.color = app.getColorFromRes(R.color.gray)
+            dateOfPeriodPref.prefForTextView.color = app.getColorFromRes(R.color.gray)
         }
         return this
     }
@@ -438,6 +453,8 @@ class Cell(
     @SerializedName("v")
     var sourceValue: String = ""
 ) {
+    @Transient
+    var isSelect: Boolean = false
     @Transient
     var isPrefColumnSelect = false
     @Transient
@@ -575,10 +592,25 @@ class TotalItem {
                 return@forEachIndexed
             }
         }
+        // есть ли в карточке свитч колона
+        val isAnySwitchColumn = columns.any { it is SwitchColumn }
         return if (index > -1) {
-            rows.forEach {
-                val cell = it.cellList[index]
-                value += calc.evaluate(cell.sourceValue)
+            rows.forEach { row ->
+                var isAddSum = true
+                if (isAnySwitchColumn)
+                // проходим по колонам в основном для того что бы узнать индекс для доступа к ячейке
+                    columns.forEachIndexed { columnIndex, column ->
+                        // если нашли
+                        if (column is SwitchColumn) {
+                            // в настройках включена опция "учитывать в итоговой панели"
+                            if (column.typePref.behavior.control)
+                                isAddSum = row.cellList[columnIndex].sourceValue.toBoolean()
+                        }
+                    }
+
+                val cell = row.cellList[index]
+                if (isAddSum)
+                    value += calc.evaluate(cell.sourceValue)
             }
             value.toString()
         } else
@@ -587,27 +619,21 @@ class TotalItem {
 }
 
 class Row {
+    @SerializedName("dc")
     val dateCreated = Date().time
+    @SerializedName("dm")
     var dateModify = Date().time
+    @SerializedName("sl")
     var cellList = mutableListOf<Cell>()
 }
 
 //
 // для отображения записи внутри карточки
 
-
 class DisplayParam {
     var width: Int = 0
     var height: Int = 0
 }
-
-// value для cell
-class CheckTypeValue(
-    @SerializedName("ch")
-    var check: Boolean = false,
-    @SerializedName("v")
-    var text: String = "check"
-)
 
 class PhoneTypeValue(
     var name: String = "",

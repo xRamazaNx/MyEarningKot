@@ -7,7 +7,6 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.contains
@@ -15,11 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import kotlinx.android.synthetic.main.activity_card.*
-import kotlinx.android.synthetic.main.card.*
 import kotlinx.android.synthetic.main.card.view.*
-import kotlinx.android.synthetic.main.formula_layout.view.*
-import kotlinx.android.synthetic.main.title_column.view.*
-import kotlinx.android.synthetic.main.total_item.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,7 +22,6 @@ import kotlinx.coroutines.withContext
 import ru.developer.press.myearningkot.App
 import ru.developer.press.myearningkot.CardViewModel
 import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.RowClickListener
 import ru.developer.press.myearningkot.adapters.AdapterRecyclerInCard
 import ru.developer.press.myearningkot.otherHelpers.bindTitleOfColumn
 
@@ -129,14 +123,7 @@ abstract class BasicCardActivity : AppCompatActivity() {
     }
 
     protected fun getAdapterForRecycler(): AdapterRecyclerInCard {
-        return AdapterRecyclerInCard(object : RowClickListener {
-            override fun rowClick(position: Int) {
-                toast("click item")
-            }
-
-            override fun rowLongClick(position: Int) {
-            }
-        }, viewModel!!, viewModel!!.card.rows)
+        return AdapterRecyclerInCard(null, viewModel!!, viewModel!!.card.rows)
     }
 
     fun createTitles() {

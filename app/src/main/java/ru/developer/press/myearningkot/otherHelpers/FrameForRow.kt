@@ -17,7 +17,6 @@ class FrameForRow(context: Context) : FrameLayout(context){
     }
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-
         val y = (height / 2).toFloat()
         canvas?.drawLine(0f, 50f, 300f, 60f, paint)
     }

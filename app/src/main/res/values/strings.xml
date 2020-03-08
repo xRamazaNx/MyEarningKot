@@ -46,7 +46,7 @@
     <string name="switchColorEnable">Цвет (вкл)</string>
     <string name="switchDisableColor">Цвет (выкл)</string>
     <string name="cross_row">Зачеркивать запись</string>
-    <string name="acceptRow">Управлять учетом в общей сумме</string>
+    <string name="acceptRow">Управлять учетом в итоговой панели</string>
     <string name="behavior_switch_setting">Настройка поведения</string>
     <string name="save_changes">Сохранить изменения?</string>
     <string name="show_total_info">Включить итоговую панель</string>
@@ -57,4 +57,17 @@
     <string name="setting_total">Настройка таблички</string>
     <string name="column">Колона:</string>
     <string name="total">Итог:</string>
+    <string name="show_date_period">Показывать дату</string>
+    <string name="set_text">Введите текст</string>
+    <string name="set_first_name">Введите имя</string>
+    <string name="set_last_name">Введите фамилию</string>
+    <string name="set_phone">Введите номер</string>
+    <string name="set_organization_name">Введите название организации</string>
+    <string name="change_phone">Выбрать контакт</string>
+    <string name="change_date">Выберите дату</string>
+    <string name="change_color">Выберите цвет</string>
+    <string name="switch_text">Переключатель</string>
+    <string name="add_image">Добавить изображения</string>
+    <string name="change_in_list">Выберите из списка</string>
+    <string name="add_in_list">Добавить в список</string>
 </resources>

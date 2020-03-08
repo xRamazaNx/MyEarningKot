@@ -13,7 +13,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.create_card_layout.*
 import kotlinx.android.synthetic.main.create_card_layout.view.*
 import kotlinx.android.synthetic.main.set_name_layout.view.*
 import org.jetbrains.anko.layoutInflater
@@ -72,7 +71,7 @@ class DialogCreateCard(val createCard: (Card) -> Unit) : DialogFragment() {
                     var selectItem = select
                     if (select == -1) {
                         sampleList =
-                            sampleHelper.addSample(newSampleText)
+                            sampleHelper.addSample(Card(newSampleText))
                         selectItem = sampleList.size - 1
                     }
                     selectSample = selectItem

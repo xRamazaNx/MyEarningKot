@@ -2,31 +2,23 @@ package ru.developer.press.myearningkot.adapters
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
-import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.annotation.DrawableRes
-import com.bumptech.glide.load.resource.drawable.DrawableResource
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeAdapter
 import org.jetbrains.anko.backgroundResource
-import ru.developer.press.myearningkot.ProvideDataRows
-import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.RowClickListener
-import ru.developer.press.myearningkot.RowDataListener
-import ru.developer.press.myearningkot.activity.toast
+import org.jetbrains.anko.wrapContent
+import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.model.Cell
 import ru.developer.press.myearningkot.model.Column
 import ru.developer.press.myearningkot.model.Row
 import ru.developer.press.myearningkot.model.SwitchColumn
-import ru.developer.press.myearningkot.otherHelpers.FrameForRow
 import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.setSelectBackground
 
 class AdapterRecyclerInCard(
-    private val rowClickListener: RowClickListener,
+    private var rowClickListener: RowClickListener?,
     private val provideDataRows: ProvideDataRows,
     list: MutableList<Row>
 ) : DragDropSwipeAdapter<Row, RowHolder>(list) {
@@ -35,23 +27,27 @@ class AdapterRecyclerInCard(
         cellClickPrefFunction = cellClickFun
     }
 
+    fun setCellClickListener(_rowClickListener: RowClickListener?){
+        rowClickListener = _rowClickListener
+    }
     private val rowNumberScrollListenerList = mutableSetOf<RowDataListener>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RowHolder {
         val context = parent.context
         val width = provideDataRows.getWidth()
 
+        val rowHeight = context.dpsToPixels(provideDataRows.getRowHeight())
         val rowView = LinearLayout(context).apply {
             layoutParams = LinearLayout.LayoutParams(
 
                 width,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                minimumHeight = provideDataRows.getRowHeight()
-            }
+                if (provideDataRows.isEnableSomeStroke()) wrapContent else rowHeight
+            )
             orientation = LinearLayout.HORIZONTAL
         }
-        val rowHolder = RowHolder(FrameLayout(context).apply { addView(rowView) })
+        val rowHolder = RowHolder(FrameLayout(context).apply {
+            addView(rowView)
+        })
 
         provideDataRows.getColumns().forEachIndexed { index, column ->
             // ячейка равно...
@@ -71,8 +67,7 @@ class AdapterRecyclerInCard(
                     if (cellClickPrefFunction != null) {
                         cellClickPrefFunction!!.invoke(columnIndex)
                     } else {
-                        itemView.context.toast(adapterPosition.toString())
-//                    rowClickListener.rowClick(rowHolder.adapterPosition)
+                        rowClickListener?.cellClick(adapterPosition, columnIndex)
                     }
                 }
             }
@@ -107,23 +102,23 @@ class AdapterRecyclerInCard(
         viewHolder.bind(item.cellList, provideDataRows.getColumns())
     }
 
-    fun clickEvent(y: Float, isLongClick: Boolean) {
-        var height = 0
-        rowNumberScrollListenerList.forEachIndexed { index, rowDataListener ->
-            height += rowDataListener.getItemHeight()
-            if (y < height) {
-                if (isLongClick)
-                    rowClickListener.rowLongClick(index)
-                else {
-                    rowClickListener.rowClick(index)
-                }
-
-                return
-            }
-
-        }
-
-    }
+//    fun clickEvent(y: Float, isLongClick: Boolean) {
+//        var height = 0
+//        rowNumberScrollListenerList.forEachIndexed { index, rowDataListener ->
+//            height += rowDataListener.getItemHeight()
+//            if (y < height) {
+//                if (isLongClick)
+//                    rowClickListener.rowLongClick(index)
+//                else {
+//                    rowClickListener.cellClick(index,)
+//                }
+//
+//                return
+//            }
+//
+//        }
+//
+//    }
 }
 
 class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataListener {
@@ -152,10 +147,15 @@ class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataList
                 }
             }
             // колона выделена- обвести
-            if (cell.isPrefColumnSelect) {
-                setSelectBackground(cellView)
-            } else {
-                viewList[index].backgroundResource = R.drawable.shape
+            when {
+                cell.isPrefColumnSelect -> {
+                    setSelectBackground(cellView)
+                }
+                cell.isSelect -> {
+                    cellView.backgroundResource = R.drawable.shape_select
+
+                }
+                else -> cellView.backgroundResource = R.drawable.shape
             }
         }
 

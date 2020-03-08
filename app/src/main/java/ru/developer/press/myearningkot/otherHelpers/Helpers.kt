@@ -86,49 +86,13 @@ fun getValutaTypeList(): MutableList<String> {
 
 fun getDateTypeList(): MutableList<String> {
     return mutableListOf<String>().apply {
-        add("Не показывать")
+        add(getDate(0, enableTime = false))
         add(getDate(1, enableTime = false))
         add(getDate(2, enableTime = false))
-        add(getDate(3, enableTime = false))
     }
 }
 
-//    public void setDateInt(int day, int month, int year) {
-//
-//        dateInt[0] = year;
-//        dateInt[1] = month;
-//        dateInt[2] = day;
-//
-//        calendar.set(dateInt[0], dateInt[1], dateInt[2]);
-//    }
-//    private void updateDateMl() {
-//        calendar.set(dateInt[0], dateInt[1], dateInt[2]);
-//        dateMl = calendar.getTimeInMillis();
-//    }
-//    public void setDateInt(int[] dateInt) {
-//        this.dateInt = dateInt;
-//        calendar.set(dateInt[0], dateInt[1], dateInt[2]);
-//    }
-//    public int[] getDateIntArray() {
-//        return dateInt;
-//    }
-//    public int getDateInt() { //
-//
-//        String year = String.valueOf(dateInt[0]);
-//        String month = String.valueOf(dateInt[1]);
-//        String day = String.valueOf(dateInt[2]);
-//
-//        if (month.length() < 2) {
-//            month = "0" + month;
-//        }
-//        if (day.length() < 2) {
-//            day = "0" + day;
-//        }
-//
-//        String dateForSort = year + month + day;
-//        return Integer.parseInt(dateForSort);
-//    }
-//колличетсво рулонов 1
+
 
 fun getDate(variantDate: Int, time: Long = Date().time, enableTime: Boolean): String {
     val sDayOfWeek = arrayOf("вс, ", "пн, ", "вт, ", "ср, ", "чт, ", "пт, ", "сб, ")
@@ -139,9 +103,9 @@ fun getDate(variantDate: Int, time: Long = Date().time, enableTime: Boolean): St
     val dayName: String = sDayOfWeek[calendar.get(Calendar.DAY_OF_WEEK) - 1]
     var timeFormat = ""
     when (variantDate) {
-        1 -> timeFormat = "dd.MM.yy"
-        2 -> timeFormat = "dd.MM.yyyy"
-        3 -> timeFormat = "dd MMMM yyyy"
+        0 -> timeFormat = "dd.MM.yy"
+        1 -> timeFormat = "dd.MM.yyyy"
+        2 -> timeFormat = "dd MMMM yyyy"
     }
     if (enableTime)
         timeFormat += " hh:mm"

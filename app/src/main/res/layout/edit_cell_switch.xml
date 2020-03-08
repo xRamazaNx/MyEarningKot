@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:padding="16dp"
+    android:background="@color/cent"
+    android:layout_height="wrap_content">
+
+    <Switch
+        android:background="?android:attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:text="@string/switch_text"
+        android:textColor="@color/light_gray"
+        android:id="@+id/switchPick"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</FrameLayout>

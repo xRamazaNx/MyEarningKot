@@ -6,25 +6,59 @@
     android:background="@color/cent"
     android:layout_height="wrap_content">
 
-
-    <TextView
-        android:id="@+id/textViewDateType"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/selectableItemBackground"
-        android:clickable="true"
-        android:drawableStart="@drawable/ic_period"
-        android:drawableEnd="@drawable/ic_drop_down"
-        android:drawablePadding="16dp"
-        android:focusable="true"
+        android:orientation="horizontal"
         android:paddingStart="24dp"
-        android:paddingTop="16dp"
-        android:paddingEnd="24dp"
-        android:paddingBottom="16dp"
-        android:singleLine="true"
-        android:text="@string/date_type"
-        android:textColor="@color/white"
-        android:textSize="14sp" />
+        android:paddingEnd="24dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            app:srcCompat="@drawable/ic_period" />
+
+        <Switch
+            android:id="@+id/switchEnableDatePeriod"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:checked="true"
+            android:clickable="true"
+            android:drawableBottom="@color/color_normal"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:text="@string/show_date_period"
+            android:textColor="@color/light_gray"
+            android:textIsSelectable="false"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+
+<!--    <TextView-->
+<!--        android:id="@+id/textViewDateType"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:background="?android:attr/selectableItemBackground"-->
+<!--        android:clickable="true"-->
+<!--        android:drawableStart="@drawable/ic_period"-->
+<!--        android:drawableEnd="@drawable/ic_drop_down"-->
+<!--        android:drawablePadding="16dp"-->
+<!--        android:focusable="true"-->
+<!--        android:paddingStart="24dp"-->
+<!--        android:paddingTop="16dp"-->
+<!--        android:paddingEnd="24dp"-->
+<!--        android:paddingBottom="16dp"-->
+<!--        android:singleLine="true"-->
+<!--        android:text="@string/date_type"-->
+<!--        android:textColor="@color/white"-->
+<!--        android:textSize="14sp" />-->
 
 
     <FrameLayout

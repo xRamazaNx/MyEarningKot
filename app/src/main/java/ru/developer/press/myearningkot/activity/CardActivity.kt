@@ -3,6 +3,7 @@ package ru.developer.press.myearningkot.activity
 import android.animation.Animator
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.view.Menu
@@ -21,52 +22,59 @@ import kotlinx.android.synthetic.main.card.view.*
 import kotlinx.coroutines.*
 import ru.developer.press.myearningkot.CardViewModel
 import ru.developer.press.myearningkot.R
+import ru.developer.press.myearningkot.RowClickListener
 import ru.developer.press.myearningkot.ViewModelCardFactory
 import ru.developer.press.myearningkot.adapters.AdapterRecyclerInCard
 import ru.developer.press.myearningkot.dialogs.startPrefActivity
 import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.DataController
+import ru.developer.press.myearningkot.otherHelpers.getColorFromRes
 import java.lang.Runnable
 
 
 open class CardActivity : BasicCardActivity() {
     override var viewModel: CardViewModel? = null
+    private val launch = CoroutineScope(Dispatchers.Main).launch {
+        val id = intent.getLongExtra(CARD_ID, 0)
+        val card = withContext(Dispatchers.IO) {
+            DataController().getCard(id)
+        }
+        createViewModel(card)
+
+        progressBar.visibility = GONE
+        doStart()
+        viewModel?.titleLiveData?.observe(this@CardActivity, Observer {
+            title = it
+        })
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // внести все нужные события ид, подписки и т.д.
-        val id = intent.getLongExtra(CARD_ID, 0)
         hideViewWhileScroll()
         hideUnnecessaryElementsFromTotalAmount()
+        launch.start()
 
-        CoroutineScope(Dispatchers.Main).launch {
-            val card = withContext(Dispatchers.IO) {
-                DataController().getCard(id)
-            }
-            createViewModel(card)
+    }
 
-            progressBar.visibility = GONE
-            doStart()
-            viewModel?.titleLiveData?.observe(this@CardActivity, Observer {
-                title = it
-            })
-
-        }
-        fbAddRow.setOnClickListener {
-            viewModel?.apply {
-                CoroutineScope(Dispatchers.Main).launch {
-                    withContext(Dispatchers.IO) {
-                        addRow()
-                    }
-                    val rows = getSortedRows()
-                    adapter.dataSet = rows
-                    appBar.setExpanded(false, true)
-                    recycler.smoothScrollToPosition(rows.size - 1)
-                    updatePlateChanged()
-
+    private fun selectedModeObserve() {
+        viewModel?.isCellSelectMode?.observe(this, Observer<Boolean> {
+            if (it) {
+                fbAddRow.setButtonIconResource(R.drawable.ic_edit_white)
+                fbAddRow.setButtonBackgroundColour(getColorFromRes(R.color.red_fb_button))
+                if (!fbAddRow.isShown)
+                    fbAddRow.show()
+            } else {
+                fbAddRow.setButtonIconResource(R.drawable.ic_add_not_ring)
+                fbAddRow.setButtonBackgroundColour(getColorFromRes(R.color.greenButton))
+                adapter.notifyAdapter()
+                if (fbAddRow.isShown) {
+                    if (!appBar.isShown)
+                        fbAddRow.hide()
                 }
             }
-        }
+        })
     }
 
     private fun createViewModel(card: Card) {
@@ -97,6 +105,10 @@ open class CardActivity : BasicCardActivity() {
                                 createTitles()
                                 updateHorizontalScrollSwitched()
                                 createRecyclerView()
+                                viewModel?.apply {
+                                    isCellSelectMode.value = false
+                                }
+                                onResume()
                             }
                         }
                     }
@@ -124,19 +136,6 @@ open class CardActivity : BasicCardActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun finish() {
-//        CoroutineScope(Dispatchers.Main).launch {
-//            DataController().updateCard(viewModel.card)
-        super.finish()
-//        }
-    }
-
-
-    //
-    //
-    //
-    //
-    //
     // выполняем что ни будь и рекуклер обновляется после конца анимации
     private fun recyclerRunEvent(runEventRecycler: () -> Unit) { // ...
         runEventRecycler()
@@ -197,10 +196,17 @@ open class CardActivity : BasicCardActivity() {
             }
 
             override fun onAnimationEnd(p0: Animator?) {
-                if (containerPlate.translationY == 0f)
-                    fbAddRow.show()
-                if (containerPlate.translationY == containerPlate.height.toFloat())
-                    fbAddRow.hide()
+                viewModel?.isCellSelectMode?.value?.let {
+                    if (it) {
+                        if (!fbAddRow.isShown)
+                            fbAddRow.show()
+                    } else {
+                        if (containerPlate.translationY == 0f)
+                            fbAddRow.show()
+                        if (containerPlate.translationY == containerPlate.height.toFloat())
+                            fbAddRow.hide()
+                    }
+                }
             }
 
             override fun onAnimationCancel(p0: Animator?) {
@@ -232,11 +238,63 @@ open class CardActivity : BasicCardActivity() {
     }
 
     override fun onBackPressed() {
-        // надо отправить в маин
-//        val intent = Intent()
-//        intent.putExtra(CARD_ID, viewModel!!.card.id)
-//        setResult(Activity.RESULT_OK, intent)
-        finish()
+        viewModel?.apply {
+            isCellSelectMode.value?.let {
+                if (it) {
+                    unSelect()
+                } else
+                    finish()
+            }
+        } ?: finish()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        launch.invokeOnCompletion {
+            viewModel?.apply {
+                val value = isCellSelectMode.value
+                isCellSelectMode.value = value
+            }
+
+            fbAddRow.setOnClickListener {
+                viewModel?.apply {
+                    val isSelectMode = isCellSelectMode.value!!
+                    if (isSelectMode) {
+                        toast("edit cell")
+                    } else
+                        CoroutineScope(Dispatchers.Main).launch {
+                            withContext(Dispatchers.IO) {
+                                addRow()
+                            }
+                            val rows = getSortedRows()
+                            adapter.dataSet = rows
+                            appBar.setExpanded(false, true)
+                            recycler.smoothScrollToPosition(rows.size - 1)
+                            updatePlateChanged()
+
+                        }
+                }
+            }
+            adapter.setCellClickListener(object : RowClickListener {
+                override fun cellClick(rowPosition: Int, cellPosition: Int) {
+                    viewModel?.cellClicked(
+                        rowPosition,
+                        cellPosition
+                    ) { oldRowPosition, isDoubleTap ->
+                        adapter.notifyItemChanged(oldRowPosition)
+                        adapter.notifyItemChanged(rowPosition)
+
+                        if (isDoubleTap)
+                            toast("выделена была")
+                    }
+                }
+
+                override fun rowLongClick(position: Int) {
+                }
+            })
+            // наблюдатель для события выделения ячейки
+            selectedModeObserve()
+        }
     }
 }
 

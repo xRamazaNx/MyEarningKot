@@ -3,10 +3,6 @@ package ru.developer.press.myearningkot.otherHelpers
 import androidx.room.*
 import androidx.room.Database
 import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.doAsyncResult
 import ru.developer.press.myearningkot.App
 import ru.developer.press.myearningkot.model.Card
@@ -141,10 +137,14 @@ class SampleHelper {
         }.get()
     }
 
-    fun addSample(name: String): MutableList<Card> {
+    fun addSample(card: Card): MutableList<Card> {
         return doAsyncResult {
             sampleJsonDao.insert(SampleJson().apply {
-                json = Gson().toJson(Card(name))
+                json = Gson().toJson(card.apply {
+                    repeat(30) {
+                        addRow()
+                    }
+                })
             })
             getSampleList()
         }.get()

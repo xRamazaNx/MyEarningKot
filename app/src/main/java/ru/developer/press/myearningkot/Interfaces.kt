@@ -1,9 +1,7 @@
 package ru.developer.press.myearningkot
 
 import android.content.Context
-import android.text.BoringLayout
 import android.view.View
-import androidx.lifecycle.MutableLiveData
 import ru.developer.press.myearningkot.model.*
 //import ru.developer.press.myearningkot.model.card
 import ru.developer.press.myearningkot.otherHelpers.Page
@@ -52,7 +50,7 @@ interface CardClickListener {
 }
 
 interface RowClickListener {
-    fun rowClick(position: Int)
+    fun cellClick(rowPosition: Int, cellPosition: Int)
     fun rowLongClick(position: Int)
 }
 

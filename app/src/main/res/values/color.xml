@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <color name="yellow_transparent">#85FFE83C</color>
+    <color name="yellow">@color/md_yellow_500</color>
+
+    <color name="gray_select">#2DB8B8B8</color>
+    <color name="red_fb_button">#C8302B</color>
+
     <color name="color_normal">#646464</color>
     <color name="color_background_info_card">#4B4B4B</color>
     <color name="color_activated">#08B193</color>
@@ -44,7 +51,7 @@
 
 
     <color name="light_gray">#E5E5E5</color>
-    <color name="light_gray_opacity">#DDC9C9C9</color>
+    <color name="light_gray_opacity">#AEE5E5E5</color>
 
     <color name="gray">#CCCCCC</color>
     <color name="gray_1">#A2A2A2</color>
@@ -175,8 +182,6 @@
     <color name="redcarpet_orange">#faff3920</color>
 
     <color name="redcarpet_orange_translucent">#ccff3920</color>
-
-    <color name="redcarpet_light_orange_translucent">#c7ff9f46</color>
 
     <color name="redcarpet_green_translucent">#1ab021</color>
 

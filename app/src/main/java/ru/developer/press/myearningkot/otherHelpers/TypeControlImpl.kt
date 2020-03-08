@@ -184,6 +184,7 @@ class SwitchTypeControl(
     override fun display(view: View, value: String) {
         val toBoolean = value.toBoolean()
 
+        view.elevation = 5f
         val typePref = provideValueProperty.typePref as SwitchTypePref
         if (typePref.isTextSwitchMode) {
             val textView = view as TextView

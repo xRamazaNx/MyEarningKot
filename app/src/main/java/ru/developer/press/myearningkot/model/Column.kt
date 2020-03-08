@@ -238,9 +238,6 @@ class SwitchColumn(name: String) : Column(name) {
     @SerializedName("cp")
     var typePref = SwitchTypePref()
 
-    var isCrossRow = false
-    var isAcceptRow = false
-
     override fun updateTypeControl(provideCardProperty: ProvideCardPropertyForCell) {
         columnTypeControl = SwitchTypeControl(getProvideProperty(provideCardProperty)).apply {
             provideValueProperty.typePref = typePref

@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
 import com.jaredrummler.android.colorpicker.ColorPickerDialog
 import com.jaredrummler.android.colorpicker.ColorPickerDialogListener
+import kotlinx.android.synthetic.main.pref_column_date.view.*
 import kotlinx.android.synthetic.main.pref_column_number.view.*
 import kotlinx.android.synthetic.main.prefs_text_view.view.*
 import kotlinx.android.synthetic.main.prefs_total.view.*
@@ -25,11 +26,11 @@ import org.jetbrains.anko.image
 import org.jetbrains.anko.layoutInflater
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.activity.BasicCardActivity
-import ru.developer.press.myearningkot.model.InputTypeNumberColumn
-import ru.developer.press.myearningkot.model.NumberColumn
-import ru.developer.press.myearningkot.model.PrefForTextView
-import ru.developer.press.myearningkot.model.TotalItem
+import ru.developer.press.myearningkot.model.*
 import ru.developer.press.myearningkot.otherHelpers.getColorFromRes
+import ru.developer.press.myearningkot.otherHelpers.getDate
+import ru.developer.press.myearningkot.otherHelpers.getDateTypeList
+import ru.developer.press.myearningkot.otherHelpers.showItemChangeDialog
 
 fun Context.getPrefTextLayout(
     // если имя передано то значит вью будет с вводом имени
@@ -201,6 +202,52 @@ fun Context.getPrefTotalLayout(
     return view
 }
 
+fun Context.getPrefDatePeriod(
+    typePref: DateTypePref,
+    prefChangedCallBack: PrefChangedCallBack
+): View {
+    val view = layoutInflater.inflate(R.layout.pref_date_period, null)
+    textPrefButtonsInit(
+        view,
+        mutableListOf<PrefForTextView>().apply { add(typePref.prefForTextView) },
+        false
+    ) {
+        prefChangedCallBack.prefChanged()
+    }
+
+    val dateTypeTextView = view.dateTypeTextView
+
+    val typeText = dateTypeTextView.text
+    val updateDateType = {
+        val date = getDate(typePref.type, enableTime = false)
+        dateTypeTextView.text = "$typeText ($date)"
+    }
+    updateDateType()
+    val showTime = view.enableTime
+    showTime.isChecked = typePref.enableTime
+
+    dateTypeTextView.setOnClickListener { view1 ->
+        val context = view1.context
+        context.showItemChangeDialog(
+            context.getString(R.string.date_type),
+            getDateTypeList(),
+            typePref.type,
+            null
+        ) { type ->
+            typePref.type = type
+            prefChangedCallBack.prefChanged()
+            updateDateType()
+        }
+    }
+    showTime.setOnCheckedChangeListener { _, b ->
+        typePref.enableTime = b
+
+        prefChangedCallBack.prefChanged()
+    }
+
+    return view
+
+}
 
 fun textPrefButtonsInit(
     view: View,
@@ -387,13 +434,15 @@ private fun setPressedBackground(boldButton: ImageButton) {
     boldButton.backgroundResource = R.drawable.button_pressed
 }
 
-interface PrefTextChangedCallback {
+interface PrefTextChangedCallback : PrefChangedCallBack {
     fun nameEdit(text: String)
+}
+
+interface PrefChangedCallBack {
     fun prefChanged()
 }
 
-interface PrefTotalChangedCallBack {
-    fun prefChanged()
+interface PrefTotalChangedCallBack : PrefChangedCallBack {
     fun calcFormula()
     fun getNumberColumns(): MutableList<NumberColumn>
     fun getTotals(): List<TotalItem>

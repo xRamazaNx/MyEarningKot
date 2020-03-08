@@ -13,7 +13,6 @@
     android:layout_marginBottom="5dp"
     android:background="@drawable/backgraund_for_card"
     android:orientation="vertical"
-    android:paddingTop="4dp"
     android:paddingBottom="4dp">
 
 <!--    -->
@@ -41,6 +40,8 @@
 
 
         <TextView
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:id="@+id/nameCard"
@@ -59,18 +60,17 @@
             android:layout_height="2dp"
             android:layout_marginStart="20dp"
             android:layout_marginLeft="20dp"
-            android:layout_marginTop="5dp"
             android:layout_marginEnd="20dp"
             android:layout_marginRight="20dp"
-            android:layout_marginBottom="5dp"
             android:background="@drawable/gradient" />
 
         <TextView
+            android:paddingTop="5dp"
             android:id="@+id/datePeriodCard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="4dp"
+            android:paddingBottom="5dp"
             android:gravity="center"
             android:textColor="@color/color_date_arhive_card"
             android:textSize="14sp"

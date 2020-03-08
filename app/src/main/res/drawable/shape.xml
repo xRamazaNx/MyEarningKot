@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:top="-1dp" android:left="-1dp">
+    <item android:top="-1px" android:left="-1px">
         <shape>
             <solid android:color="@color/transparent"/>
             <stroke android:color="@color/color_normal" android:width="1px"/>

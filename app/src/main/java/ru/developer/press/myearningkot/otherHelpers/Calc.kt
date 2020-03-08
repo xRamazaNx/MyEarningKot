@@ -196,7 +196,7 @@ class Calc {
         } else if (Character.isDigit(expr[i])) {
             val start = i
             while (i < expr.length && (Character.isDigit(expr[i]) || expr[i] == '.')) i++
-            val number = decimalFormat.parse(expr.substring(start, i)).toDouble()
+            val number = decimalFormat.parse(expr.substring(start, i))?.toDouble()
             token = Number(decimalFormat.format(number).toDouble())
             return
         } else if (Character.isLetter(expr[i])) {

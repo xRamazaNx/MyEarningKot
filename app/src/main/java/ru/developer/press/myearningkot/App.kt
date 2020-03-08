@@ -13,8 +13,8 @@ import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.ColumnType
 import ru.developer.press.myearningkot.model.DataController
 import ru.developer.press.myearningkot.model.NumberColumn
-import ru.developer.press.myearningkot.otherHelpers.CustomExceptionHandler
 import ru.developer.press.myearningkot.otherHelpers.Database
+import ru.developer.press.myearningkot.otherHelpers.SampleHelper
 import ru.developer.press.myearningkot.otherHelpers.SampleJson
 
 
@@ -38,92 +38,72 @@ class App : Application() {
                     Database::class.java,
                     "Database.db"
                 ).build()
-            val sampleJsonDao =
-                database
-                    .sampleJsonDao()
 
             val isFirst = pref!!.getBoolean(prefFirstKey, true)
             if (isFirst) {
                 pref!!.edit().putBoolean(prefFirstKey, false).apply()
-                DataController().addPage("Доход")
+                DataController().addPage("Активные")
                 GlobalScope.launch {
                     withContext(Dispatchers.IO) {
                         CoroutineScope(Dispatchers.IO).launch {
-                            sampleJsonDao.insert(SampleJson().apply {
-                                json = Gson().toJson(Card(name = "Доход").apply {
-//                                    deleteColumn()
-                                        addColumn(ColumnType.NUMBER, getString(R.string.summa))
+                            val sampleHelper = SampleHelper()
+                            // доход
+                            sampleHelper.addSample(Card(name = "Доход").apply {
+                                //                                    deleteColumn()
+                                addColumn(ColumnType.NUMBER, getString(R.string.summa))
 
-                                        addColumn(ColumnType.NUMBER, getString(R.string.avans))
+                                addColumn(ColumnType.NUMBER, getString(R.string.avans))
 
-                                    addColumn(ColumnType.TEXT, getString(R.string.note)).apply {
-                                        width = 450
-                                    }
-                                    addColumn(ColumnType.DATE, getString(R.string.date)).apply {
-                                        width = 430
-                                    }
+                                addColumn(ColumnType.TEXT, getString(R.string.note)).apply {
+                                    width = 450
+                                }
+                                addColumn(ColumnType.DATE, getString(R.string.date)).apply {
+                                    width = 430
+                                }
 
-                                    // временная суета...
-                                    repeat(30) {
-                                        addRow()
-                                    }
-
-                                    addTotal()
-                                    addTotal()
-                                })
+                                addTotal()
+                                addTotal()
                             })
                             // расход
-                            sampleJsonDao.insert(SampleJson().apply {
-                                json = Gson().toJson(Card(name = "Расход").apply {
-                                    deleteColumn()
+                            sampleHelper.addSample(Card(name = "Расход").apply {
+                                deleteColumn()
 
-                                    addColumn(ColumnType.NUMBER, "Бюджет") as NumberColumn
+                                addColumn(ColumnType.NUMBER, "Бюджет") as NumberColumn
 
-                                    addColumn(ColumnType.NUMBER, "Потрачено") as NumberColumn
+                                addColumn(ColumnType.NUMBER, "Потрачено") as NumberColumn
 
-                                    addColumn(ColumnType.LIST, "Категория").apply {
-                                        width = 430
-                                    }
-                                    addColumn(ColumnType.TEXT, getString(R.string.note)).apply {
-                                        width = 450
-                                    }
-                                    addColumn(ColumnType.DATE, getString(R.string.date)).apply {
-                                        width = 430
-                                    }
-                                    // временная суета...
-                                    repeat(30) {
-                                        addRow()
-                                    }
-                                    addTotal()
-                                    addTotal()
-                                })
+                                addColumn(ColumnType.LIST, "Категория").apply {
+                                    width = 430
+                                }
+                                addColumn(ColumnType.TEXT, getString(R.string.note)).apply {
+                                    width = 450
+                                }
+                                addColumn(ColumnType.DATE, getString(R.string.date)).apply {
+                                    width = 430
+                                }
+                                addTotal()
+                                addTotal()
                             })
                             //долги
-                            sampleJsonDao.insert(SampleJson().apply {
-                                json = Gson().toJson(Card(name = "Мои долги").apply {
-                                    deleteColumn()
+                           sampleHelper.addSample(Card(name = "Мои долги").apply {
+                               deleteColumn()
 
-                                    addColumn(ColumnType.NUMBER, "Должен") as NumberColumn
+                               addColumn(ColumnType.NUMBER, "Должен") as NumberColumn
 
-                                    addColumn(ColumnType.NUMBER, "Оплатил") as NumberColumn
+                               addColumn(ColumnType.NUMBER, "Оплатил") as NumberColumn
 
-                                    addColumn(ColumnType.LIST, "Кому").apply {
-                                        width = 430
-                                    }
-                                    addColumn(ColumnType.TEXT, getString(R.string.note)).apply {
-                                        width = 450
-                                    }
-                                    addColumn(ColumnType.DATE, getString(R.string.date)).apply {
-                                        width = 430
-                                    }
-                                    // временная суета...
-                                    repeat(30) {
-                                        addRow()
-                                    }
-                                    addTotal()
-                                    addTotal()
-                                })
-                            })
+                               addColumn(ColumnType.LIST, "Кому").apply {
+                                   width = 430
+                               }
+                               addColumn(ColumnType.TEXT, getString(R.string.note)).apply {
+                                   width = 450
+                               }
+                               addColumn(ColumnType.DATE, getString(R.string.date)).apply {
+                                   width = 430
+                               }
+                               addTotal()
+                               addTotal()
+                           })
 //
                         }
                     }

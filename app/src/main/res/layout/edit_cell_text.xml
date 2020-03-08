@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:padding="16dp"
+    android:background="@color/cent"
+    android:layout_height="wrap_content">
+
+    <EditText
+        android:textColor="@color/light_gray"
+        android:textColorHint="@color/color_normal"
+        android:inputType="text|textMultiLine"
+        android:id="@+id/editCellText"
+        android:maxHeight="200dp"
+        android:hint="@string/set_text"
+        android:padding="24dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</FrameLayout>

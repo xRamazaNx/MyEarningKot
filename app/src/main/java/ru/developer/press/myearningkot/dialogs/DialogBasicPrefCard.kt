@@ -35,7 +35,7 @@ class DialogBasicPrefCard(
                 val dp24 = context.dpsToPixels(24)
                 val dp8 = context.dpsToPixels(8)
                 setPadding(dp24, dp24, dp24, dp8)
-                textSize = 22f
+                textSize = 20f
             })
             val view = context.layoutInflater.inflate(R.layout.card_basic_pref_layout, null)
 
@@ -71,6 +71,24 @@ class DialogBasicPrefCard(
             }
             switchEnableSomeStroke.setOnCheckedChangeListener { _, b ->
                 card.enableSomeStroke = b
+                updateCard()
+            }
+            val heightUp = view.heightSizeUp
+            val heightDown = view.heightSizeDown
+            val heightSize = view.heightSize
+
+            fun updateHeightInfo (){
+                heightSize.text = card.heightCells.toString()
+            }
+            updateHeightInfo()
+            heightUp.setOnClickListener {
+                card.heightCells +=1
+                updateHeightInfo()
+                updateCard()
+            }
+            heightDown.setOnClickListener {
+                card.heightCells -=1
+                updateHeightInfo()
                 updateCard()
             }
 

@@ -56,7 +56,6 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
                 .get(PageViewModel::class.java)
         }
         progressBar.visibility = GONE
-        viewInit()
     }
 
     private lateinit var viewModel: PageViewModel
@@ -120,7 +119,6 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
                 }
             }.show(supportFragmentManager, "createCard")
         }
-
 
         addPageButton.setOnClickListener {
             DialogSetName { pageName ->
@@ -291,8 +289,8 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
 
     override fun onResume() {
         super.onResume()
-
         initializerViewModel.invokeOnCompletion {
+            viewInit()
             val instance = App.instance
             val id = instance?.getUpdateCardId()
             if (id != null && id > -1) {

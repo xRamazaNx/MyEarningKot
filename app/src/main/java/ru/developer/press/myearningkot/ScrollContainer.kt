@@ -16,7 +16,7 @@ class ScrollContainer(
     private lateinit var motionEventFromActionDown: MotionEvent
     var dragNdropMode: Boolean = false
     private var isMove: Boolean = false
-
+    private var moveSize = 0f
 
     init {
         horizontalScrollView?.isSmoothScrollingEnabled = true
@@ -24,18 +24,29 @@ class ScrollContainer(
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-        if (ev!!.action == MotionEvent.ACTION_MOVE) {
+        if (ev == null)
+            return false
+//        val newSize = ev.x
+
+        if (ev.action == MotionEvent.ACTION_MOVE) {
             isMove = true
         }
         if (ev.action == MotionEvent.ACTION_DOWN) {
             motionEventFromActionDown = MotionEvent.obtain(ev)
             isMove = false
+//            moveSize = newSize
         }
         // при прикосновении 2 пальцами происходит ошибка pointerIndex out of range
-        if (ev.pointerCount == 1 && !isMove && ev.action == MotionEvent.ACTION_UP) {
-                super.dispatchTouchEvent(motionEventFromActionDown)
-                super.dispatchTouchEvent(ev)
-
+        if (!isMove && ev.pointerCount == 1 && ev.action == MotionEvent.ACTION_UP) {
+//            var clickPermission = true
+//            if (isMove) {
+//                if (moveSize in newSize - 5..newSize + 5)
+//                    clickPermission = false
+//            }
+//            if (clickPermission) {
+            super.dispatchTouchEvent(motionEventFromActionDown)
+            super.dispatchTouchEvent(ev)
+//            }
         } else {
             recycler.onTouchEvent(ev)
             columnDisableScrollContainer.onTouchEvent(ev)
@@ -44,7 +55,6 @@ class ScrollContainer(
         horizontalScrollView.onTouchEvent(ev)
         return true
     }
-
 }
 
 class HorScrollView(context: Context, attributeSet: AttributeSet) :
