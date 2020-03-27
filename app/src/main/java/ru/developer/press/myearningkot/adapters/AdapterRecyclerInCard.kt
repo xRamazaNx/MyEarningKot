@@ -4,15 +4,18 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeAdapter
-import org.jetbrains.anko.backgroundResource
-import org.jetbrains.anko.wrapContent
+import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.*
-import ru.developer.press.myearningkot.model.Cell
 import ru.developer.press.myearningkot.model.Column
+import ru.developer.press.myearningkot.model.NumerationColumn
 import ru.developer.press.myearningkot.model.Row
 import ru.developer.press.myearningkot.model.SwitchColumn
 import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.setSelectBackground
@@ -20,28 +23,35 @@ import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.setSelectBackgro
 class AdapterRecyclerInCard(
     private var rowClickListener: RowClickListener?,
     private val provideDataRows: ProvideDataRows,
-    list: MutableList<Row>
-) : DragDropSwipeAdapter<Row, RowHolder>(list) {
+    private val plate: View
+) : RecyclerView.Adapter<RowHolder>() {
     private var cellClickPrefFunction: ((Int) -> Unit)? = null
     fun setCellClickPref(cellClickFun: ((Int) -> Unit)?) {
         cellClickPrefFunction = cellClickFun
     }
 
-    fun setCellClickListener(_rowClickListener: RowClickListener?){
+    fun setCellClickListener(_rowClickListener: RowClickListener?) {
         rowClickListener = _rowClickListener
     }
-    private val rowNumberScrollListenerList = mutableSetOf<RowDataListener>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RowHolder {
         val context = parent.context
+
+        if (viewType == -1)
+            return RowHolder(FrameLayout(context).apply {
+                layoutParams = FrameLayout.LayoutParams(matchParent, plate.height)
+                backgroundColor = Color.TRANSPARENT
+            })
         val width = provideDataRows.getWidth()
 
         val rowHeight = context.dpsToPixels(provideDataRows.getRowHeight())
         val rowView = LinearLayout(context).apply {
             layoutParams = LinearLayout.LayoutParams(
-
                 width,
-                if (provideDataRows.isEnableSomeStroke()) wrapContent else rowHeight
+                if (provideDataRows.isEnableSomeStroke()) {
+                    minimumHeight = rowHeight
+                    wrapContent
+                } else rowHeight
             )
             orientation = LinearLayout.HORIZONTAL
         }
@@ -63,103 +73,121 @@ class AdapterRecyclerInCard(
         // нажатие для настройки колоны
         return rowHolder.apply {
             viewList.forEachIndexed { columnIndex, view ->
-                view.setOnClickListener {
-                    if (cellClickPrefFunction != null) {
+                if (cellClickPrefFunction != null) {
+                    view.setOnClickListener {
                         cellClickPrefFunction!!.invoke(columnIndex)
-                    } else {
-                        rowClickListener?.cellClick(adapterPosition, columnIndex)
                     }
+                } else {
+                    if (columnIndex > 0) {
+
+                        view.setOnClickListener {
+                            rowClickListener?.cellClick(it, adapterPosition, columnIndex)
+                        }
+                    }
+
                 }
             }
         }
     }
 
+    override fun getItemViewType(position: Int): Int {
+        val size = provideDataRows.rows.size
+        return if (size == position) -1 else 0
+    }
+
     override fun getItemCount(): Int {
-        return provideDataRows.getSize()
+        return provideDataRows.rows.size + 1 // отступ от тотал
     }
 
-    fun notifyAdapter() {
-//        rowNumberScrollListenerList.forEachIndexed { index, rowHolder ->
-//            rowHolder.bind(dataSet[index])
-//        }
-        rowNumberScrollListenerList.clear()
-        notifyDataSetChanged()
-
+    override fun onBindViewHolder(holder: RowHolder, position: Int) {
+        if (holder.itemViewType == -1)
+            return
+        holder.bind(provideDataRows.rows[position], provideDataRows.getColumns())
     }
 
-    override fun getViewHolder(itemView: View): RowHolder = RowHolder(itemView)
-
-    override fun getViewToTouchToStartDraggingItem(
-        item: Row,
-        viewHolder: RowHolder,
-        position: Int
-    ): View? {
-        return null
-    }
-
-    override fun onBindViewHolder(item: Row, viewHolder: RowHolder, position: Int) {
-        rowNumberScrollListenerList.add(viewHolder)
-        viewHolder.bind(item.cellList, provideDataRows.getColumns())
-    }
-
-//    fun clickEvent(y: Float, isLongClick: Boolean) {
-//        var height = 0
-//        rowNumberScrollListenerList.forEachIndexed { index, rowDataListener ->
-//            height += rowDataListener.getItemHeight()
-//            if (y < height) {
-//                if (isLongClick)
-//                    rowClickListener.rowLongClick(index)
-//                else {
-//                    rowClickListener.cellClick(index,)
-//                }
-//
-//                return
-//            }
-//
-//        }
-//
-//    }
 }
 
+val animationDelete: Animation = AnimationUtils.loadAnimation(App.instance?.baseContext, R.anim.anim_delete)
+
 class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataListener {
+    private val animationAdd = AnimationUtils.loadAnimation(itemView.context, R.anim.anim_add)
     var viewList = mutableListOf<View>()
     var rowNumber: TextView? = null
+    private var positionRow = 0
 
     fun bind(
-        row: MutableList<Cell>,
+        row: Row,
         columns: MutableList<Column>
     ) {
-
-        row.forEachIndexed { index, cell ->
+        if (itemViewType == -1) {
+            return
+        }
+        positionRow = adapterPosition
+        row.cellList.forEachIndexed { index, cell ->
             val cellView = viewList[index]
             cell.displayCellView(cellView)
 
-            // если есть хоть один свитч который настроен на поведение меняющее запись
-
-            val column = columns[index]
-            if (column is SwitchColumn) {
-                val behavior = column.typePref.behavior
-                val frameLayout = itemView as FrameLayout
-                if (behavior.crossOut && cell.sourceValue.toBoolean()) {
-                    frameLayout.foreground = itemView.context.getDrawable(R.drawable.cross_line)
-                } else {
-                    frameLayout.foreground = ColorDrawable(Color.TRANSPARENT)
-                }
-            }
-            // колона выделена- обвести
             when {
+                // колона выделена- обвести
                 cell.isPrefColumnSelect -> {
                     setSelectBackground(cellView)
                 }
+                // ячейка выделена - обвести
                 cell.isSelect -> {
-                    cellView.backgroundResource = R.drawable.shape_select
-
+                    cellView.backgroundResource = R.drawable.shape_cell_select
                 }
-                else -> cellView.backgroundResource = R.drawable.shape
+                else ->
+                    cellView.backgroundResource = R.drawable.shape
+
             }
         }
 
         rowNumber?.text = (layoutPosition + 1).toString()
+        rowNumber?.setTextColor((columns[0] as NumerationColumn).typePref.prefForTextView.color)
+
+        when (row.status) {
+            Row.Status.SELECT -> {
+                rowNumber?.text = "✔"
+                //            rowNumber?.text = ""
+                rowNumber?.setTextColor(
+                    ContextCompat.getColor(
+                        itemView.context,
+                        R.color.shape_select_border
+                    )
+                )
+                //            itemView.backgroundColorResource = R.color.color_long_click_item
+                itemView.backgroundResource = R.drawable.shape_select
+                //            itemView.backgroundColorResource = R.color.shape_select_solid
+                //            rowNumber?.backgroundResource = R.drawable.ic_check_ring
+            }
+            Row.Status.ADDED -> {
+                itemView.startAnimation(animationAdd)
+                row.status = Row.Status.NONE
+                bind(row, columns)
+            }
+            Row.Status.DELETED -> {
+                itemView.startAnimation(animationDelete)
+            }
+            else -> {
+                // если есть хоть один свитч который настроен на поведение меняющее запись
+                row.cellList.forEachIndexed { index, cell ->
+                    val column = columns[index]
+                    if (column is SwitchColumn) {
+                        val behavior = column.typePref.behavior
+                        val frameLayout = itemView as FrameLayout
+                        if (behavior.crossOut && cell.sourceValue.toBoolean()) {
+                            frameLayout.foreground =
+                                itemView.context.getDrawable(R.drawable.cross_line)
+                            itemView.backgroundColorResource = R.color.light_gray_opacity
+                        } else {
+                            frameLayout.foreground = ColorDrawable(Color.TRANSPARENT)
+                        }
+                    }
+                }
+                itemView.backgroundColor = Color.TRANSPARENT
+            }
+        }
+
 
     }
 

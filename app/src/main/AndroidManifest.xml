@@ -23,7 +23,8 @@
             android:value="b0d11f6997c56533e75d4fac75e05aee"/>
 
         <activity android:name=".activity.PrefCardActivity" />
-        <activity android:name=".activity.CardActivity">
+        <activity android:name=".activity.CardActivity"
+            android:windowSoftInputMode="adjustNothing">
 
         </activity>
         <activity android:name=".activity.MainActivity">

@@ -23,5 +23,5 @@
         android:ems="10"
         android:inputType="text"
         android:textColor="@color/white"
-        android:textColorHint="@color/color_polosa_razdelitel" />
+        android:textColorHint="@color/color_normal" />
 </LinearLayout>

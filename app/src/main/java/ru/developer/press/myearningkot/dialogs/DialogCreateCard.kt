@@ -25,7 +25,7 @@ import ru.developer.press.myearningkot.otherHelpers.SampleHelper
 import ru.developer.press.myearningkot.otherHelpers.showItemChangeDialog
 import ru.developer.press.myearningkot.prefSampleLastChanged
 
-class DialogCreateCard(val createCard: (Card) -> Unit) : DialogFragment() {
+class DialogCreateCard(private val createCard: (Card) -> Unit) : DialogFragment() {
 
     private val sampleHelper = SampleHelper()
     private val pref = App.instance!!.pref!!

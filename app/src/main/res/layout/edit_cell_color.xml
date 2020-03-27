@@ -1,20 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:padding="16dp"
-    android:background="@color/cent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/cent">
 
     <TextView
-        android:background="?android:attr/selectableItemBackground"
-        android:gravity="center_vertical"
-        android:drawableEnd="@drawable/ic_circle"
-        android:text="@string/change_color"
-        android:textColor="@color/light_gray"
-        android:id="@+id/colorPickButton"
-        android:padding="16dp"
-        android:drawablePadding="16dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
 
-</FrameLayout>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/centDark"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:text="@string/change_color"
+        android:textColor="@color/gray_1"
+        android:textSize="18sp" />
+    <TextView
+        android:id="@+id/colorPickButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:drawableEnd="@drawable/ic_circle"
+        android:drawablePadding="16dp"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:text="@string/color"
+        android:textColor="@color/light_gray" />
+
+</LinearLayout>

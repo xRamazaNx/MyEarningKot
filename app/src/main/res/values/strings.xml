@@ -70,4 +70,9 @@
     <string name="add_image">Добавить изображения</string>
     <string name="change_in_list">Выберите из списка</string>
     <string name="add_in_list">Добавить в список</string>
+    <string name="change_images">Выбор картинок</string>
+    <string name="paste">Вставить</string>
+    <string name="select_row">Выделить запись</string>
+    <string name="cut">Вырезать</string>
+    <string name="first_name">Имя</string>
 </resources>

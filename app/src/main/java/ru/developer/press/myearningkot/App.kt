@@ -9,13 +9,11 @@ import com.bugsnag.android.Bugsnag
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import ru.developer.press.myearningkot.activity.ID_UPDATE_CARD
-import ru.developer.press.myearningkot.model.Card
-import ru.developer.press.myearningkot.model.ColumnType
-import ru.developer.press.myearningkot.model.DataController
-import ru.developer.press.myearningkot.model.NumberColumn
+import ru.developer.press.myearningkot.model.*
 import ru.developer.press.myearningkot.otherHelpers.Database
 import ru.developer.press.myearningkot.otherHelpers.SampleHelper
 import ru.developer.press.myearningkot.otherHelpers.SampleJson
+import ru.developer.press.myearningkot.otherHelpers.clone
 
 
 class App : Application() {
@@ -25,6 +23,17 @@ class App : Application() {
 
     }
 
+    var copyCell: Cell? = null
+    set(value) {
+        if (value == null)
+            field = value
+        else{
+            field = Cell().apply {
+                sourceValue = value.sourceValue
+                type = value.type
+            }
+        }
+    }
     lateinit var database: Database
     var pref: SharedPreferences? = null
 

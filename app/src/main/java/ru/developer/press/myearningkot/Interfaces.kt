@@ -11,6 +11,10 @@ interface AdapterPageInterface {
     fun getPageCount(): Int
     fun getPages(): MutableList<Page>
 }
+interface AdapterEditCellInterface {
+    fun getCellCount(): Int
+    fun getEditCellParams(): MutableList<EditCellFragment.EditCellParam>
+}
 
 
 interface ProvideData {
@@ -26,7 +30,9 @@ interface ProvideDataCards : ProvideData {
 }
 
 // для получения данных списка записей реализатор CardViewModel
-interface ProvideDataRows : ProvideData {
+interface ProvideDataRows{
+    val rows: List<Row>
+
     fun getColumns(): MutableList<Column>
     // отдает ширину или мачпарент или ширину дисплея
     fun getWidth(): Int
@@ -50,8 +56,7 @@ interface CardClickListener {
 }
 
 interface RowClickListener {
-    fun cellClick(rowPosition: Int, cellPosition: Int)
-    fun rowLongClick(position: Int)
+    fun cellClick(view: View, rowPosition: Int, cellPosition: Int)
 }
 
 interface NotifyCallback {

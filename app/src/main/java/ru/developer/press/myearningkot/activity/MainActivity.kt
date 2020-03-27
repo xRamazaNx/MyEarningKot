@@ -14,8 +14,10 @@ import android.widget.TableLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.postDelayed
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.viewpager2.widget.ViewPager2
 import co.zsmb.materialdrawerkt.builders.accountHeader
 import co.zsmb.materialdrawerkt.builders.drawer
 import co.zsmb.materialdrawerkt.builders.footer
@@ -23,7 +25,6 @@ import co.zsmb.materialdrawerkt.draweritems.badgeable.primaryItem
 import co.zsmb.materialdrawerkt.draweritems.badgeable.secondaryItem
 import co.zsmb.materialdrawerkt.draweritems.expandable.expandableItem
 import co.zsmb.materialdrawerkt.draweritems.profile.profile
-import co.zsmb.materialdrawerkt.draweritems.switchable.switchItem
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -33,7 +34,7 @@ import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.textColorResource
 import ru.developer.press.myearningkot.*
-import ru.developer.press.myearningkot.adapters.AdapterViewPager
+import ru.developer.press.myearningkot.adapters.AdapterViewPagerMain
 import ru.developer.press.myearningkot.dialogs.DialogCreateCard
 import ru.developer.press.myearningkot.dialogs.DialogSetName
 import ru.developer.press.myearningkot.model.Card
@@ -45,7 +46,7 @@ const val ID_UPDATE_CARD = "id_card"
 
 class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
     private lateinit var drawer: Drawer
-    private lateinit var adapterViewPager: AdapterViewPager
+    private lateinit var adapterViewPagerMain: AdapterViewPagerMain
 
     private var initializerViewModel: Job = GlobalScope.launch(Dispatchers.Main) {
         val pageList = withContext(Dispatchers.IO) {
@@ -114,7 +115,7 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
                 // что произхойдет при нажатии на "создать"
                 viewModel.addCard(indexPage, card) { positionCard ->
                     appBar.setExpanded(false, true).apply {
-                        adapterViewPager.scrollToPosition(indexPage, positionCard)
+                        adapterViewPagerMain.scrollToPosition(indexPage, positionCard)
                     }
                 }
             }.show(supportFragmentManager, "createCard")
@@ -127,9 +128,9 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
                     withContext(Dispatchers.IO) {
                         viewModel.addPage(pageName)
                     }
-                    adapterViewPager.addPage()
+                    adapterViewPagerMain.addPage()
                     val index = viewModel.getPageCount() - 1
-                    adapterViewPager.notifyItemInserted(index)
+                    adapterViewPagerMain.notifyItemInserted(index)
                     delay(300)
                     tabs.getTabAt(index)?.select()
                 }
@@ -138,53 +139,17 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
     }
 
     private fun initTabAndViewPager() {
-        this.adapterViewPager = AdapterViewPager(
+        this.adapterViewPagerMain = AdapterViewPagerMain(
             supportFragmentManager,
             lifecycle,
             viewModel
         )
-        viewPager.adapter = adapterViewPager
+        viewPager.adapter = adapterViewPagerMain
 
-        TabLayoutMediator(tabs, viewPager,
-            TabLayoutMediator.TabConfigurationStrategy { tab, position ->
-                val tabTextView = TextView(this).apply {
-                    isSingleLine = true
-                    layoutParams = TableLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT).apply {
-                        weight = 0f
-                    }
-                    gravity = Gravity.CENTER
-                    text = viewModel.getTabName(position)
-                    textColorResource =
-                        R.color.dark_text
-                    if (position == 0) {
-                        textColorResource =
-                            R.color.white
-
-                    }
-                }
-                tab.customView = tabTextView
-                tab.view.layoutParams =
-                    LinearLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT).apply {
-                        weight = 0f
-                    }
-            }).attach()
-
-
-        tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            val white = R.color.white
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-                (tab?.customView as TextView).textColorResource = white
+        linkViewPagerAndTabs(tabs, viewPager, mutableListOf<String>().apply {
+            repeat(viewModel.getPageCount()) {
+                add(viewModel.getTabName(it))
             }
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-                (tab?.customView as TextView).textColorResource =
-                    R.color.dark_text
-            }
-
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                (tab?.customView as TextView).textColorResource = white
-            }
-
         })
     }
 
@@ -290,6 +255,7 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
     override fun onResume() {
         super.onResume()
         initializerViewModel.invokeOnCompletion {
+            viewModel.calcAllCards()
             viewInit()
             val instance = App.instance
             val id = instance?.getUpdateCardId()
@@ -299,9 +265,14 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
                     tabs.selectedTabPosition
                 )
                 viewPager.post {
-                    adapterViewPager.notifyCardInPage(tabs.selectedTabPosition, position)
+                    adapterViewPagerMain.notifyCardInPage(tabs.selectedTabPosition, position)
                 }
                 instance.setUpdateCardId(-1)
+            }
+
+            adapterViewPagerMain.notifyDataSetChanged()
+            viewPager.postDelayed(500) {
+                toast("cards in page for viewModel = ${viewModel.getPages()[0].cards.size} \n cards in page for viewPager = ${adapterViewPagerMain.fragments[0].cards.size}")
             }
         }
 
@@ -309,6 +280,50 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
 
 }
 
+fun linkViewPagerAndTabs(tabs: TabLayout, viewPager: ViewPager2, nameList: List<String>) {
+    val context = tabs.context
+    TabLayoutMediator(tabs, viewPager,
+        TabLayoutMediator.TabConfigurationStrategy { tab, position ->
+            val tabTextView = TextView(context).apply {
+                isSingleLine = true
+                layoutParams = TableLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT).apply {
+                    weight = 0f
+                }
+                gravity = Gravity.CENTER
+                text = nameList[position]
+                textColorResource =
+                    R.color.dark_text
+                if (position == 0) {
+                    textColorResource =
+                        R.color.white
+
+                }
+            }
+            tab.customView = tabTextView
+            tab.view.layoutParams =
+                LinearLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT).apply {
+                    weight = 0f
+                }
+        }).attach()
+
+
+    tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+        val white = R.color.white
+        override fun onTabReselected(tab: TabLayout.Tab?) {
+            (tab?.customView as TextView).textColorResource = white
+        }
+
+        override fun onTabUnselected(tab: TabLayout.Tab?) {
+            (tab?.customView as TextView).textColorResource =
+                R.color.dark_text
+        }
+
+        override fun onTabSelected(tab: TabLayout.Tab?) {
+            (tab?.customView as TextView).textColorResource = white
+        }
+
+    })
+}
 
 fun Context.toast(message: CharSequence) =
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()

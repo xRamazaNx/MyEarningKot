@@ -22,7 +22,7 @@
 
     <item
         android:id="@+id/elementSetting"
-        android:icon="@drawable/ic_font_setting"
+        android:icon="@drawable/ic_setting_build"
         android:title="@string/setting"
         app:showAsAction="always" />
     <item

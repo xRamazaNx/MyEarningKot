@@ -126,6 +126,7 @@ class PrefCardActivity : BasicCardActivity() {
         prefWindow.animationStyle = R.style.popup_window_animation
         prefWindow.setOnDismissListener {
             containerPlate.animate().translationY(0f)
+            selectedControl.unSelectAll()
         }
     }
 
@@ -386,7 +387,7 @@ class PrefCardActivity : BasicCardActivity() {
                             // для обновления ширины задать а потом убрать
 //                            adapter.updateWidthIndex = columnIndex
 //                            adapter.widthSelected = column.width
-                            adapter.notifyAdapter()
+                            notifyAdapter()
                         }
                         ElementType.COLUMN_TITLE -> {
                             val selectedColumnTitle =
@@ -432,7 +433,7 @@ class PrefCardActivity : BasicCardActivity() {
                             val elementColumn = selectedElement as SelectedElement.ElementColumn
                             viewModel?.selectionColumn(elementColumn.columnIndex, false)
                             // обновление
-                            adapter.notifyAdapter()
+                            notifyAdapter()
                             // удаление вью для настройки
                         }
                         ElementType.COLUMN_TITLE -> {
@@ -607,10 +608,11 @@ class PrefCardActivity : BasicCardActivity() {
                                                 .layoutParams.width =
                                                 total.width
                                         }
-                                        containerPlate.requestLayout()
+                                        totalContainer.requestLayout()
                                     }
 
                                     override fun widthChanged() {
+                                        updatePlate()
                                     }
                                 })
                             }
@@ -648,7 +650,7 @@ class PrefCardActivity : BasicCardActivity() {
                                                         viewModel?.updateTypeControlColumn(it)
                                                     }
                                                 }
-                                                adapter.notifyAdapter()
+                                                notifyAdapter()
                                                 updatePlate()
                                             }
                                         }

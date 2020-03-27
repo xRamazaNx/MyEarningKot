@@ -104,11 +104,6 @@ abstract class BasicCardActivity : AppCompatActivity() {
 
     protected open fun createRecyclerView() {
         recycler.apply {
-            orientation =
-                DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING
-            //            longPressToStartDragging = true
-            orientation?.removeSwipeDirectionFlag(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.LEFT)
-            orientation?.removeSwipeDirectionFlag(DragDropSwipeRecyclerView.ListOrientation.DirectionFlag.RIGHT)
 
             layoutManager = LinearLayoutManager(this@BasicCardActivity)
 
@@ -123,7 +118,7 @@ abstract class BasicCardActivity : AppCompatActivity() {
     }
 
     protected fun getAdapterForRecycler(): AdapterRecyclerInCard {
-        return AdapterRecyclerInCard(null, viewModel!!, viewModel!!.card.rows)
+        return AdapterRecyclerInCard(null, viewModel!!, containerPlate)
     }
 
     fun createTitles() {
@@ -158,6 +153,12 @@ abstract class BasicCardActivity : AppCompatActivity() {
             addTotal.visibility = VISIBLE
         else
             addTotal.visibility = GONE
+    }
+
+    protected fun notifyAdapter() {
+        viewModel?.let {
+            adapter.notifyDataSetChanged()
+        }
     }
 }
 

@@ -53,7 +53,13 @@ class FormulaLayout(
         }
 
         initClickNumbers()
-        initClickOperation()
+        initClickOperation(view){
+            formula.formulaElements.add(Formula.FormulaElement().apply {
+                type = OTHER
+                value = " $it "
+            })
+            displayFormula()
+        }
         initClickColumns()
         initClickTotals()
 
@@ -125,40 +131,7 @@ class FormulaLayout(
         layoutParams = LinearLayout.LayoutParams(wrapContent, matchParent)
     }
 
-    private fun initClickOperation() {
-        val add = view.add
-        val sub = view.subtract
-        val mult = view.multiply
-        val div = view.divide
-        val percent = view.percent
-        val leftBracket = view.leftBracket
-        val rightBracket = view.rightBracket
-        val point = view.point
 
-        val click: (View) -> Unit = {
-            val textView = it as TextView
-            var op = textView.text.toString()
-            if (it == view.subtract)
-                op = "-"
-            if (it == view.multiply)
-                op = "*"
-
-            formula.formulaElements.add(Formula.FormulaElement().apply {
-                type = OTHER
-                value = " $op "
-            })
-            displayFormula()
-        }
-
-        add.setOnClickListener(click)
-        sub.setOnClickListener(click)
-        mult.setOnClickListener(click)
-        div.setOnClickListener(click)
-        percent.setOnClickListener(click)
-        leftBracket.setOnClickListener(click)
-        rightBracket.setOnClickListener(click)
-        point.setOnClickListener(click)
-    }
 
     private fun initClickNumbers() {
         val one = view.one
@@ -279,4 +252,34 @@ fun formulaDialogShow(
         textColor = Color.WHITE
     }
     dialog.window?.setBackgroundDrawable(ColorDrawable(context.getColorFromRes(R.color.cent)))
+}
+fun initClickOperation(view: View, callBack : (String) -> Unit) {
+    val add = view.add
+    val sub = view.subtract
+    val mult = view.multiply
+    val div = view.divide
+    val percent = view.percent
+    val leftBracket = view.leftBracket
+    val rightBracket = view.rightBracket
+    val point = view.point
+
+    val click: (View) -> Unit = {
+        val textView = it as TextView
+        var op = textView.text.toString()
+        if (it == view.subtract)
+            op = "-"
+        if (it == view.multiply)
+            op = "*"
+
+        callBack(op)
+    }
+
+    add.setOnClickListener(click)
+    sub.setOnClickListener(click)
+    mult.setOnClickListener(click)
+    div.setOnClickListener(click)
+    percent.setOnClickListener(click)
+    leftBracket.setOnClickListener(click)
+    rightBracket.setOnClickListener(click)
+    point.setOnClickListener(click)
 }

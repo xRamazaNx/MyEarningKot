@@ -1,10 +1,10 @@
 package ru.developer.press.myearningkot.model
 
 import android.graphics.Color
-import android.telephony.PhoneNumberUtils
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
+import android.text.TextUtils
 import android.text.style.ForegroundColorSpan
 import android.view.Gravity
 import android.view.View
@@ -27,8 +27,8 @@ import ru.developer.press.myearningkot.model.Formula.Companion.TOTAL_ID
 import ru.developer.press.myearningkot.otherHelpers.*
 import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.multiplyChar
 import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.subtractChar
-import java.lang.Exception
 import java.util.*
+import kotlin.Exception
 import kotlin.random.Random
 
 // каточка
@@ -103,8 +103,11 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
                 }
             }
         }
-    ) {
+    ) :Row{
+        row.status = Row.Status.ADDED
         rows.add(row)
+        updateTypeControlRow(rows.size - 1)
+        return row
     }
 
     fun addColumn(type: ColumnType, name: String, position: Int = columns.size): Column {
@@ -149,7 +152,7 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
             is PhoneColumn ->
                 gson.toJson(
                     PhoneTypeValue(
-                        number = 89881234567,
+                        phone = 89881234567.toString(),
                         name = "Иван",
                         lastName = "Иванов",
                         organization = "press dev"
@@ -208,50 +211,6 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
         }
         return null
     }
-
-//    fun fillTotalAmount() {
-//        if (rows.isEmpty())
-//            return
-//
-//        var tempSum = 0.0
-//        var tempAvans = 0.0
-//        // anyTime
-//        sumColumnId.clear()
-//        avansColumnId.clear()
-//        columns.forEach { column ->
-//            if (column is NumberColumn) {
-//                if (column.sumCheck) {
-//                    sumColumnId.add(column.id)
-//                }
-//                if (column.avansCheck) {
-//                    avansColumnId.add(column.id)
-//                }
-//            }
-//        }
-//        sumColumnId.forEach { idColumn ->
-//            columns.forEachIndexed { indexColumn, column ->
-//                if (idColumn == column.id) {
-//                    rows.forEach { row ->
-//                        //                        if (  если в карте в записях есть переключатель то проыерить регулирует ли он участвование в общей сумме)
-//                        tempSum += row.cellList[indexColumn].sourceValue.toDouble()
-//                    }
-//                }
-//            }
-//        }
-//        avansColumnId.forEach { idColumn ->
-//            columns.forEachIndexed { indexColumn, column ->
-//                if (idColumn == column.id) {
-//                    rows.forEach {
-//                        tempAvans += it.cellList[indexColumn].sourceValue.toDouble()
-//                    }
-//                }
-//            }
-//        }
-//
-//        totalAmount.sum = tempSum
-//        totalAmount.avans = tempAvans
-//    }
-
 
     private fun getCellOfSample(position: Int): Cell {
         val column = columns[position]
@@ -373,6 +332,8 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
             val value = valueLayout.totalValue
 
             title.text = totalItem.title
+            title.maxLines = 1
+            title.ellipsize = TextUtils.TruncateAt.END
             totalItem.titlePref.customize(title)
 
             totalItem.totalPref.prefForTextView.customize(value)
@@ -389,39 +350,74 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
         column.updateTypeControl(this)
         val indexOf = columns.indexOf(column)
         rows.forEachIndexed { rowIndex, row ->
-            row.cellList[indexOf].also {
-                it.cellTypeControl = column.columnTypeControl
+            row.cellList[indexOf].also { cell ->
+                cell.cellTypeControl = column.columnTypeControl
+                cell.type = column.getType()
                 when (column) {
                     is NumerationColumn ->
-                        it.updateTypeValue(column.typePref)
+                        cell.updateTypeValue(column.typePref)
                     is TextColumn ->
-                        it.updateTypeValue(column.typePref)
+                        cell.updateTypeValue(column.typePref)
                     is NumberColumn -> {
                         if (column.inputType == InputTypeNumberColumn.FORMULA) {
-                            it.sourceValue = column.calcFormula(rowIndex, this)
+                            cell.sourceValue = column.calcFormula(rowIndex, this)
                         }
-                        it.updateTypeValue(column.typePref)
+                        cell.updateTypeValue(column.typePref)
                     }
                     is PhoneColumn ->
-                        it.updateTypeValue(column.typePref)
+                        cell.updateTypeValue(column.typePref)
                     is DateColumn ->
-                        it.updateTypeValue(column.typePref)
+                        cell.updateTypeValue(column.typePref)
                     is ColorColumn ->
-                        it.updateTypeValue(column.typePref)
+                        cell.updateTypeValue(column.typePref)
                     is SwitchColumn ->
-                        it.updateTypeValue(column.typePref)
+                        cell.updateTypeValue(column.typePref)
                     is ImageColumn ->
-                        it.updateTypeValue(column.typePref)
+                        cell.updateTypeValue(column.typePref)
                     is ListColumn ->
-                        it.updateTypeValue(column.typePref)
+                        cell.updateTypeValue(column.typePref)
                 }
 
             }
         }
     }
 
-    fun unSelectCell() :Int {
-        rows.forEachIndexed {rowIndex, row ->
+    fun updateTypeControlRow(indexRow: Int) {
+        columns.forEachIndexed { index, column ->
+            rows[indexRow].cellList[index].also { cell ->
+                cell.cellTypeControl = column.columnTypeControl
+                cell.type = column.getType()
+                when (column) {
+                    is NumerationColumn ->
+                        cell.updateTypeValue(column.typePref)
+                    is TextColumn ->
+                        cell.updateTypeValue(column.typePref)
+                    is NumberColumn -> {
+                        if (column.inputType == InputTypeNumberColumn.FORMULA) {
+                            cell.sourceValue = column.calcFormula(indexRow, this)
+                        }
+                        cell.updateTypeValue(column.typePref)
+                    }
+                    is PhoneColumn ->
+                        cell.updateTypeValue(column.typePref)
+                    is DateColumn ->
+                        cell.updateTypeValue(column.typePref)
+                    is ColorColumn ->
+                        cell.updateTypeValue(column.typePref)
+                    is SwitchColumn ->
+                        cell.updateTypeValue(column.typePref)
+                    is ImageColumn ->
+                        cell.updateTypeValue(column.typePref)
+                    is ListColumn ->
+                        cell.updateTypeValue(column.typePref)
+                }
+
+            }
+        }
+    }
+
+    fun unSelectCell(): Int {
+        rows.forEachIndexed { rowIndex, row ->
             val cell = row.cellList.find { it.isSelect }
             if (cell != null) {
                 cell.isSelect = false
@@ -429,6 +425,36 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
             }
         }
         return -1
+    }
+
+    fun unSelectRows() {
+        rows.forEach {
+            it.status = Row.Status.NONE
+        }
+    }
+
+    fun getSelectedCell(): Cell? {
+        rows.forEach { row ->
+            row.cellList.forEach { cell ->
+                if (cell.isSelect) {
+                    return cell
+                }
+            }
+        }
+        return null
+    }
+
+    fun deleteRow(row: Row) {
+        rows.remove(row)
+    }
+
+    fun getSelectedRows(): MutableList<Row> {
+        val selRows = mutableListOf<Row>()
+        rows.forEach {
+            if (it.status == Row.Status.SELECT)
+                selRows.add(it)
+        }
+        return selRows
     }
 
 }
@@ -449,38 +475,58 @@ class PrefForCard(
 }
 
 
-class Cell(
+data class Cell(
     @SerializedName("v")
     var sourceValue: String = ""
 ) {
     @Transient
+    var type = ColumnType.TEXT
+
+    @Transient
     var isSelect: Boolean = false
+
     @Transient
     var isPrefColumnSelect = false
+
     @Transient
     lateinit var cellTypeControl: CellTypeControl
 
     fun updateTypeValue(typePref: Prefs) {
         when (typePref) {
             is NumberTypePref -> {
-                displayValue = try {
-                    val double = sourceValue.toDouble()
-                    getDecimalFormatNumber(double, typePref)
-                } catch (exception: NumberFormatException) {
-                    "Error numbers"
-                }
+                val calc = Calc()
+                displayValue =
+                    if (sourceValue == "")
+                        ""
+                    else
+                        try {
+                            //                    val double = sourceValue.toDouble()
+                            val value = calc.evaluate(sourceValue)!!
+                            getDecimalFormatNumber(value, typePref)
+                        } catch (exception: Exception) {
+                            "Error numbers"
+                        }
             }
             is DateTypePref -> {
-                val timeML: Long = sourceValue.toLong()
-                displayValue = getDate(typePref.type, timeML, typePref.enableTime)
+                displayValue =
+                    if (sourceValue == "")
+                        ""
+                    else {
+                        val timeML: Long = sourceValue.toLong()
+                        getDate(typePref.type, timeML, typePref.enableTime)
+                    }
             }
             is PhoneTypePref -> {
                 val typeValue =
                     Gson().fromJson<PhoneTypeValue>(sourceValue, PhoneTypeValue::class.java)
-                val number = typeValue.number
+                val number = typeValue.phone
 
-                val formatNumber =
-                    PhoneNumberUtils.formatNumber(number.toString(), Locale.getDefault().country)
+//                val formatNumber = if (number.isNotEmpty())
+//                    PhoneNumberUtils.formatNumber(
+//                    number,
+//                    Locale.getDefault().country
+//                ) else
+//                    ""
                 val name = typeValue.name
                 val lastName = typeValue.lastName
                 val organization = typeValue.organization
@@ -498,7 +544,7 @@ class Cell(
                                 s = lastName
                         2 ->
                             if (typePref.phone)
-                                s = formatNumber
+                                s = number
                         3 ->
                             if (typePref.organization)
                                 s = organization
@@ -525,6 +571,18 @@ class Cell(
 
     fun displayCellView(view: View) {
         cellTypeControl.display(view, displayValue)
+    }
+
+    // опустошить
+    fun clear() {
+        sourceValue = when (type) {
+            ColumnType.PHONE -> Gson().toJson(PhoneTypeValue())
+            ColumnType.COLOR -> Color.WHITE.toString()
+            ColumnType.SWITCH -> false.toString()
+            else -> {
+                ""
+            }
+        }
     }
 }
 
@@ -573,7 +631,7 @@ class TotalItem {
                 string.append(elementVal)
         }
         value = try {
-            val d = calc.evaluate(string.toString())
+            val d = calc.evaluate(string.toString())!!
             getDecimalFormatNumber(d, totalPref)
         } catch (exception: Exception) {
 
@@ -595,6 +653,7 @@ class TotalItem {
         // есть ли в карточке свитч колона
         val isAnySwitchColumn = columns.any { it is SwitchColumn }
         return if (index > -1) {
+            val column = columns[index] as NumberColumn
             rows.forEach { row ->
                 var isAddSum = true
                 if (isAnySwitchColumn)
@@ -610,7 +669,11 @@ class TotalItem {
 
                 val cell = row.cellList[index]
                 if (isAddSum)
-                    value += calc.evaluate(cell.sourceValue)
+                    value += try {
+                        calc.evaluate(cell.sourceValue)!!
+                    } catch (exc: Exception) {
+                        return "Error"
+                    }
             }
             value.toString()
         } else
@@ -619,15 +682,33 @@ class TotalItem {
 }
 
 class Row {
+    fun copy(): Row {
+        return Row().apply {
+            this.dateModify = this@Row.dateModify
+            this.status = Status.SELECT
+            this@Row.cellList.forEach {
+                cellList.add(it.copy())
+            }
+        }
+    }
+
+    @Transient
+    var status = Status.NONE
+
     @SerializedName("dc")
     val dateCreated = Date().time
+
     @SerializedName("dm")
     var dateModify = Date().time
+
     @SerializedName("sl")
     var cellList = mutableListOf<Cell>()
+
+    enum class Status {
+        SELECT, DELETED, NONE, ADDED
+    }
 }
 
-//
 // для отображения записи внутри карточки
 
 class DisplayParam {
@@ -638,7 +719,7 @@ class DisplayParam {
 class PhoneTypeValue(
     var name: String = "",
     var lastName: String = "",
-    var number: Long = 0,
+    var phone: String = "",
     var organization: String = ""
 ) {
     fun getPhoneInfo(phoneTypePref: PhoneTypePref): String {
@@ -651,7 +732,7 @@ class PhoneTypeValue(
                 1 -> if (phoneTypePref.lastName)
                     append = lastName
                 2 -> if (phoneTypePref.phone)
-                    append = number.toString()
+                    append = phone
                 3 -> if (phoneTypePref.organization)
                     append = organization
             }

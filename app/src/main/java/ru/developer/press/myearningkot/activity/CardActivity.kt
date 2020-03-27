@@ -2,38 +2,45 @@ package ru.developer.press.myearningkot.activity
 
 import android.animation.Animator
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.View.GONE
+import android.view.animation.Animation
+import androidx.core.view.postDelayed
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView.ItemAnimator.ItemAnimatorFinishedListener
 import com.google.android.material.appbar.AppBarLayout
 import kotlinx.android.synthetic.main.activity_card.*
-import kotlinx.android.synthetic.main.activity_card.appBar
-import kotlinx.android.synthetic.main.activity_card.progressBar
 import kotlinx.android.synthetic.main.activity_card.view.*
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.card.view.*
 import kotlinx.coroutines.*
-import ru.developer.press.myearningkot.CardViewModel
-import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.RowClickListener
-import ru.developer.press.myearningkot.ViewModelCardFactory
+import ru.developer.press.myearningkot.*
+import ru.developer.press.myearningkot.CardViewModel.SelectMode
 import ru.developer.press.myearningkot.adapters.AdapterRecyclerInCard
+import ru.developer.press.myearningkot.adapters.animationDelete
 import ru.developer.press.myearningkot.dialogs.startPrefActivity
 import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.DataController
+import ru.developer.press.myearningkot.model.NumberColumn
+import ru.developer.press.myearningkot.model.Row
+import ru.developer.press.myearningkot.otherHelpers.EditCellControl
 import ru.developer.press.myearningkot.otherHelpers.getColorFromRes
+import uk.co.markormesher.android_fab.SpeedDialMenuAdapter
+import uk.co.markormesher.android_fab.SpeedDialMenuItem
 import java.lang.Runnable
 
 
 open class CardActivity : BasicCardActivity() {
     override var viewModel: CardViewModel? = null
+    private var cellClickTime: Long = 0
+    private var isLongClick = false
     private val launch = CoroutineScope(Dispatchers.Main).launch {
         val id = intent.getLongExtra(CARD_ID, 0)
         val card = withContext(Dispatchers.IO) {
@@ -52,29 +59,235 @@ open class CardActivity : BasicCardActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // внести все нужные события ид, подписки и т.д.
-        hideViewWhileScroll()
         hideUnnecessaryElementsFromTotalAmount()
         launch.start()
+        tableView.isLong.observe(this, Observer {
+            isLongClick = it
+        })
+        fbAddRow.setContentCoverColour(Color.TRANSPARENT)
+        hideViewWhileScroll()
 
+        // листенер для обновления после удаления то есть после ее анимации
+        animationDelete.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationRepeat(p0: Animation?) {
+
+            }
+
+            override fun onAnimationEnd(p0: Animation?) {
+                viewModel?.apply {
+                    sortedList()
+                    updatePlateChanged()
+                    selectMode.value = SelectMode.NONE
+                }
+            }
+
+            override fun onAnimationStart(p0: Animation?) {
+            }
+
+        })
+    }
+
+    fun isEqualCellAndCopyCell(): Boolean {
+        val selectedCellType = viewModel?.getSelectedCellType()
+        val copyCell = App.instance?.copyCell
+        var eq = false
+        copyCell?.let {
+            eq = it.type == selectedCellType
+        }
+        return eq
     }
 
     private fun selectedModeObserve() {
-        viewModel?.isCellSelectMode?.observe(this, Observer<Boolean> {
-            if (it) {
-                fbAddRow.setButtonIconResource(R.drawable.ic_edit_white)
-                fbAddRow.setButtonBackgroundColour(getColorFromRes(R.color.red_fb_button))
-                if (!fbAddRow.isShown)
-                    fbAddRow.show()
-            } else {
-                fbAddRow.setButtonIconResource(R.drawable.ic_add_not_ring)
-                fbAddRow.setButtonBackgroundColour(getColorFromRes(R.color.greenButton))
-                adapter.notifyAdapter()
-                if (fbAddRow.isShown) {
-                    if (!appBar.isShown)
-                        fbAddRow.hide()
+        val menu = toolbar.menu
+        viewModel?.selectMode?.observe(this, Observer { selectMode ->
+            menu.clear()
+            when (selectMode) {
+                SelectMode.CELL -> {
+                    menuInflater.inflate(R.menu.cell_menu, menu)
+                    // ставим иконку вставить в зависимости доступности вставки
+                    if (isEqualCellAndCopyCell()) {
+                        menu.findItem(R.id.pasteCell).setIcon(R.drawable.ic_paste_white)
+                    } else
+                        menu.findItem(R.id.pasteCell).setIcon(R.drawable.ic_paste_white_disabled)
+
+                    val speedAdapter = object : SpeedDialMenuAdapter() {
+
+                        private val list = mutableListOf<SpeedDialMenuItem>().apply {
+                            add(
+                                SpeedDialMenuItem(
+                                    this@CardActivity,
+                                    if (isEqualCellAndCopyCell())
+                                        getDrawable(R.drawable.ic_paste_white)!!
+                                    else
+                                        getDrawable(R.drawable.ic_paste_white_disabled)!!
+                                    ,
+//                                    getString(R.string.PASTE)
+                                    ""
+                                )
+                            )
+                            add(
+                                SpeedDialMenuItem(
+                                    this@CardActivity,
+                                    getDrawable(R.drawable.ic_copy_white)!!,
+//                                    getString(R.string.COPY)
+                                    ""
+                                )
+                            )
+                            add(
+                                SpeedDialMenuItem(
+                                    this@CardActivity,
+                                    getDrawable(R.drawable.ic_cut_white)!!,
+                                    ""
+//                                    getString(R.string.cut)
+                                )
+                            )
+                            add(
+                                SpeedDialMenuItem(
+                                    this@CardActivity,
+                                    getDrawable(R.drawable.ic_edit_white)!!,
+//                                    getString(R.string.DELETE)
+                                    ""
+                                )
+                            )
+                        }
+
+                        override fun getCount(): Int = list.size
+
+                        override fun onMenuItemClick(position: Int): Boolean {
+                            fbAddRow.closeSpeedDialMenu()
+                            fbAddRow.postDelayed(100) {
+
+                                when (position) {
+                                    0 -> {
+                                        if (isEqualCellAndCopyCell()) {
+                                            viewModel?.pasteCell()
+                                            notifyAdapter()
+                                            viewModel?.updatePlateChanged()
+                                        }
+                                    }
+                                    1 -> {
+                                        viewModel?.copySelectedCell(false)
+                                    }
+                                    2 -> {
+                                        viewModel?.copySelectedCell(true)
+                                        notifyAdapter()
+                                        viewModel?.updatePlateChanged()
+                                    }
+                                    3 -> {
+                                        viewModel?.editCell()
+                                    }
+                                }
+                            }
+                            return true
+                        }
+
+                        override fun getMenuItem(
+                            context: Context,
+                            position: Int
+                        ): SpeedDialMenuItem = list[position]
+
+                        override fun getBackgroundColour(position: Int): Int {
+                            return getColorFromRes(R.color.red_fb_button)
+                        }
+                    }
+                    fbAddRow.speedDialMenuAdapter = speedAdapter
+                    // при открытии меню проверка одного ли типа ячейки чтоб работала кнопка вставки или нет
+                    fbAddRow.setButtonIconResource(R.drawable.ic_menu_3_line)
+                    fbAddRow.setButtonBackgroundColour(getColorFromRes(R.color.red_fb_button))
+                    if (!fbAddRow.isShown)
+                        fbAddRow.show()
+                    supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_check)
+                }
+
+                SelectMode.ROW -> {
+                    menuInflater.inflate(R.menu.row_menu, menu)
+                    fbAddRow.speedDialMenuAdapter = object : SpeedDialMenuAdapter() {
+                        private val list = mutableListOf<SpeedDialMenuItem>().apply {
+                            add(
+                                SpeedDialMenuItem(
+                                    this@CardActivity,
+                                    getDrawable(R.drawable.ic_paste_white)!!,
+//                                    getString(R.string.PASTE)
+                                    ""
+                                )
+                            )
+                            add(
+                                SpeedDialMenuItem(
+                                    this@CardActivity,
+                                    getDrawable(R.drawable.ic_copy_white)!!,
+//                                    getString(R.string.COPY)
+                                    ""
+                                )
+                            )
+                            add(
+                                SpeedDialMenuItem(
+                                    this@CardActivity,
+                                    getDrawable(R.drawable.ic_cut_white)!!,
+                                    ""
+//                                    getString(R.string.cut)
+                                )
+                            )
+                            add(
+                                SpeedDialMenuItem(
+                                    this@CardActivity,
+                                    getDrawable(R.drawable.ic_delete_white)!!,
+//                                    getString(R.string.DELETE)
+                                    ""
+                                )
+                            )
+                        }
+
+                        override fun getCount(): Int = list.size
+
+                        override fun onMenuItemClick(position: Int): Boolean {
+                            when (position) {
+                                0 -> {
+                                    toast("paste")
+                                }
+                                1 -> {
+                                    toast("copy")
+                                }
+                                2 -> {
+                                    toast("cut")
+                                }
+                                3 -> {
+                                    toast("delete")
+                                }
+                            }
+                            return true
+                        }
+
+                        override fun getMenuItem(
+                            context: Context,
+                            position: Int
+                        ): SpeedDialMenuItem = list[position]
+
+                        override fun getBackgroundColour(position: Int): Int {
+                            return getColorFromRes(R.color.shape_select_border)
+                        }
+                    }
+                    fbAddRow.setButtonIconResource(R.drawable.ic_menu_3_line)
+                    fbAddRow.setButtonBackgroundColour(getColorFromRes(R.color.shape_select_border))
+                    if (!fbAddRow.isShown)
+                        fbAddRow.show()
+                    supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_check)
+                }
+                else -> {
+                    menuInflater.inflate(R.menu.card_main_menu, menu)
+                    fbAddRow.speedDialMenuAdapter = null
+                    fbAddRow.setButtonIconResource(R.drawable.ic_add_not_ring)
+                    fbAddRow.setButtonBackgroundColour(getColorFromRes(R.color.greenButton))
+                    // тут именно это пусть будет
+                    Handler().post { waitForAnimationsToFinish() }
+                    if (fbAddRow.isShown) {
+                        if (!appBar.isShown)
+                            fbAddRow.hide()
+                    }
+                    supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_back_white)
                 }
             }
         })
+
     }
 
     private fun createViewModel(card: Card) {
@@ -106,7 +319,7 @@ open class CardActivity : BasicCardActivity() {
                                 updateHorizontalScrollSwitched()
                                 createRecyclerView()
                                 viewModel?.apply {
-                                    isCellSelectMode.value = false
+                                    selectMode.value = SelectMode.NONE
                                 }
                                 onResume()
                             }
@@ -131,6 +344,56 @@ open class CardActivity : BasicCardActivity() {
                     card = viewModel!!.card,
                     title = getString(R.string.setting)
                 )
+            }
+            // cell
+            R.id.editCell -> {
+                viewModel?.editCell()
+            }
+            R.id.pasteCell -> {
+                if (isEqualCellAndCopyCell()) {
+                    viewModel?.pasteCell()
+                    notifyAdapter()
+                }
+            }
+            R.id.copyCell -> {
+                viewModel?.copySelectedCell(false)
+            }
+            R.id.cutCell -> {
+                viewModel?.copySelectedCell(true)
+                notifyAdapter()
+            }
+            // row
+            R.id.deleteRow -> {
+                CoroutineScope(Dispatchers.Main).launch {
+                    withContext(Dispatchers.IO) {
+                        viewModel?.deleteRows {
+                            launch(Dispatchers.Main) {
+                                notifyAdapter()
+                            }
+                        }
+                    }
+                }
+
+            }
+            R.id.cutRow -> {
+                viewModel?.copySelectedRows(true)
+                notifyAdapter()
+            }
+            R.id.copyRow -> {
+                viewModel?.copySelectedRows(false)
+                notifyAdapter()
+            }
+            R.id.pasteRow -> {
+                viewModel?.pasteRows()
+                notifyAdapter()
+            }
+            R.id.duplicateRow -> {
+                viewModel?.duplicateRows()
+                notifyAdapter()
+            }
+
+            android.R.id.home -> {
+                onBackPressed()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -167,16 +430,11 @@ open class CardActivity : BasicCardActivity() {
             // animations running.
             Handler().post(waitForAnimationsToFinishRunnable)
         }
-
-    // The recycler view is done animating, it's now time to doStuff().
-    private fun notifyAdapter() {
-        (recycler.adapter as AdapterRecyclerInCard).notifyAdapter()
-    }
-    //
-    //
-    //
-    //
-    //
+//
+//
+//
+//
+//
 
 
     private fun hideUnnecessaryElementsFromTotalAmount() {
@@ -188,7 +446,6 @@ open class CardActivity : BasicCardActivity() {
         }
     }
 
-
     private fun hideViewWhileScroll() {
         val animListener = object :
             Animator.AnimatorListener {
@@ -196,8 +453,8 @@ open class CardActivity : BasicCardActivity() {
             }
 
             override fun onAnimationEnd(p0: Animator?) {
-                viewModel?.isCellSelectMode?.value?.let {
-                    if (it) {
+                viewModel?.selectMode?.value?.let { selectMode ->
+                    if (selectMode != SelectMode.NONE) {
                         if (!fbAddRow.isShown)
                             fbAddRow.show()
                     } else {
@@ -225,77 +482,141 @@ open class CardActivity : BasicCardActivity() {
             val isHide = -verticalOffset == heightToolbar
             val isShow = verticalOffset == 0
 
-            containerPlate.apply {
-                if (isShow) {
-                    animate().translationY(0f)
-                }
-                if (isHide) {
-                    animate().translationY(height.toFloat())
-
-                }
+//            containerPlate.apply {
+            if (isShow) {
+                fbAddRow.show()
+//                    animate().translationY(0f)
             }
+            if (isHide) {
+                fbAddRow.hide()
+//                    animate().translationY(height.toFloat())
+
+            }
+//            }
         })
     }
 
     override fun onBackPressed() {
-        viewModel?.apply {
-            isCellSelectMode.value?.let {
-                if (it) {
-                    unSelect()
-                } else
-                    finish()
+        if (fbAddRow.isSpeedDialMenuOpen)
+            fbAddRow.closeSpeedDialMenu()
+        else
+            viewModel?.apply {
+                selectMode.value?.let {
+                    if (it != SelectMode.NONE) {
+                        unSelect()
+                    } else
+                        finish()
+                }
+            } ?: finish()
+    }
+
+    private val rowClickListener = object : RowClickListener {
+        override fun cellClick(view: View, rowPosition: Int, cellPosition: Int) {
+            if (isLongClick) {
+                viewModel?.rowClicked(rowPosition) {
+                    notifyAdapter()
+                    adapter.notifyItemChanged(rowPosition)
+                }
+            } else {
+                if (viewModel!!.selectMode.value == SelectMode.ROW) {
+                    isLongClick = true
+                    cellClick(view, rowPosition, cellPosition)
+                    return
+                }
+                viewModel?.cellClicked(
+                    rowPosition,
+                    cellPosition
+                ) { oldRowPosition, isDoubleTap ->
+                    if (isDoubleTap) {
+                        viewModel?.editCell()
+                    } else {
+                        adapter.notifyItemChanged(oldRowPosition)
+                        adapter.notifyItemChanged(rowPosition)
+                    }
+                }
+
             }
-        } ?: finish()
+        }
+
     }
 
     override fun onResume() {
         super.onResume()
         launch.invokeOnCompletion {
             viewModel?.apply {
-                val value = isCellSelectMode.value
-                isCellSelectMode.value = value
+                val value = selectMode.value
+                selectMode.value = value
             }
 
             fbAddRow.setOnClickListener {
                 viewModel?.apply {
-                    val isSelectMode = isCellSelectMode.value!!
-                    if (isSelectMode) {
-                        toast("edit cell")
-                    } else
-                        CoroutineScope(Dispatchers.Main).launch {
-                            withContext(Dispatchers.IO) {
+                    when (selectMode.value!!) {
+                        // если нажали в режиме выбора ячейки
+                        SelectMode.CELL -> {
+                            fbAddRow.openSpeedDialMenu()
+                        }
+                        // если нажали в режиме выбора строк
+                        SelectMode.ROW -> {
+                            fbAddRow.openSpeedDialMenu()
+                        }
+                        // если нажали в простое
+                        else -> CoroutineScope(Dispatchers.Main).launch {
+                            val rowAdded = withContext(Dispatchers.IO) {
                                 addRow()
                             }
-                            val rows = getSortedRows()
-                            adapter.dataSet = rows
-                            appBar.setExpanded(false, true)
-                            recycler.smoothScrollToPosition(rows.size - 1)
+//                            notifyAdapter()
+                            // обновляем в начале так как отчет идет в самой карточке
                             updatePlateChanged()
+                            recycler.scrollToPosition(rows.indexOf(rowAdded) + 1) //  у нас на одну больше из за отступа для плейт
+                            appBar.setExpanded(false, true)
+//                            Handler().postDelayed(150) {
+//                                recyclerRunEvent {
+//                                }
+//                            }
 
                         }
-                }
-            }
-            adapter.setCellClickListener(object : RowClickListener {
-                override fun cellClick(rowPosition: Int, cellPosition: Int) {
-                    viewModel?.cellClicked(
-                        rowPosition,
-                        cellPosition
-                    ) { oldRowPosition, isDoubleTap ->
-                        adapter.notifyItemChanged(oldRowPosition)
-                        adapter.notifyItemChanged(rowPosition)
-
-                        if (isDoubleTap)
-                            toast("выделена была")
                     }
                 }
-
-                override fun rowLongClick(position: Int) {
-                }
-            })
+            }
+            adapter.setCellClickListener(rowClickListener)
             // наблюдатель для события выделения ячейки
             selectedModeObserve()
         }
     }
+
+    private fun CardViewModel.editCell() {
+        val column = card.columns[cellSelectPosition]
+        val selectCell = sortedList()[rowSelectPosition].cellList[cellSelectPosition]
+
+        EditCellControl(
+            this@CardActivity,
+            column,
+            selectCell.sourceValue
+        ) { newValue ->
+            selectCell.sourceValue = newValue
+            updateTypeControlColumn(cellSelectPosition)
+            if (column is NumberColumn) {
+                card.columns.filterIsInstance<NumberColumn>().forEach {
+                    updateTypeControlColumn(it)
+                }
+            }
+            adapter.notifyDataSetChanged()
+            updateCardInDB().invokeOnCompletion {
+                updatePlateChanged()
+            }
+
+        }.editCell()
+    }
+
+    private fun updateCardInDB() =
+        CoroutineScope(Dispatchers.Main).launch {
+            withContext(Dispatchers.IO) {
+                viewModel?.card?.let {
+                    DataController().updateCard(it)
+                }
+            }
+        }
+
 }
 
 

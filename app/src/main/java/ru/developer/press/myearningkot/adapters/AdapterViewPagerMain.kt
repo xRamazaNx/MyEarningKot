@@ -8,15 +8,13 @@ import ru.developer.press.myearningkot.AdapterPageInterface
 import ru.developer.press.myearningkot.PageFragment
 import ru.developer.press.myearningkot.model.Card
 
-class AdapterViewPager(
+class AdapterViewPagerMain(
     fragmentManager: FragmentManager,
     lifecycle: Lifecycle,
-    pageViewModel: AdapterPageInterface
+    private val pageInterface: AdapterPageInterface
 ) : FragmentStateAdapter(fragmentManager, lifecycle) {
 
-    private val pageInterface: AdapterPageInterface = pageViewModel
-
-    private val fragments = mutableListOf<PageFragment>()
+    val fragments = mutableListOf<PageFragment>()
 
     //
     init {

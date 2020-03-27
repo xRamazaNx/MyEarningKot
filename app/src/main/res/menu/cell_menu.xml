@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        app:showAsAction="always"
+        android:icon="@drawable/ic_edit_white"
+        android:id="@+id/editCell"
+        android:title="@string/PASTE"/>
+    <item
+        app:showAsAction="always"
+        android:icon="@drawable/ic_cut_white"
+        android:id="@+id/cutCell"
+        android:title="@string/cut"/>
+    <item
+        app:showAsAction="always"
+        android:icon="@drawable/ic_copy_white"
+        android:id="@+id/copyCell"
+        android:title="@string/COPY"/>
+    <item
+        app:showAsAction="always"
+        android:icon="@drawable/ic_paste_white"
+        android:id="@+id/pasteCell"
+        android:title="@string/PASTE"/>
+
+
+
+</menu>

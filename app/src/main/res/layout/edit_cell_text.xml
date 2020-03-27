@@ -1,19 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:padding="16dp"
+    android:layout_height="wrap_content"
     android:background="@color/cent"
-    android:layout_height="wrap_content">
+    android:orientation="vertical">
+
+    <TextView
+
+        android:id="@+id/titleTextEdit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/centDark"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:text="@string/input_of_data"
+        android:textColor="@color/gray_1"
+        android:textSize="18sp" />
 
     <EditText
-        android:textColor="@color/light_gray"
-        android:textColorHint="@color/color_normal"
-        android:inputType="text|textMultiLine"
         android:id="@+id/editCellText"
-        android:maxHeight="200dp"
-        android:hint="@string/set_text"
-        android:padding="24dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/set_text"
+        android:inputType="textMultiLine"
 
-</FrameLayout>
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:paddingBottom="12dp"
+        android:paddingTop="16dp"
+        android:textColor="@color/light_gray"
+        android:textColorHint="@color/color_normal" />
+
+</LinearLayout>

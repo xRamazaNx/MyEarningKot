@@ -1,13 +1,16 @@
 package ru.developer.press.myearningkot
 
 import android.content.Context
-import android.os.SystemClock.uptimeMillis
+import android.os.Handler
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
+import android.view.ViewConfiguration
 import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
+import androidx.lifecycle.MutableLiveData
 import kotlinx.android.synthetic.main.activity_card.view.*
+import ru.developer.press.myearningkot.activity.toast
 
 
 class ScrollContainer(
@@ -17,6 +20,17 @@ class ScrollContainer(
     var dragNdropMode: Boolean = false
     private var isMove: Boolean = false
     private var moveSize = 0f
+    val isLong = MutableLiveData<Boolean>().apply {
+        value = false
+    }
+
+    private val hand = Handler()
+    private var mLongPressed = Runnable {
+        isLong.value = true
+        clickEvent(MotionEvent.obtain(motionEventFromActionDown).apply {
+            action = MotionEvent.ACTION_UP
+        })
+    }
 
     init {
         horizontalScrollView?.isSmoothScrollingEnabled = true
@@ -32,21 +46,20 @@ class ScrollContainer(
             isMove = true
         }
         if (ev.action == MotionEvent.ACTION_DOWN) {
-            motionEventFromActionDown = MotionEvent.obtain(ev)
+            isLong.value = false
             isMove = false
-//            moveSize = newSize
+            motionEventFromActionDown = MotionEvent.obtain(ev)
+            hand.postDelayed(mLongPressed, ViewConfiguration.getLongPressTimeout().toLong())
         }
+        if (isMove || ev.action == MotionEvent.ACTION_UP) {
+            hand.removeCallbacks(mLongPressed)
+        }
+
         // при прикосновении 2 пальцами происходит ошибка pointerIndex out of range
         if (!isMove && ev.pointerCount == 1 && ev.action == MotionEvent.ACTION_UP) {
-//            var clickPermission = true
-//            if (isMove) {
-//                if (moveSize in newSize - 5..newSize + 5)
-//                    clickPermission = false
-//            }
-//            if (clickPermission) {
-            super.dispatchTouchEvent(motionEventFromActionDown)
-            super.dispatchTouchEvent(ev)
-//            }
+            if (!isLong.value!!)
+                clickEvent(ev)
+
         } else {
             recycler.onTouchEvent(ev)
             columnDisableScrollContainer.onTouchEvent(ev)
@@ -54,6 +67,11 @@ class ScrollContainer(
         }
         horizontalScrollView.onTouchEvent(ev)
         return true
+    }
+
+    private fun clickEvent(ev: MotionEvent?) {
+        super.dispatchTouchEvent(motionEventFromActionDown)
+        super.dispatchTouchEvent(ev)
     }
 }
 

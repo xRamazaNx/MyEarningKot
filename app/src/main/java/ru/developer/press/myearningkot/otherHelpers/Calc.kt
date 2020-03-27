@@ -60,20 +60,24 @@ class Calc {
         roundingMode = RoundingMode.HALF_EVEN
     }
 
-    fun evaluate(e: String): Double {
-        val groupingSeparator =
-            DecimalFormatSymbols.getInstance(Locale.getDefault()).groupingSeparator.toString()
-        val substring = e
-            // замена разделителя тысячных на слияние
-            .replace(groupingSeparator, "")
+    fun evaluate(e: String): Double? {
+        return try {
+            val groupingSeparator =
+                DecimalFormatSymbols.getInstance(Locale.getDefault()).groupingSeparator.toString()
+            val substring = e
+                // замена разделителя тысячных на слияние
+                .replace(groupingSeparator, "")
                 // замена плавающей запятой на точку
-            .replace(',', '.')
-        logD(substring)
-        expr = substring
-        i = 0
-        token = StartOfExpression
-        nextToken()
-        return evaluateAdd()
+                .replace(',', '.')
+            logD(substring)
+            expr = substring
+            i = 0
+            token = StartOfExpression
+            nextToken()
+            evaluateAdd()
+        } catch (exp: CalcException) {
+            null
+        }
     }
 
     private fun evaluateAdd(): Double {

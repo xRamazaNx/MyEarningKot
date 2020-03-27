@@ -7,6 +7,7 @@ import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.adapters.ParamModel
 import ru.developer.press.myearningkot.otherHelpers.*
 import java.lang.Exception
+import java.lang.StringBuilder
 import java.util.*
 import kotlin.random.Random
 
@@ -109,7 +110,7 @@ class NumberColumn(name: String) : Column(name) {
     }
 
     fun calcFormula(rowIndex: Int, card: Card): String {
-        val string = java.lang.StringBuilder()
+        val string = StringBuilder()
         return try {
             formula.formulaElements.forEach {
                 if (it.type == Formula.COLUMN_ID) {
@@ -130,8 +131,11 @@ class NumberColumn(name: String) : Column(name) {
                             // проверяем колона работает по формуле или ручной ввод
                             if (numberColumn.inputType == InputTypeNumberColumn.FORMULA) {
                                 numberColumn.calcFormula(rowIndex, card)
-                            } else
-                                card.rows[rowIndex].cellList[index].sourceValue
+                            } else{
+                                val cell = card.rows[rowIndex].cellList[index]
+                                cell.updateTypeValue(numberColumn.typePref)
+                                cell.displayValue
+                            }
                         string.append(value)
                     }
                 } else

@@ -11,7 +11,7 @@
 
     <string name="PASTE">Вставить</string>
     <string name="COPY">Копировать</string>
-    <string name="DUBLICATE">Дублировать</string>
+    <string name="DUPLICATE">Дублировать</string>
     <string name="EDIT">Изменить</string>
     <string name="DELETE">Удалить</string>
     <string name="NOTE">ЗАМЕТКА</string>
