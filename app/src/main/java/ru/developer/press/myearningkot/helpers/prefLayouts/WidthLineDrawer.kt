@@ -1,4 +1,4 @@
-package ru.developer.press.myearningkot.otherHelpers.PrefLayouts
+package ru.developer.press.myearningkot.helpers.prefLayouts
 
 import android.content.Context
 import android.graphics.Canvas
@@ -7,7 +7,7 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
 import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.otherHelpers.getColorFromRes
+import ru.developer.press.myearningkot.helpers.getColorFromRes
 
 class WidthLineDrawer(context: Context, attributeSet: AttributeSet) : View(context, attributeSet) {
 

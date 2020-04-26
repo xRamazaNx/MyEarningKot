@@ -1,10 +1,9 @@
-package ru.developer.press.myearningkot.otherHelpers
+package ru.developer.press.myearningkot.helpers
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.net.Uri
-import android.telephony.PhoneNumberUtils
 import android.text.TextUtils
 import android.view.Gravity.CENTER
 import android.view.View
@@ -13,23 +12,21 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout.LayoutParams
 import android.widget.LinearLayout.LayoutParams.MATCH_PARENT
-import android.widget.Switch
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
-import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.bumptech.glide.request.RequestOptions
+import jp.wasabeef.glide.transformations.CropTransformation
 import org.jetbrains.anko.backgroundResource
+import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.padding
 import ru.developer.press.myearningkot.ColumnTypeControl
 import ru.developer.press.myearningkot.ProvideValueProperty
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.dpsToPixels
-import ru.developer.press.myearningkot.model.*
-import java.util.*
+import ru.developer.press.myearningkot.model.ImageTypePref
+import ru.developer.press.myearningkot.model.SwitchTypePref
+import ru.developer.press.myearningkot.model.TextTypePref
 
 
 // общий класс для реализации cellType
@@ -97,7 +94,7 @@ class NumerationTypeControl(
 class NumberTypeControl(
     provideValueProperty: ProvideValueProperty
 
-) : TextTypeControl(provideValueProperty){
+) : TextTypeControl(provideValueProperty) {
     override fun display(view: View, value: String) {
         super.display(view, value)
     }
@@ -210,19 +207,59 @@ class ImageTypeControl(
     provideValueProperty: ProvideValueProperty
 ) : TypeControlImpl(provideValueProperty), ColumnTypeControl {
     override fun createCellView(context: Context): View {
-        return ImageView(context).apply {
+        // используем контейнер для фото что бы не было проблем с краями
+        return FrameLayout(context).apply {
             layoutParams = getLayoutParamOfCell()
+            val imageView = ImageView(context).apply {
+                layoutParams = FrameLayout.LayoutParams(matchParent, matchParent)
+            }
+            addView(imageView)
+
         }
     }
 
+    @SuppressLint("CheckResult")
     override fun display(view: View, value: String) {
         // потом поработать над тем что бы получать изображение и показать это если файл не найден
+        val imageTypePref = provideValueProperty.typePref as ImageTypePref
+
+
+        val imageView = (view as FrameLayout).getChildAt(0) as ImageView
+        // через пост чтобы использовать размеры изображения для управления качеством в ячейке
         Glide
             .with(view)
-            .load(Uri.parse(value))
-            .fitCenter()
-            .into(view as ImageView)
-
+            .load("")
+            .into(imageView)
+        imageView.post {
+            // если нет фото то просто как игнор
+            if (value.isNotEmpty()) {
+                val glide = Glide
+                    .with(view)
+                    .load(value)
+                    // если ошщибка вдруг в полуении изображений
+                    .error(R.drawable.ic_image_error)
+                if (imageTypePref.imageViewMode == 0) {
+                    // если выбрано "поместить" то этого хватает
+                    glide.fitCenter()
+                } else {
+                    // если выбрано обрезать
+                    val width = imageView.width
+                    val height = imageView.height
+                    glide.apply(
+                        // используем трансформацию (нужна библиотека для glide 'jp.wasabeef:glide-transformations:4.1.0')
+                        RequestOptions.bitmapTransform(
+                            // обрезаем под изображение
+                            CropTransformation(
+                                width,
+                                height
+                            )
+                            // этот метод устанавливает качество и поэтому тут тоже выбрали ширину и высоту imageView
+                        ).override(width, height)
+                    )
+                }
+                glide.into(imageView)
+            }
+        }
     }
 
 }

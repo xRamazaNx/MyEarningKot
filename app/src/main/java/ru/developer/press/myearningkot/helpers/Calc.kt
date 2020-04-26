@@ -1,6 +1,5 @@
-package ru.developer.press.myearningkot.otherHelpers
+package ru.developer.press.myearningkot.helpers
 
-import ru.developer.press.myearningkot.logD
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
@@ -69,7 +68,6 @@ class Calc {
                 .replace(groupingSeparator, "")
                 // замена плавающей запятой на точку
                 .replace(',', '.')
-            logD(substring)
             expr = substring
             i = 0
             token = StartOfExpression

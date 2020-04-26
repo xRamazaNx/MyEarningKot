@@ -1,4 +1,4 @@
-package ru.developer.press.myearningkot.otherHelpers
+package ru.developer.press.myearningkot.helpers
 
 import android.annotation.SuppressLint
 import android.content.Context

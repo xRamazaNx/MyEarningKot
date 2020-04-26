@@ -1,4 +1,4 @@
-package ru.developer.press.myearningkot.otherHelpers.PrefLayouts
+package ru.developer.press.myearningkot.helpers.prefLayouts
 
 import android.content.Context
 import android.graphics.Color
@@ -7,48 +7,34 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.SeekBar
 import android.widget.TextView
-import androidx.core.widget.addTextChangedListener
 import com.jaredrummler.android.colorpicker.ColorPickerDialog
 import com.jaredrummler.android.colorpicker.ColorPickerDialogListener
 import kotlinx.android.synthetic.main.pref_column_date.view.*
-import kotlinx.android.synthetic.main.pref_column_number.view.*
 import kotlinx.android.synthetic.main.prefs_text_view.view.*
 import kotlinx.android.synthetic.main.prefs_total.view.*
 import kotlinx.android.synthetic.main.prefs_total.view.digitsCountDown
 import kotlinx.android.synthetic.main.prefs_total.view.digitsCountUp
 import kotlinx.android.synthetic.main.prefs_total.view.digitsSize
 import kotlinx.android.synthetic.main.prefs_total.view.groupNumberSwitch
-import kotlinx.android.synthetic.main.prefs_with_name.view.*
 import kotlinx.android.synthetic.main.toolbar_pref.view.*
 import kotlinx.android.synthetic.main.width_seek_bar_layout.view.*
-import org.jetbrains.anko.backgroundResource
-import org.jetbrains.anko.image
-import org.jetbrains.anko.layoutInflater
+import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.activity.BasicCardActivity
 import ru.developer.press.myearningkot.model.*
-import ru.developer.press.myearningkot.otherHelpers.getColorFromRes
-import ru.developer.press.myearningkot.otherHelpers.getDate
-import ru.developer.press.myearningkot.otherHelpers.getDateTypeList
-import ru.developer.press.myearningkot.otherHelpers.showItemChangeDialog
+import ru.developer.press.myearningkot.helpers.getColorFromRes
+import ru.developer.press.myearningkot.helpers.getDate
+import ru.developer.press.myearningkot.helpers.getDateTypeList
+import ru.developer.press.myearningkot.helpers.showItemChangeDialog
+import splitties.alertdialog.appcompat.alertDialog
 
 fun Context.getPrefTextLayout(
-    // если имя передано то значит вью будет с вводом имени
-    name: String? = null,
     prefForTextView: MutableList<PrefForTextView>,
     isWorkAlignPanel: Boolean,
     callback: PrefTextChangedCallback?
 ): View {
 
-    val view = if (name != null) {
-        val inflate = layoutInflater.inflate(R.layout.prefs_with_name, null)
-        val editTextName = inflate.prefNameEditText
-        editTextName.setText(name)
-        editTextName.addTextChangedListener {
-            callback?.nameEdit(it.toString())
-        }
-        inflate
-    } else
+    val view =
         layoutInflater.inflate(R.layout.prefs_no_name, null)
 
     fun init() {
@@ -76,11 +62,11 @@ fun Context.getPrefTotalLayout(
 ): View {
 
     val view = layoutInflater.inflate(R.layout.prefs_total, null)
-    val total = totals[0]
+    val firstTotal = totals[0]
 
     val widthColumnSeekBar = view.widthColumnSeekBar
 
-    widthColumnSeekBar.progress = total.width
+    widthColumnSeekBar.progress = firstTotal.width
     widthColumnSeekBar.setOnSeekBarChangeListener(object :
         SeekBar.OnSeekBarChangeListener {
         override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
@@ -107,12 +93,14 @@ fun Context.getPrefTotalLayout(
             add(it.totalPref.prefForTextView)
         }
     }
-    val typePref = total.totalPref
+    val typePref = firstTotal.totalPref
 
     val digitDown = view.digitsCountDown
     val digitUp = view.digitsCountUp
     val digitsSizeTextView = view.digitsSize
     val grouping = view.groupNumberSwitch
+    val ignoreSwitchWork = view.ignoreSwitchColumnWorkSwitch
+    val ignoreInfo = view.ignoreSwitchWorkInfo
 
     digitsSizeTextView.text = typePref.digitsCount.toString()
     grouping.isChecked = typePref.isGrouping
@@ -122,6 +110,34 @@ fun Context.getPrefTotalLayout(
         }
         callback.prefChanged()
     }
+
+    ignoreSwitchWork.isChecked = firstTotal.isIgnoreSwitchWork
+    ignoreSwitchWork.setOnCheckedChangeListener { _, b ->
+        totals.forEach {
+            it.isIgnoreSwitchWork = b
+        }
+        callback.prefChanged()
+    }
+
+    ignoreInfo.setOnClickListener {
+        val text: String =
+            "Если в карточке есть колона типа \"Переключатель\" данная функия будет игнорировать работу переключателя с включенной опцией \"Управлять учетом в итовой панели\""
+        val alertDialog = alertDialog {
+
+            val textView = TextView(this@getPrefTotalLayout).apply {
+                setText(text)
+                padding = 24
+            }
+            setView(textView)
+            setPositiveButton(
+                R.string.OK
+            ) { p0, _ ->
+                p0.dismiss()
+            }
+        }
+        alertDialog.show()
+    }
+
 
     val editDigit = fun(digitOffset: Int) {
         var digit = typePref.digitsCount
@@ -185,7 +201,7 @@ fun Context.getPrefTotalLayout(
             }
         }
         formulaDialogShow(
-            total.formula,
+            firstTotal.formula,
             this,
             callback.getNumberColumns(),
             filterNTotals = filterTotalList,

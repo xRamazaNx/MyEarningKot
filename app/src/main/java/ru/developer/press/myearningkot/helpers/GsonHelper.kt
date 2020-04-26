@@ -1,4 +1,4 @@
-package ru.developer.press.myearningkot.otherHelpers
+package ru.developer.press.myearningkot.helpers
 
 import com.google.gson.*
 import ru.developer.press.myearningkot.model.Card

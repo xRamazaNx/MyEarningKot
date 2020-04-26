@@ -16,6 +16,7 @@ import android.widget.PopupWindow
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.view.forEach
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.appbar.AppBarLayout
 import com.google.gson.Gson
@@ -24,6 +25,7 @@ import kotlinx.android.synthetic.main.card.*
 import kotlinx.android.synthetic.main.card.datePeriodCard
 import kotlinx.android.synthetic.main.card.nameCard
 import kotlinx.android.synthetic.main.card.view.*
+import kotlinx.android.synthetic.main.set_name_layout.view.*
 import kotlinx.android.synthetic.main.total_item.view.totalValue
 import kotlinx.android.synthetic.main.total_item_layout.view.*
 import kotlinx.coroutines.CoroutineScope
@@ -31,7 +33,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
-import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.backgroundColorResource
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.wrapContent
@@ -40,12 +41,13 @@ import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.ViewModelCardFactory
 import ru.developer.press.myearningkot.dialogs.DialogBasicPrefCard
 import ru.developer.press.myearningkot.dialogs.DialogBasicPrefPlate
+import ru.developer.press.myearningkot.dialogs.DialogSetName
 import ru.developer.press.myearningkot.model.*
-import ru.developer.press.myearningkot.otherHelpers.PrefCardInfo
-import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.*
-import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.ElementPrefType.*
-import ru.developer.press.myearningkot.otherHelpers.SampleHelper
-import ru.developer.press.myearningkot.otherHelpers.showItemChangeDialog
+import ru.developer.press.myearningkot.helpers.PrefCardInfo
+import ru.developer.press.myearningkot.helpers.prefLayouts.*
+import ru.developer.press.myearningkot.helpers.prefLayouts.ElementPrefType.*
+import ru.developer.press.myearningkot.helpers.SampleHelper
+import ru.developer.press.myearningkot.helpers.showItemChangeDialog
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.negativeButton
 import splitties.alertdialog.appcompat.positiveButton
@@ -316,7 +318,6 @@ class PrefCardActivity : BasicCardActivity() {
                 selectedControl.showPref()
             }
             R.id.moveToRight -> {
-
                 selectedControl.moveToRight()
             }
             R.id.moveToLeft -> {
@@ -324,6 +325,9 @@ class PrefCardActivity : BasicCardActivity() {
             }
             R.id.deleteColumn -> {
                 selectedControl.delete()
+            }
+            R.id.renameElement -> {
+                selectedControl.rename()
             }
             android.R.id.home -> {
                 setCardOfResult()
@@ -473,30 +477,6 @@ class PrefCardActivity : BasicCardActivity() {
                         when (elementPref.elementPrefType) {
                             TEXT_VIEW -> {
                                 var isWorkAlignPanel = true
-                                val name: String?
-
-                                // проверка имени
-                                val firstSelected = elementPref.selectedElementList[0]
-                                when (firstSelected.elementType) {
-                                    ElementType.COLUMN_TITLE -> {
-                                        val elementColumn =
-                                            firstSelected as SelectedElement.ElementColumnTitle
-                                        val column = card.columns[elementColumn.columnIndex]
-                                        name = column.name
-                                    }
-                                    ElementType.NAME -> {
-                                        name = card.name
-                                    }
-                                    ElementType.TOTAL_TITLE -> {
-                                        val selectTotalItem =
-                                            firstSelected as SelectedElement.ElementTotal
-                                        val index = selectTotalItem.index
-                                        name = card.totals[index].title
-                                    }
-                                    else -> {
-                                        name = null
-                                    }
-                                }
 
                                 // проверка для настройки выравнивания
                                 elementPref.selectedElementList.forEach {
@@ -534,7 +514,7 @@ class PrefCardActivity : BasicCardActivity() {
                                         prefList.add(prefForTextView)
                                     }
                                 }
-                                getPrefTextLayout(name, prefList, isWorkAlignPanel,
+                                getPrefTextLayout(prefList, isWorkAlignPanel,
                                     object : PrefTextChangedCallback {
                                         override fun nameEdit(text: String) {
                                             elementPref.selectedElementList.forEach {
@@ -733,7 +713,7 @@ class PrefCardActivity : BasicCardActivity() {
 
                 override fun setVisiblePrefButton(isVisible: Boolean) {
                     toolbar.menu.findItem(R.id.elementSetting).isVisible = isVisible
-                    visibleButton(selectedControl.selectPrefType)
+                    visibleButton(selectedControl.selectPrefType, selectedControl.isRenameMode)
 
                 }
 
@@ -811,7 +791,7 @@ class PrefCardActivity : BasicCardActivity() {
                         columnList.forEach {
                             val deleteColumnResult: Boolean? = viewModel?.deleteColumn(it)
                             if (!deleteColumnResult!!) {
-                                toast("Нельзя удалить столбец для нумерации")
+                                toast(getString(R.string.cannot_delete_numbering_column))
                             }
                         }
                         createTitles()
@@ -827,12 +807,56 @@ class PrefCardActivity : BasicCardActivity() {
                                 if (delTotal) {
                                     viewModel?.updatePlateChanged()
                                 } else {
+                                    //#edit надо тут показать окошко с этим сообщением
                                     toast("Нельзя удалить единственный итог, если хотите отключить итоговую панель, отключите ее в настройках карточки")
                                 }
                             }
                         }
                         initElementClick()
                     }
+                }
+
+                override fun rename(selectedElementList: MutableList<SelectedElement>) {
+                    val element = selectedElementList[0]
+                    val text = when (element.elementType) {
+                        ElementType.COLUMN_TITLE -> {
+                            val columnTitleElement = element as SelectedElement.ElementColumnTitle
+                            val column = card.columns[columnTitleElement.columnIndex]
+                            column.name
+                        }
+                        ElementType.TOTAL_TITLE -> {
+                            val totalElement = element as SelectedElement.ElementTotal
+                            card.totals[totalElement.index].title
+
+                        }
+                        else -> {
+                            card.name
+                        }
+                    }
+
+                    DialogSetName {
+                        when (element.elementType) {
+                            ElementType.COLUMN_TITLE -> {
+                                val columnTitleElement =
+                                    element as SelectedElement.ElementColumnTitle
+                                val column = card.columns[columnTitleElement.columnIndex]
+                                column.name = it
+                                val columnTitle =
+                                    columnContainer.getChildAt(columnTitleElement.columnIndex) as TextView
+                                columnTitle.text = it
+                            }
+                            ElementType.TOTAL_TITLE -> {
+                                val totalElement = element as SelectedElement.ElementTotal
+                                card.totals[totalElement.index].title = it
+                                updatePlate()
+                            }
+                            else -> {
+                                card.name = it
+                                updatePlate()
+                            }
+                        }
+                    }.setFirstName(text)
+                        .show(supportFragmentManager, "setNameElement")
                 }
             }
         }
@@ -854,16 +878,17 @@ class PrefCardActivity : BasicCardActivity() {
         toolbar.post {
             val isVisible = selectedControl.isSelect
             toolbar.menu.findItem(R.id.elementSetting).isVisible = isVisible
-            visibleButton(selectedControl.selectPrefType)
+            visibleButton(selectedControl.selectPrefType, selectedControl.isRenameMode)
         }
 
     }
 
-    private fun visibleButton(prefType: ElementPrefType) {
+    private fun visibleButton(prefType: ElementPrefType, isRenameMode: Boolean) {
         val isColumnOrTotal = prefType == TOTAL || prefType == COLUMN
         toolbar.menu.findItem(R.id.moveToRight).isVisible = isColumnOrTotal
         toolbar.menu.findItem(R.id.moveToLeft).isVisible = isColumnOrTotal
         toolbar.menu.findItem(R.id.deleteColumn).isVisible = isColumnOrTotal
+        toolbar.menu.findItem(R.id.renameElement).isVisible = isRenameMode
     }
 
     private fun updatePlate() {

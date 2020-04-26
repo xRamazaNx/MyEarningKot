@@ -18,9 +18,8 @@ import org.jetbrains.anko.textColorResource
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.dpsToPixels
 import ru.developer.press.myearningkot.model.Card
-import ru.developer.press.myearningkot.otherHelpers.getDateTypeList
-import ru.developer.press.myearningkot.otherHelpers.getValutaTypeList
-import ru.developer.press.myearningkot.otherHelpers.showItemChangeDialog
+import ru.developer.press.myearningkot.helpers.getValutaTypeList
+import ru.developer.press.myearningkot.helpers.showItemChangeDialog
 
 class DialogBasicPrefCard(
     val card: Card,

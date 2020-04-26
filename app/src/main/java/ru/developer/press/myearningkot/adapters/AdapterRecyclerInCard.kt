@@ -18,7 +18,7 @@ import ru.developer.press.myearningkot.model.Column
 import ru.developer.press.myearningkot.model.NumerationColumn
 import ru.developer.press.myearningkot.model.Row
 import ru.developer.press.myearningkot.model.SwitchColumn
-import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.setSelectBackground
+import ru.developer.press.myearningkot.helpers.prefLayouts.setSelectBackground
 
 class AdapterRecyclerInCard(
     private var rowClickListener: RowClickListener?,
@@ -39,7 +39,6 @@ class AdapterRecyclerInCard(
 
         if (viewType == -1)
             return RowHolder(FrameLayout(context).apply {
-                layoutParams = FrameLayout.LayoutParams(matchParent, plate.height)
                 backgroundColor = Color.TRANSPARENT
             })
         val width = provideDataRows.getWidth()
@@ -91,26 +90,29 @@ class AdapterRecyclerInCard(
     }
 
     override fun getItemViewType(position: Int): Int {
-        val size = provideDataRows.rows.size
+        val size = provideDataRows.sortedRows.size
         return if (size == position) -1 else 0
     }
 
     override fun getItemCount(): Int {
-        return provideDataRows.rows.size + 1 // отступ от тотал
+        return provideDataRows.sortedRows.size + 1 // отступ от тотал
     }
 
     override fun onBindViewHolder(holder: RowHolder, position: Int) {
-        if (holder.itemViewType == -1)
+        if (holder.itemViewType == -1) {
+            holder.itemView.layoutParams = FrameLayout.LayoutParams(matchParent, plate.height)
             return
-        holder.bind(provideDataRows.rows[position], provideDataRows.getColumns())
+        }
+        holder.bind(provideDataRows.sortedRows[position], provideDataRows.getColumns())
     }
 
 }
 
-val animationDelete: Animation = AnimationUtils.loadAnimation(App.instance?.baseContext, R.anim.anim_delete)
+val animationDelete: Animation =
+    AnimationUtils.loadAnimation(App.instance?.baseContext, R.anim.anim_delete)
+val animationAdd: Animation = AnimationUtils.loadAnimation(App.instance?.baseContext, R.anim.anim_add)
 
 class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataListener {
-    private val animationAdd = AnimationUtils.loadAnimation(itemView.context, R.anim.anim_add)
     var viewList = mutableListOf<View>()
     var rowNumber: TextView? = null
     private var positionRow = 0
@@ -166,6 +168,7 @@ class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataList
                 bind(row, columns)
             }
             Row.Status.DELETED -> {
+                itemView.backgroundColorResource = R.color.md_red_200
                 itemView.startAnimation(animationDelete)
             }
             else -> {

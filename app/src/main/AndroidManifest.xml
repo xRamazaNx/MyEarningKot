@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="ru.developer.press.myearningkot">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
@@ -20,10 +20,11 @@
         tools:ignore="GoogleAppIndexingWarning">
         <meta-data
             android:name="com.bugsnag.android.API_KEY"
-            android:value="b0d11f6997c56533e75d4fac75e05aee"/>
+            android:value="b0d11f6997c56533e75d4fac75e05aee" />
 
         <activity android:name=".activity.PrefCardActivity" />
-        <activity android:name=".activity.CardActivity"
+        <activity
+            android:name=".activity.CardActivity"
             android:windowSoftInputMode="adjustNothing">
 
         </activity>
@@ -34,6 +35,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="ru.developer.press.myearningkot.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+
+        </provider>
     </application>
 
 </manifest>

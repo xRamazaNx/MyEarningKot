@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.contains
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
 import kotlinx.android.synthetic.main.activity_card.*
 import kotlinx.android.synthetic.main.card.view.*
 import kotlinx.coroutines.CoroutineScope
@@ -23,7 +22,9 @@ import ru.developer.press.myearningkot.App
 import ru.developer.press.myearningkot.CardViewModel
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.adapters.AdapterRecyclerInCard
-import ru.developer.press.myearningkot.otherHelpers.bindTitleOfColumn
+import ru.developer.press.myearningkot.model.createViewInPlate
+import ru.developer.press.myearningkot.model.updateTotalAmount
+import ru.developer.press.myearningkot.helpers.bindTitleOfColumn
 
 @SuppressLint("Registered")
 abstract class BasicCardActivity : AppCompatActivity() {
@@ -63,16 +64,22 @@ abstract class BasicCardActivity : AppCompatActivity() {
             // создаем заголовки колон и подписываемся
             createTitles()
             // подписываем
-            observeTotalAmount()
+            observePlate()
+            observeTotals()
         }
 //        tableView.horizontalScrollView.columnsScrollView = columnScrollContainer
         updateHorizontalScrollSwitched()
         createRecyclerView()
     }
 
-    private fun observeTotalAmount() {
+    private fun observePlate() {
         viewModel?.cardLiveData?.observe(this, Observer {
-            it.customizeTotalAmount(totalAmountView)
+            it.createViewInPlate(totalAmountView)
+        })
+    }
+    private fun observeTotals() {
+        viewModel?.totalLiveData?.observe(this, Observer {
+            it.updateTotalAmount(totalAmountView)
         })
     }
 

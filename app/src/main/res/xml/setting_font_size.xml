@@ -79,7 +79,7 @@
             android:defaultValue="16"
             android:entries="@array/font_size"
             android:entryValues="@array/font_size"
-            android:key="@string/Ostatok"
-            android:title="@string/Ostatok"/>
+            android:key="@string/residue"
+            android:title="@string/residue"/>
     </PreferenceCategory>
 </PreferenceScreen>

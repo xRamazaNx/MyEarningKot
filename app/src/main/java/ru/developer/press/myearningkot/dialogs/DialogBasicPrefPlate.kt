@@ -1,5 +1,6 @@
 package ru.developer.press.myearningkot.dialogs
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
@@ -8,7 +9,6 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
-import kotlinx.android.synthetic.main.card_basic_pref_layout.view.*
 import kotlinx.android.synthetic.main.card_basic_pref_layout.view.switchEnableHorizontalScroll
 import kotlinx.android.synthetic.main.plate_basic_pref_layout.view.*
 import kotlinx.coroutines.CoroutineScope
@@ -20,19 +20,17 @@ import org.jetbrains.anko.textColorResource
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.dpsToPixels
 import ru.developer.press.myearningkot.model.Card
-import ru.developer.press.myearningkot.otherHelpers.getDateTypeList
-import ru.developer.press.myearningkot.otherHelpers.getValutaTypeList
-import ru.developer.press.myearningkot.otherHelpers.showItemChangeDialog
 
 class DialogBasicPrefPlate(
     val card: Card,
     val basicPrefEvent: () -> Unit
 ) : DialogFragment() {
 
+    @SuppressLint("InflateParams")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = AlertDialog.Builder(context).apply {
             setCustomTitle(TextView(context).apply {
-                text = "Настройки карточки"
+                text = context.getString(R.string.plate_setting)
                 textColorResource = R.color.light_gray
                 val dp24 = context.dpsToPixels(24)
                 val dp8 = context.dpsToPixels(8)

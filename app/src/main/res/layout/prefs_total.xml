@@ -7,6 +7,7 @@
 
 
     <include layout="@layout/toolbar_pref" />
+
     <include layout="@layout/width_seek_bar_layout" />
 
     <ScrollView
@@ -95,6 +96,41 @@
                 android:padding="16dp"
                 android:text="@string/group_number"
                 android:textColor="@color/light_gray" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:alpha="0.5"
+                android:background="@color/color_normal" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Switch
+                    android:id="@+id/ignoreSwitchColumnWorkSwitch"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:padding="16dp"
+                    android:text="@string/ignore_switch_work"
+                    android:textColor="@color/light_gray" />
+
+                <ImageButton
+                    android:id="@+id/ignoreSwitchWorkInfo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:padding="16dp"
+                    android:src="@drawable/ic_info"
+                    android:tint="@color/white" />
+
+            </LinearLayout>
 
             <FrameLayout
                 android:layout_width="match_parent"

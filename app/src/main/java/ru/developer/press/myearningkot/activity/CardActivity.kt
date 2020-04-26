@@ -23,15 +23,14 @@ import kotlinx.android.synthetic.main.card.view.*
 import kotlinx.coroutines.*
 import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.CardViewModel.SelectMode
-import ru.developer.press.myearningkot.adapters.AdapterRecyclerInCard
+import ru.developer.press.myearningkot.adapters.animationAdd
 import ru.developer.press.myearningkot.adapters.animationDelete
+import ru.developer.press.myearningkot.dialogs.PICK_IMAGE_MULTIPLE
+import ru.developer.press.myearningkot.dialogs.editCellTag
 import ru.developer.press.myearningkot.dialogs.startPrefActivity
-import ru.developer.press.myearningkot.model.Card
-import ru.developer.press.myearningkot.model.DataController
-import ru.developer.press.myearningkot.model.NumberColumn
-import ru.developer.press.myearningkot.model.Row
-import ru.developer.press.myearningkot.otherHelpers.EditCellControl
-import ru.developer.press.myearningkot.otherHelpers.getColorFromRes
+import ru.developer.press.myearningkot.model.*
+import ru.developer.press.myearningkot.helpers.EditCellControl
+import ru.developer.press.myearningkot.helpers.getColorFromRes
 import uk.co.markormesher.android_fab.SpeedDialMenuAdapter
 import uk.co.markormesher.android_fab.SpeedDialMenuItem
 import java.lang.Runnable
@@ -50,10 +49,11 @@ open class CardActivity : BasicCardActivity() {
 
         progressBar.visibility = GONE
         doStart()
-        viewModel?.titleLiveData?.observe(this@CardActivity, Observer {
-            title = it
-        })
-
+        viewModel?.apply {
+            titleLiveData.observe(this@CardActivity, Observer {
+                title = it
+            })
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,34 +68,37 @@ open class CardActivity : BasicCardActivity() {
         hideViewWhileScroll()
 
         // листенер для обновления после удаления то есть после ее анимации
-        animationDelete.setAnimationListener(object : Animation.AnimationListener {
+        val animateListener = object : Animation.AnimationListener {
             override fun onAnimationRepeat(p0: Animation?) {
 
             }
 
             override fun onAnimationEnd(p0: Animation?) {
-                viewModel?.apply {
-                    sortedList()
-                    updatePlateChanged()
-                    selectMode.value = SelectMode.NONE
+                CoroutineScope(Dispatchers.IO).launch {
+
+                    viewModel?.apply {
+                        deleteRows { indexDel: Int ->
+                            launch(Dispatchers.Main) {
+                                adapter.notifyItemRemoved(indexDel)
+
+                            }
+                        }
+                        launch(Dispatchers.Main) {
+                            updateTotals()
+                            selectMode.value = SelectMode.NONE
+                        }
+                    }
                 }
             }
 
             override fun onAnimationStart(p0: Animation?) {
             }
 
-        })
+        }
+        animationDelete.setAnimationListener(animateListener)
+        animationAdd.setAnimationListener(animateListener)
     }
 
-    fun isEqualCellAndCopyCell(): Boolean {
-        val selectedCellType = viewModel?.getSelectedCellType()
-        val copyCell = App.instance?.copyCell
-        var eq = false
-        copyCell?.let {
-            eq = it.type == selectedCellType
-        }
-        return eq
-    }
 
     private fun selectedModeObserve() {
         val menu = toolbar.menu
@@ -105,7 +108,7 @@ open class CardActivity : BasicCardActivity() {
                 SelectMode.CELL -> {
                     menuInflater.inflate(R.menu.cell_menu, menu)
                     // ставим иконку вставить в зависимости доступности вставки
-                    if (isEqualCellAndCopyCell()) {
+                    if (viewModel!!.isEqualCellAndCopyCell()) {
                         menu.findItem(R.id.pasteCell).setIcon(R.drawable.ic_paste_white)
                     } else
                         menu.findItem(R.id.pasteCell).setIcon(R.drawable.ic_paste_white_disabled)
@@ -116,7 +119,7 @@ open class CardActivity : BasicCardActivity() {
                             add(
                                 SpeedDialMenuItem(
                                     this@CardActivity,
-                                    if (isEqualCellAndCopyCell())
+                                    if (viewModel!!.isEqualCellAndCopyCell())
                                         getDrawable(R.drawable.ic_paste_white)!!
                                     else
                                         getDrawable(R.drawable.ic_paste_white_disabled)!!
@@ -159,22 +162,16 @@ open class CardActivity : BasicCardActivity() {
 
                                 when (position) {
                                     0 -> {
-                                        if (isEqualCellAndCopyCell()) {
-                                            viewModel?.pasteCell()
-                                            notifyAdapter()
-                                            viewModel?.updatePlateChanged()
-                                        }
+                                        pasteCell()
                                     }
                                     1 -> {
-                                        viewModel?.copySelectedCell(false)
+                                        copySelectedCell()
                                     }
                                     2 -> {
-                                        viewModel?.copySelectedCell(true)
-                                        notifyAdapter()
-                                        viewModel?.updatePlateChanged()
+                                        cutSelectedCell()
                                     }
                                     3 -> {
-                                        viewModel?.editCell()
+                                        editCell()
                                     }
                                 }
                             }
@@ -194,19 +191,24 @@ open class CardActivity : BasicCardActivity() {
                     // при открытии меню проверка одного ли типа ячейки чтоб работала кнопка вставки или нет
                     fbAddRow.setButtonIconResource(R.drawable.ic_menu_3_line)
                     fbAddRow.setButtonBackgroundColour(getColorFromRes(R.color.red_fb_button))
-                    if (!fbAddRow.isShown)
-                        fbAddRow.show()
                     supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_check)
                 }
 
                 SelectMode.ROW -> {
                     menuInflater.inflate(R.menu.row_menu, menu)
+                    if (viewModel!!.isCapabilityPaste()) {
+                        menu.findItem(R.id.pasteRow).setIcon(R.drawable.ic_paste_white)
+                    } else
+                        menu.findItem(R.id.pasteRow).setIcon(R.drawable.ic_paste_white_disabled)
                     fbAddRow.speedDialMenuAdapter = object : SpeedDialMenuAdapter() {
                         private val list = mutableListOf<SpeedDialMenuItem>().apply {
                             add(
                                 SpeedDialMenuItem(
                                     this@CardActivity,
-                                    getDrawable(R.drawable.ic_paste_white)!!,
+                                    if (viewModel!!.isCapabilityPaste())
+                                        getDrawable(R.drawable.ic_paste_white)!!
+                                    else
+                                        getDrawable(R.drawable.ic_paste_white_disabled)!!,
 //                                    getString(R.string.PASTE)
                                     ""
                                 )
@@ -242,16 +244,16 @@ open class CardActivity : BasicCardActivity() {
                         override fun onMenuItemClick(position: Int): Boolean {
                             when (position) {
                                 0 -> {
-                                    toast("paste")
+                                    pasteRows()
                                 }
                                 1 -> {
-                                    toast("copy")
+                                    copySelectedRows()
                                 }
                                 2 -> {
-                                    toast("cut")
+                                    cutSelectedRows()
                                 }
                                 3 -> {
-                                    toast("delete")
+                                    removeSelectedRows()
                                 }
                             }
                             return true
@@ -268,8 +270,6 @@ open class CardActivity : BasicCardActivity() {
                     }
                     fbAddRow.setButtonIconResource(R.drawable.ic_menu_3_line)
                     fbAddRow.setButtonBackgroundColour(getColorFromRes(R.color.shape_select_border))
-                    if (!fbAddRow.isShown)
-                        fbAddRow.show()
                     supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_check)
                 }
                 else -> {
@@ -311,22 +311,27 @@ open class CardActivity : BasicCardActivity() {
                         if (viewModel == null) {
                             recreate()
                         } else {
-                            CoroutineScope(Dispatchers.Main).launch {
+                            CoroutineScope(Dispatchers.IO).launch {
                                 val card = DataController().getCard(id)
-                                // потому что вьюможель не умирает и не создается занового
-                                viewModel!!.updateCard(card)
-                                createTitles()
-                                updateHorizontalScrollSwitched()
-                                createRecyclerView()
-                                viewModel?.apply {
-                                    selectMode.value = SelectMode.NONE
+                                withContext(Dispatchers.Main) {
+                                    viewModel!!.updateCard(card)
+                                    createTitles()
+                                    updateHorizontalScrollSwitched()
+                                    createRecyclerView()
+                                    viewModel?.apply {
+                                        selectMode.value = SelectMode.NONE
+                                    }
+                                    onResume()
                                 }
-                                onResume()
                             }
                         }
                     }
                 }
             }
+        }
+        if (requestCode == PICK_IMAGE_MULTIPLE) {
+            supportFragmentManager.fragments.find { it.tag == editCellTag }
+                ?.onActivityResult(requestCode, resultCode, data)
         }
     }
 
@@ -347,49 +352,33 @@ open class CardActivity : BasicCardActivity() {
             }
             // cell
             R.id.editCell -> {
-                viewModel?.editCell()
+                editCell()
             }
             R.id.pasteCell -> {
-                if (isEqualCellAndCopyCell()) {
-                    viewModel?.pasteCell()
-                    notifyAdapter()
-                }
+                pasteCell()
+
             }
             R.id.copyCell -> {
-                viewModel?.copySelectedCell(false)
+                copySelectedCell()
             }
             R.id.cutCell -> {
-                viewModel?.copySelectedCell(true)
-                notifyAdapter()
+                cutSelectedCell()
             }
             // row
             R.id.deleteRow -> {
-                CoroutineScope(Dispatchers.Main).launch {
-                    withContext(Dispatchers.IO) {
-                        viewModel?.deleteRows {
-                            launch(Dispatchers.Main) {
-                                notifyAdapter()
-                            }
-                        }
-                    }
-                }
-
+                removeSelectedRows()
             }
             R.id.cutRow -> {
-                viewModel?.copySelectedRows(true)
-                notifyAdapter()
+                cutSelectedRows()
             }
             R.id.copyRow -> {
-                viewModel?.copySelectedRows(false)
-                notifyAdapter()
+                copySelectedRows()
             }
             R.id.pasteRow -> {
-                viewModel?.pasteRows()
-                notifyAdapter()
+                pasteRows()
             }
             R.id.duplicateRow -> {
-                viewModel?.duplicateRows()
-                notifyAdapter()
+                duplicateRows()
             }
 
             android.R.id.home -> {
@@ -397,6 +386,51 @@ open class CardActivity : BasicCardActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun duplicateRows() {
+        viewModel?.duplicateRows()
+        scrollToPosition(viewModel!!.card.rows.size)
+    }
+
+    private fun pasteRows() {
+        viewModel?.apply {
+            pasteRows()
+            selectMode.value = SelectMode.NONE
+        }
+
+    }
+
+    private fun cutSelectedRows() {
+        viewModel?.copySelectedRows()
+        removeSelectedRows()
+    }
+
+    private fun copySelectedRows() {
+        viewModel?.copySelectedRows()
+        viewModel?.selectMode?.value = SelectMode.ROW
+    }
+
+    private fun cutSelectedCell() {
+        viewModel?.copySelectedCell(true)
+        notifyAdapter()
+    }
+
+    private fun copySelectedCell() {
+        viewModel?.copySelectedCell(false)
+    }
+
+    private fun pasteCell() {
+        viewModel?.pasteCell()
+    }
+
+    private fun removeSelectedRows() {
+        viewModel?.apply {
+            card.getSelectedRows().forEach {
+                it.status = Row.Status.DELETED
+            }
+        }
+        notifyAdapter()
     }
 
     // выполняем что ни будь и рекуклер обновляется после конца анимации
@@ -528,7 +562,7 @@ open class CardActivity : BasicCardActivity() {
                     cellPosition
                 ) { oldRowPosition, isDoubleTap ->
                     if (isDoubleTap) {
-                        viewModel?.editCell()
+                        editCell()
                     } else {
                         adapter.notifyItemChanged(oldRowPosition)
                         adapter.notifyItemChanged(rowPosition)
@@ -538,6 +572,10 @@ open class CardActivity : BasicCardActivity() {
             }
         }
 
+    }
+
+    private fun editCell() {
+        viewModel?.editCell()
     }
 
     override fun onResume() {
@@ -566,13 +604,8 @@ open class CardActivity : BasicCardActivity() {
                             }
 //                            notifyAdapter()
                             // обновляем в начале так как отчет идет в самой карточке
-                            updatePlateChanged()
-                            recycler.scrollToPosition(rows.indexOf(rowAdded) + 1) //  у нас на одну больше из за отступа для плейт
-                            appBar.setExpanded(false, true)
-//                            Handler().postDelayed(150) {
-//                                recyclerRunEvent {
-//                                }
-//                            }
+                            updateTotals()
+                            scrollToPosition(sortedRows.indexOf(rowAdded) + 1)
 
                         }
                     }
@@ -584,9 +617,18 @@ open class CardActivity : BasicCardActivity() {
         }
     }
 
+    private fun updateTotals() {
+        viewModel?.card?.updateTotalAmount(totalAmountView)
+    }
+
+    private fun scrollToPosition(position: Int) {
+        recycler.scrollToPosition(position) //  у нас на одну больше из за отступа для плейт
+        appBar.setExpanded(false, true)
+    }
+
     private fun CardViewModel.editCell() {
         val column = card.columns[cellSelectPosition]
-        val selectCell = sortedList()[rowSelectPosition].cellList[cellSelectPosition]
+        val selectCell = sortList()[rowSelectPosition].cellList[cellSelectPosition]
 
         EditCellControl(
             this@CardActivity,
@@ -602,7 +644,7 @@ open class CardActivity : BasicCardActivity() {
             }
             adapter.notifyDataSetChanged()
             updateCardInDB().invokeOnCompletion {
-                updatePlateChanged()
+                updateTotals()
             }
 
         }.editCell()
@@ -618,10 +660,3 @@ open class CardActivity : BasicCardActivity() {
         }
 
 }
-
-
-/*
-- ширина всей таблицы не должна быть меньше ширины экрана
-- только rowClick
-- колумны не должны наживаться
- */

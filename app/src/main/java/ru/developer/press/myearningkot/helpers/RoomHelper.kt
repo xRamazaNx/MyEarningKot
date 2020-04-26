@@ -1,4 +1,4 @@
-package ru.developer.press.myearningkot.otherHelpers
+package ru.developer.press.myearningkot.helpers
 
 import androidx.room.*
 import androidx.room.Database

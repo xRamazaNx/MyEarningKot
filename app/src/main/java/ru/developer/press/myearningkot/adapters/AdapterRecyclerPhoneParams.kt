@@ -46,7 +46,7 @@ class AdapterRecyclerPhoneParams(
         viewHolder: PhoneParamHolder,
         position: Int
     ): View? {
-        return viewHolder.itemView
+        return viewHolder.itemView.moveItem
     }
 
     override fun onBindViewHolder(

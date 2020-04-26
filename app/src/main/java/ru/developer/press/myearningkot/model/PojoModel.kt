@@ -1,32 +1,23 @@
 package ru.developer.press.myearningkot.model
 
 import android.graphics.Color
+import android.net.Uri
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
-import android.text.TextUtils
 import android.text.style.ForegroundColorSpan
-import android.view.Gravity
 import android.view.View
-import android.view.View.GONE
-import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.core.text.toSpannable
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import kotlinx.android.synthetic.main.card.view.*
-import kotlinx.android.synthetic.main.total_item.view.*
-import kotlinx.android.synthetic.main.total_item_layout.view.*
 import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.*
-import ru.developer.press.myearningkot.activity.CardActivity
 import ru.developer.press.myearningkot.model.Formula.Companion.COLUMN_ID
 import ru.developer.press.myearningkot.model.Formula.Companion.OTHER
 import ru.developer.press.myearningkot.model.Formula.Companion.TOTAL_ID
-import ru.developer.press.myearningkot.otherHelpers.*
-import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.multiplyChar
-import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.subtractChar
+import ru.developer.press.myearningkot.helpers.*
+import ru.developer.press.myearningkot.helpers.prefLayouts.multiplyChar
+import ru.developer.press.myearningkot.helpers.prefLayouts.subtractChar
 import java.util.*
 import kotlin.Exception
 import kotlin.random.Random
@@ -57,12 +48,7 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
     var columns = mutableListOf<Column>()
     var totals = mutableListOf<TotalItem>()
 
-
-//    // ид колон которые суммируются
-//    val sumColumnId = mutableSetOf<Long>()
-//    val avansColumnId = mutableSetOf<Long>()
-
-    private val dateOfPeriod: String
+    val dateOfPeriod: String
         get() {
             val variantDate = cardPref.dateOfPeriodPref.type
             val enableTime = cardPref.dateOfPeriodPref.enableTime
@@ -81,10 +67,13 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
 //        fillTotalAmount()
     }
 
-    fun addTotal() {
-        totals.add(TotalItem().apply {
+    fun addTotal(): TotalItem {
+        val totalItem = TotalItem().apply {
             formula.formulaElements.add(Formula.FormulaElement(OTHER, "0"))
-        })
+        }
+        totals.add(totalItem)
+
+        return totalItem
     }
 
     fun deleteTotal(index: Int): Boolean {
@@ -103,7 +92,7 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
                 }
             }
         }
-    ) :Row{
+    ): Row {
         row.status = Row.Status.ADDED
         rows.add(row)
         updateTypeControlRow(rows.size - 1)
@@ -141,28 +130,38 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
             is ColorColumn -> {
                 Color.WHITE.toString()
             }
-            is ImageColumn ->
-                getURLForResource(R.drawable.ic_image).toString()
+            is ImageColumn -> {
+                Gson().toJson(ImageTypeValue())
+            }
             is SwitchColumn -> {
-                val r = (0..1).random()
-                (r == 0).toString()
+//                val r = (0..1).random()
+//                (r == 0).toString()
+                false.toString()
             }
             is ListColumn ->
-                "Выбранный элемент"
+//                "элемент"
+                ""
             is PhoneColumn ->
                 gson.toJson(
                     PhoneTypeValue(
-                        phone = 89881234567.toString(),
-                        name = "Иван",
-                        lastName = "Иванов",
-                        organization = "press dev"
+//                        phone = 89881234567.toString(),
+//                        name = "Иван",
+//                        lastName = "Иванов",
+//                        organization = "press dev"
                     )
                 )
 
-            is DateColumn -> Date().time.toString()
-            is NumberColumn -> Random.nextDouble(100.987644, 15956.9999999).toString()
+            is DateColumn -> {
+//                Date().time.toString()
+                ""
+            }
+            is NumberColumn -> {
+//                Random.nextDouble(100.987644, 15956.9999999).toString()
+                ""
+            }
             else -> {
-                "текст который может быть таким длинным что он просто не помещается на экране"
+//                "текст который может быть таким длинным что он просто не помещается на экране"
+                ""
             }
         }
         cellTypeControl = column.columnTypeControl
@@ -218,7 +217,7 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
             cellTypeControl = column.columnTypeControl
             sourceValue = when (column) {
                 is ImageColumn -> {
-                    getURLForResource(R.drawable.ic_image).toString()
+                    getPathForResource(R.drawable.ic_image).toString()
                 }
                 is SwitchColumn -> {
                     "true"
@@ -274,77 +273,6 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
     override fun isSingleLine(): Boolean = !enableSomeStroke
 
     override fun getValutaType(): Int = valuta
-
-    fun customizeTotalAmount(totalAmountView: View) {
-        val context = totalAmountView.context
-        val nameCard = totalAmountView.nameCard
-        val datePeriodCard = totalAmountView.datePeriodCard
-
-        nameCard.text = name
-        val isCardActivity = context is CardActivity
-        datePeriodCard.visibility = if (isShowDatePeriod && !isCardActivity) View.VISIBLE else GONE
-        datePeriodCard.text = dateOfPeriod
-
-        // визуальная настройка
-        cardPref.namePref.customize(nameCard)
-        cardPref.dateOfPeriodPref.prefForTextView.customize(datePeriodCard)
-
-        //главный контейнер для заголовков и значений
-        val totalContainer: LinearLayout =
-            context.layoutInflater.inflate(
-                R.layout.total_item_layout,
-                null
-            ) as LinearLayout
-        totalContainer.layoutParams = ViewGroup.LayoutParams(matchParent, wrapContent)
-
-        //удаляем где бы не были
-        totalAmountView.totalContainerDisableScroll.removeAllViews()
-        totalAmountView.totalContainerScroll.removeAllViews()
-        // добавляем в главный лейаут
-        if (enableHorizontalScrollTotal) {
-            totalAmountView.totalContainerScroll.addView(totalContainer)
-        } else {
-            totalAmountView.totalContainerDisableScroll.addView(totalContainer)
-        }
-        // контейнер для всех значений
-        val totalValueLayout = totalContainer.totalValueContainer
-        // кнтейнер для всех заголовков
-        val totalTitleLayout = totalContainer.totalTitleContainer
-
-        totals.forEachIndexed { index, totalItem ->
-            // лайот где валуе и линия
-            val valueLayout =
-                context.layoutInflater.inflate(R.layout.total_item_value, null)
-
-            val layoutParams = LinearLayout.LayoutParams(totalItem.width, matchParent).apply {
-                weight = 1f
-            }
-            valueLayout.layoutParams = layoutParams
-            if (index == totals.size - 1) {
-                valueLayout._verLine.visibility = GONE
-            }
-
-            val title = TextView(context).apply {
-                this.layoutParams = layoutParams
-                gravity = Gravity.CENTER
-                padding = 5
-            }
-            val value = valueLayout.totalValue
-
-            title.text = totalItem.title
-            title.maxLines = 1
-            title.ellipsize = TextUtils.TruncateAt.END
-            totalItem.titlePref.customize(title)
-
-            totalItem.totalPref.prefForTextView.customize(value)
-            totalItem.calcFormula(this)
-            value.text = totalItem.value
-
-            totalTitleLayout.addView(title)
-            totalValueLayout.addView(valueLayout)
-        }
-
-    }
 
     fun updateTypeControlColumn(column: Column) {
         column.updateTypeControl(this)
@@ -558,6 +486,21 @@ data class Cell(
                 }
                 displayValue = info.toString()
             }
+            is ImageTypePref -> {
+                val imageTypeValue = Gson().fromJson(sourceValue, ImageTypeValue::class.java)
+                val imageUriList = imageTypeValue.imagePathList
+                displayValue =
+                    if (imageUriList.isEmpty())
+                        Uri.EMPTY.toString()
+                    else {
+                        val changeImage = imageTypeValue.changeImage
+                        if (changeImage > -1)
+                            imageUriList[changeImage]
+                        else
+                            imageUriList[0]
+                    }
+
+            }
             else -> {
                 displayValue = sourceValue
             }
@@ -571,6 +514,14 @@ data class Cell(
 
     fun displayCellView(view: View) {
         cellTypeControl.display(view, displayValue)
+    }
+
+    fun copy(): Cell {
+        return Cell(sourceValue).also {
+            it.type = type
+            it.cellTypeControl = cellTypeControl
+            it.displayValue = displayValue
+        }
     }
 
     // опустошить
@@ -599,6 +550,7 @@ class TotalItem {
     var totalPref: NumberTypePref = NumberTypePref().apply {
         prefForTextView.color = Color.WHITE
     }
+    var isIgnoreSwitchWork: Boolean = false
 
     fun calcFormula(card: Card) {
         val calc = Calc()
@@ -608,7 +560,7 @@ class TotalItem {
             if (element.type == COLUMN_ID) {
                 val elementId = elementVal.toLong()
                 if (card.columns.any { it.id == elementId }) {
-                    string.append(card.getSumFromColumn(elementId))
+                    string.append(card.getSumFromColumn(elementId, isIgnoreSwitchWork))
                 } else {
                     formula.formulaElements.remove(element)
                     calcFormula(card)
@@ -620,7 +572,6 @@ class TotalItem {
                 if (card.totals.any { it.id == elementId }) {
                     val findTotal = card.totals.find { it.id == elementId }!!
                     findTotal.calcFormula(card)
-//                    logD(findTotal.value)
                     string.append(findTotal.value)
                 } else {
                     formula.formulaElements.remove(element)
@@ -639,7 +590,7 @@ class TotalItem {
         }
     }
 
-    private fun Card.getSumFromColumn(id: Long): String {
+    private fun Card.getSumFromColumn(id: Long, ignoreSwitchWork: Boolean): String {
 
         var index = -1
         val calc = Calc()
@@ -657,20 +608,25 @@ class TotalItem {
             rows.forEach { row ->
                 var isAddSum = true
                 if (isAnySwitchColumn)
-                // проходим по колонам в основном для того что бы узнать индекс для доступа к ячейке
-                    columns.forEachIndexed { columnIndex, column ->
-                        // если нашли
-                        if (column is SwitchColumn) {
-                            // в настройках включена опция "учитывать в итоговой панели"
-                            if (column.typePref.behavior.control)
-                                isAddSum = row.cellList[columnIndex].sourceValue.toBoolean()
+                //  если в итоговой не включен игнор этой функции
+                    if (!isIgnoreSwitchWork)
+                    // проходим по колонам в основном для того что бы узнать индекс для доступа к ячейке
+                        columns.forEachIndexed { columnIndex, column ->
+                            // если нашли колону свитч
+                            if (column is SwitchColumn) {
+                                // в настройках включена опция "учитывать в итоговой панели"
+                                if (column.typePref.behavior.control)
+                                // то посмотрим переключатель на что установлен
+                                    isAddSum = row.cellList[columnIndex].sourceValue.toBoolean()
+                            }
                         }
-                    }
 
                 val cell = row.cellList[index]
-                if (isAddSum)
+                val source = cell.sourceValue
+                // если надо прибавить и сорц не пустой
+                if (isAddSum && source.isNotEmpty())
                     value += try {
-                        calc.evaluate(cell.sourceValue)!!
+                        calc.evaluate(source)!!
                     } catch (exc: Exception) {
                         return "Error"
                     }
@@ -685,12 +641,15 @@ class Row {
     fun copy(): Row {
         return Row().apply {
             this.dateModify = this@Row.dateModify
-            this.status = Status.SELECT
+            this.status = Status.NONE
             this@Row.cellList.forEach {
                 cellList.add(it.copy())
             }
         }
     }
+
+    @Transient
+    var id = -1
 
     @Transient
     var status = Status.NONE
@@ -717,9 +676,13 @@ class DisplayParam {
 }
 
 class PhoneTypeValue(
+    @SerializedName("n")
     var name: String = "",
+    @SerializedName("ln")
     var lastName: String = "",
+    @SerializedName("p")
     var phone: String = "",
+    @SerializedName("o")
     var organization: String = ""
 ) {
     fun getPhoneInfo(phoneTypePref: PhoneTypePref): String {
@@ -740,6 +703,21 @@ class PhoneTypeValue(
         }
         return infoBuilder.toString()
     }
+}
+
+class ImageTypeValue {
+    fun removePath(selectedTabPosition: Int) {
+        imagePathList.removeAt(selectedTabPosition)
+        val size = imagePathList.size
+        if (changeImage >= size && imagePathList.isNotEmpty())
+            changeImage = size - 1
+    }
+
+    @SerializedName("ip")
+    val imagePathList = mutableListOf<String>()
+
+    @SerializedName("ci")
+    var changeImage = -1
 }
 
 class ListType {
@@ -808,6 +786,7 @@ class Formula {
         return spannable.toSpannable()
     }
 
+    // копировать из формулы в ту из которой вызвали этот метод
     fun copyFrom(_formula: Formula) {
         formulaElements.clear()
         _formula.formulaElements.forEach { element ->
@@ -836,13 +815,19 @@ class Formula {
     }
 
     internal companion object {
-        val OTHER = 0
-        val COLUMN_ID = 1
-        val TOTAL_ID = 2
+        const val OTHER = 0
+        const val COLUMN_ID = 1
+        const val TOTAL_ID = 2
     }
 
+    @SerializedName("fe")
     val formulaElements = mutableListOf<FormulaElement>()
 
-    data class FormulaElement(var type: Int = 0, var value: String = "")
+    data class FormulaElement(
+        @SerializedName("t")
+        var type: Int = 0,
+        @SerializedName("v")
+        var value: String = ""
+    )
 
 }

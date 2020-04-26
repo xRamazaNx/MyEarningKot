@@ -13,12 +13,19 @@ import ru.developer.press.myearningkot.R
 
 class DialogSetName(val setName: (String) -> Unit) : DialogFragment() {
 
+    private var name = ""
+    fun setFirstName(name: String): DialogSetName {
+        this.name = name
+        return this
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = AlertDialog.Builder(context).apply {
             val view = context.layoutInflater.inflate(R.layout.set_name_layout, null)
 
-            val editTextCardName = view.editTextCardName
+            val editTextCardName = view.editTextName
+            editTextCardName.setText(name)
+            editTextCardName.showKeyboard()
             //
             setView(view)
             setPositiveButton(R.string.OK) { _: DialogInterface, _: Int ->

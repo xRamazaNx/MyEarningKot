@@ -4,18 +4,13 @@ import android.content.Context
 import android.view.View
 import ru.developer.press.myearningkot.model.*
 //import ru.developer.press.myearningkot.model.card
-import ru.developer.press.myearningkot.otherHelpers.Page
+import ru.developer.press.myearningkot.helpers.Page
 
 // для viewPage обратная связь реализатор PageViewModel
 interface AdapterPageInterface {
     fun getPageCount(): Int
     fun getPages(): MutableList<Page>
 }
-interface AdapterEditCellInterface {
-    fun getCellCount(): Int
-    fun getEditCellParams(): MutableList<EditCellFragment.EditCellParam>
-}
-
 
 interface ProvideData {
     fun getSize(): Int
@@ -31,7 +26,7 @@ interface ProvideDataCards : ProvideData {
 
 // для получения данных списка записей реализатор CardViewModel
 interface ProvideDataRows{
-    val rows: List<Row>
+    val sortedRows: MutableList<Row>
 
     fun getColumns(): MutableList<Column>
     // отдает ширину или мачпарент или ширину дисплея

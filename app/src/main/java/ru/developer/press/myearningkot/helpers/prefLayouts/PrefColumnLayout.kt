@@ -1,15 +1,17 @@
-package ru.developer.press.myearningkot.otherHelpers.PrefLayouts
+package ru.developer.press.myearningkot.helpers.prefLayouts
 
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.view.View
+import android.widget.RadioGroup
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnItemDragListener
 import kotlinx.android.synthetic.main.pref_column_date.view.*
+import kotlinx.android.synthetic.main.pref_column_image.view.*
 import kotlinx.android.synthetic.main.pref_column_list.view.*
 import kotlinx.android.synthetic.main.pref_column_number.view.*
 import kotlinx.android.synthetic.main.pref_column_phone.view.*
@@ -22,7 +24,7 @@ import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.adapters.AdapterRecyclerPhoneParams
 import ru.developer.press.myearningkot.adapters.ParamModel
 import ru.developer.press.myearningkot.model.*
-import ru.developer.press.myearningkot.otherHelpers.*
+import ru.developer.press.myearningkot.helpers.*
 import splitties.alertdialog.appcompat.alertDialog
 import java.util.*
 
@@ -83,7 +85,7 @@ interface PrefColumnChangedCallback {
     fun widthChanged()
     fun prefChanged()
     fun widthProgress()
-    fun recreateView()
+    fun recreateView() //  для колоны переключателя
     fun getNumberColumns(): MutableList<NumberColumn>
 }
 
@@ -91,7 +93,7 @@ abstract class PrefColumnLayout(
     val columnList: MutableList<Column>,
     val prefColumnChangedCallback: PrefColumnChangedCallback
 ) {
-    abstract fun initPref(view: View)
+    abstract fun initBasicPref(view: View)
 
     protected fun initSeekBarAndToolbarButtons(view: View) {
         val widthColumnSeekBar = view.widthColumnSeekBar
@@ -122,7 +124,7 @@ abstract class PrefColumnLayout(
                 it.setDefaultPref()
             }
             prefColumnChangedCallback.prefChanged()
-            initPref(view)
+            initBasicPref(view)
         }
 
     }
@@ -135,7 +137,7 @@ open class PrefTextColumnLayout(
     prefColumnChangedCallback: PrefColumnChangedCallback
 ) : PrefColumnLayout(columnList, prefColumnChangedCallback) {
 
-    override fun initPref(view: View) {
+    override fun initBasicPref(view: View) {
         initSeekBarAndToolbarButtons(view)
 
         val prefForTextViewList = getPrefForTextViewList()
@@ -165,7 +167,7 @@ open class PrefTextColumnLayout(
 
     override fun getPrefColumnView(context: Context): View {
         val view = context.layoutInflater.inflate(R.layout.pref_column_text, null)
-        initPref(view)
+        initBasicPref(view)
         return view
     }
 }
@@ -175,7 +177,7 @@ class PrefNumberColumnLayout(
     prefColumnChangedCallback: PrefColumnChangedCallback
 ) : PrefTextColumnLayout(column, prefColumnChangedCallback) {
 
-    override fun initPref(view: View) {
+    override fun initBasicPref(view: View) {
         initSeekBarAndToolbarButtons(view)
         val numberColumn = columnList[0] as NumberColumn
         val numberColumns = columnList.filterIsInstance(NumberColumn::class.java)
@@ -282,7 +284,14 @@ class PrefNumberColumnLayout(
                 }
 
             }
-            formulaDialogShow(numberColumn.formula, context, filterColumns, allColumns, null, null) { formula ->
+            formulaDialogShow(
+                numberColumn.formula,
+                context,
+                filterColumns,
+                allColumns,
+                null,
+                null
+            ) { formula ->
                 select(formulaInput)
                 unSelect(manualInput)
 
@@ -298,7 +307,7 @@ class PrefNumberColumnLayout(
 
     override fun getPrefColumnView(context: Context): View {
         val view = context.layoutInflater.inflate(R.layout.pref_column_number, null)
-        initPref(view)
+        initBasicPref(view)
         return view
     }
 }
@@ -308,7 +317,7 @@ class PrefPhoneColumnLayout(
     prefColumnChangedCallback: PrefColumnChangedCallback
 ) : PrefTextColumnLayout(column, prefColumnChangedCallback) {
 
-    override fun initPref(view: View) {
+    override fun initBasicPref(view: View) {
         initSeekBarAndToolbarButtons(view)
         val column = columnList[0] as PhoneColumn
 
@@ -356,7 +365,7 @@ class PrefPhoneColumnLayout(
 
     override fun getPrefColumnView(context: Context): View {
         val view = context.layoutInflater.inflate(R.layout.pref_column_phone, null)
-        initPref(view)
+        initBasicPref(view)
         return view
     }
 }
@@ -366,7 +375,7 @@ class PrefDateColumnLayout(
     prefColumnChangedCallback: PrefColumnChangedCallback
 ) : PrefTextColumnLayout(column, prefColumnChangedCallback) {
 
-    override fun initPref(view: View) {
+    override fun initBasicPref(view: View) {
         initSeekBarAndToolbarButtons(view)
         val typePref = (columnList[0] as DateColumn).typePref
 
@@ -412,7 +421,7 @@ class PrefDateColumnLayout(
 
     override fun getPrefColumnView(context: Context): View {
         val view = context.layoutInflater.inflate(R.layout.pref_column_date, null)
-        initPref(view)
+        initBasicPref(view)
         return view
     }
 }
@@ -421,13 +430,13 @@ class PrefColorColumnLayout(
     column: MutableList<Column>,
     prefColumnChangedCallback: PrefColumnChangedCallback
 ) : PrefColumnLayout(column, prefColumnChangedCallback) {
-    override fun initPref(view: View) {
+    override fun initBasicPref(view: View) {
         initSeekBarAndToolbarButtons(view)
     }
 
     override fun getPrefColumnView(context: Context): View {
         val view = context.layoutInflater.inflate(R.layout.pref_column_color, null)
-        initPref(view)
+        initBasicPref(view)
         return view
     }
 }
@@ -437,14 +446,14 @@ class PrefSwitchColumnLayout(
     column: MutableList<Column>,
     prefColumnChangedCallback: PrefColumnChangedCallback
 ) : PrefColumnLayout(column, prefColumnChangedCallback) {
-    override fun initPref(view: View) {
+    override fun initBasicPref(view: View) {
         initSeekBarAndToolbarButtons(view)
         view.defaultPref.setOnClickListener {
             columnList.forEach {
                 it.setDefaultPref()
             }
             prefColumnChangedCallback.recreateView()
-            initPref(view)
+            initBasicPref(view)
         }
         val firstTypePref = (columnList[0] as SwitchColumn).typePref
 
@@ -525,7 +534,6 @@ class PrefSwitchColumnLayout(
                 }
                 setView(
                     context.getPrefTextLayout(
-                        null,
                         prefForTextView,
                         true,
                         object : PrefTextChangedCallback {
@@ -565,7 +573,7 @@ class PrefSwitchColumnLayout(
 
     override fun getPrefColumnView(context: Context): View {
         val view = context.layoutInflater.inflate(R.layout.pref_column_switch, null)
-        initPref(view)
+        initBasicPref(view)
         return view
     }
 }
@@ -575,13 +583,26 @@ class PrefImageColumnLayout(
     column: MutableList<Column>,
     prefColumnChangedCallback: PrefColumnChangedCallback
 ) : PrefColumnLayout(column, prefColumnChangedCallback) {
-    override fun initPref(view: View) {
+    override fun initBasicPref(view: View) {
         initSeekBarAndToolbarButtons(view)
     }
 
     override fun getPrefColumnView(context: Context): View {
         val view = context.layoutInflater.inflate(R.layout.pref_column_image, null)
-        initPref(view)
+        val radioGroup = view.imageViewSettingInCellRG
+        val firstColumn = columnList[0] as ImageColumn
+        if (firstColumn.typePref.imageViewMode == 0)
+            radioGroup.check(R.id.putImageRB)
+        else
+            radioGroup.check(R.id.cutImageRB)
+
+        radioGroup.setOnCheckedChangeListener { _: RadioGroup, id: Int ->
+            columnList.filterIsInstance<ImageColumn>().forEach {
+                it.typePref.imageViewMode = if (id == R.id.putImageRB) 0 else 1
+            }
+            prefColumnChangedCallback.prefChanged()
+        }
+        initBasicPref(view)
         return view
     }
 }
@@ -591,7 +612,7 @@ class PrefListColumnLayout(
     prefColumnChangedCallback: PrefColumnChangedCallback
 ) : PrefTextColumnLayout(column, prefColumnChangedCallback) {
 
-    override fun initPref(view: View) {
+    override fun initBasicPref(view: View) {
         val dataController = DataController()
         val context = view.context
         initSeekBarAndToolbarButtons(view)
@@ -650,7 +671,7 @@ class PrefListColumnLayout(
                         columnList.filterIsInstance(ListColumn::class.java).forEach {
                             it.typePref.listTypeIndex = index
                         }
-                    initPref(view)
+                    initBasicPref(view)
                     prefColumnChangedCallback.prefChanged()
                 }
             }
@@ -662,7 +683,7 @@ class PrefListColumnLayout(
 
     override fun getPrefColumnView(context: Context): View {
         val view = context.layoutInflater.inflate(R.layout.pref_column_list, null)
-        initPref(view)
+        initBasicPref(view)
         return view
     }
 }
@@ -672,7 +693,7 @@ class PrefNumerationColumnLayout(
     prefColumnChangedCallback: PrefColumnChangedCallback
 ) : PrefTextColumnLayout(column, prefColumnChangedCallback) {
 
-    override fun initPref(view: View) {
+    override fun initBasicPref(view: View) {
         initSeekBarAndToolbarButtons(view)
 
         textPrefButtonsInit(view, getPrefForTextViewList()) {
@@ -686,13 +707,13 @@ class PrefNoneColumnLayout(
     column: MutableList<Column>,
     prefColumnChangedCallback: PrefColumnChangedCallback
 ) : PrefColumnLayout(column, prefColumnChangedCallback) {
-    override fun initPref(view: View) {
+    override fun initBasicPref(view: View) {
         initSeekBarAndToolbarButtons(view)
     }
 
     override fun getPrefColumnView(context: Context): View {
         val view = context.layoutInflater.inflate(R.layout.pref_column_image, null)
-        initPref(view)
+        initBasicPref(view)
         return view
     }
 }

@@ -9,33 +9,22 @@
     <CheckBox
         android:id="@+id/phoneParamCheckBox"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         android:text="param check"
         android:textColor="@color/light_gray" />
 
-   <LinearLayout
-       android:paddingStart="16dp"
-       android:paddingEnd="16dp"
-       android:orientation="vertical"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content">
+    <ImageButton
+        android:id="@+id/moveItem"
+        android:padding="8dp"
+        android:background="@color/transparent"
+        android:src="@drawable/ic_move"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
 
-
-       <ImageView
-           android:rotation="180"
-           android:layout_weight="1"
-           android:layout_width="match_parent"
-           android:layout_height="0dp"
-           app:srcCompat="@drawable/ic_drop_down" />
-       <ImageView
-           android:layout_weight="1"
-           android:layout_width="match_parent"
-           android:layout_height="0dp"
-           app:srcCompat="@drawable/ic_drop_down" />
-   </LinearLayout>
+        android:contentDescription="@string/move" />
 
 
 </LinearLayout>

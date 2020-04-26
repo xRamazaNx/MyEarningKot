@@ -40,7 +40,7 @@ fun getColumnTypeList(): MutableList<String> = mutableListOf<String>().apply {
     add("Цвет")
     add("Переключатель")
     add("Изображение")
-    add("Список")
+//    add("Список")
 }
 fun getColumnTypeEnumList(): MutableList<ColumnType> = mutableListOf<ColumnType>().apply {
     add(ColumnType.NUMBER)

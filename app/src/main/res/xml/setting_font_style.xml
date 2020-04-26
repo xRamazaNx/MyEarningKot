@@ -72,6 +72,6 @@
             android:entries="@array/style_array"
             android:entryValues="@array/style_array_value"
             android:key="@string/OstatokKeyStyle"
-            android:title="@string/Ostatok"/>
+            android:title="@string/residue"/>
     </PreferenceCategory>
 </PreferenceScreen>

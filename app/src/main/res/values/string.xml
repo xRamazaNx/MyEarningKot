@@ -18,14 +18,12 @@
     <string name="NOTESMALL">Заметка</string>
     <string name="SUMMA">СУММА</string>
     <string name="SUMMASMALL">Сумма</string>
-    <string name="cash_advance">АВАНС</string>
-    <string name="cash_advance_small">Аванс</string>
+    <string name="AVANS">АВАНС</string>
     <string name="DATE">ДАТА</string>
     <string name="DATESMALL">Дата</string>
     <string name="EARNING">ВСЕГО</string>
     <string name="EARNING_small">Всего</string>
-    <string name="THE_REST">ОСТАТОК</string>
-    <string name="THE_REST_small">Остаток</string>
+    <string name="RESIDUE">ОСТАТОК</string>
     <string name="ARHIVE">Архив</string>
     <string name="COMPLETE_ACCOUNTING">Завершить учет</string>
     <string name="COMPLETE_ACCOUNTING_CARD">Завершить</string>
@@ -215,7 +213,7 @@
     <string name="zarplataKeyStyle">zarplataKeyStyle</string>
     <string name="avans_key_obshee">avansKey</string>
     <string name="avans_key_obsheeKeyStyle">avans_key_obsheeKeyStyle</string>
-    <string name="Ostatok">Остаток</string>
+    <string name="residue">Остаток</string>
     <string name="OstatokKeyStyle">OstatokKeyStyle</string>
 
     <string name="key_style_obshee">keyStyleObshee</string>

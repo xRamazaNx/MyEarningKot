@@ -20,15 +20,18 @@ import kotlinx.android.synthetic.main.edit_cell_number.view.*
 import kotlinx.android.synthetic.main.edit_cell_number.view.editCellText
 import kotlinx.android.synthetic.main.edit_cell_phone.view.*
 import kotlinx.android.synthetic.main.edit_cell_text.view.*
-import org.jetbrains.anko.*
+import org.jetbrains.anko.layoutInflater
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.model.Column
 import ru.developer.press.myearningkot.model.ColumnType
 import ru.developer.press.myearningkot.model.PhoneTypeValue
-import ru.developer.press.myearningkot.otherHelpers.PrefLayouts.initClickOperation
-import java.lang.StringBuilder
+import ru.developer.press.myearningkot.helpers.prefLayouts.initClickOperation
+import java.lang.Exception
 import java.util.*
 
+
+val PICK_IMAGE_MULTIPLE = 1
+const val editCellTag = "dialogEditCell"
 
 class DialogEditCell(
     private val column: Column,
@@ -37,27 +40,29 @@ class DialogEditCell(
 ) : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val context = context!!
 
         return when (column.getType()) {
-            ColumnType.TEXT -> getTextDialog(context)
-            ColumnType.NUMBER -> getNumberDialog(context)
-            ColumnType.PHONE -> getPhoneDialog(context)
-            ColumnType.DATE -> getDateDialog(context)
-            ColumnType.IMAGE -> getImageDialog(context)
-            ColumnType.LIST -> getListDialog(context)
+            ColumnType.TEXT -> getTextDialog()
+            ColumnType.NUMBER -> getNumberDialog()
+            ColumnType.PHONE -> getPhoneDialog()
+            ColumnType.DATE -> getDateDialog()
+            ColumnType.LIST -> getListDialog()
 
             else -> AlertDialog.Builder(context).create()
         }
     }
 
-    private fun getDateDialog(context: Context): AlertDialog {
+    private fun getDateDialog(): AlertDialog {
         val calendar = Calendar.getInstance().apply {
-            timeInMillis = value.toLong()
+            timeInMillis = try {
+                value.toLong()
+            } catch (exc: Exception) {
+                Date().time
+            }
         }
         return DatePickerDialog(
-            context,
-            DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
+            context!!,
+            DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
                 calendar.set(year, month, dayOfMonth)
                 value = calendar.timeInMillis.toString()
                 changed(value)
@@ -75,19 +80,13 @@ class DialogEditCell(
     }
 
 
-    private fun getListDialog(context: Context): AlertDialog {
+    private fun getListDialog(): AlertDialog {
         return getAlertDialog().apply {
             setView(context.layoutInflater.inflate(R.layout.edit_cell_list, null))
         }.create()
     }
 
-    private fun getImageDialog(context: Context): AlertDialog {
-        return getAlertDialog().apply {
-            setView(context.layoutInflater.inflate(R.layout.edit_cell_image, null))
-        }.create()
-    }
-
-    private fun getNumberDialog(context: Context): AlertDialog {
+    private fun getNumberDialog(): AlertDialog {
         return getAlertDialog().apply {
             val view = context.layoutInflater.inflate(R.layout.edit_cell_number, null)
             view.titleNumberEdit.text = column.name
@@ -112,7 +111,7 @@ class DialogEditCell(
         }.create()
     }
 
-    private fun getPhoneDialog(context: Context): AlertDialog {
+    private fun getPhoneDialog(): AlertDialog {
         return getAlertDialog().apply {
             val view = context.layoutInflater.inflate(R.layout.edit_cell_phone, null)
             view.titlePhoneEdit.text = column.name
@@ -148,13 +147,11 @@ class DialogEditCell(
                 updateValue()
             }
 
-            name.showKeyboard()
-
             setView(view)
         }.create()
     }
 
-    private fun getTextDialog(context: Context): AlertDialog {
+    private fun getTextDialog(): AlertDialog {
         return getAlertDialog().apply {
             val view = context.layoutInflater.inflate(R.layout.edit_cell_text, null)
             view.titleTextEdit.text = column.name
@@ -174,27 +171,19 @@ class DialogEditCell(
     private fun getAlertDialog(): AlertDialog.Builder {
 
         return AlertDialog.Builder(context).apply {
-            setPositiveButton(R.string.OK) { v: DialogInterface, i: Int ->
+            setPositiveButton(R.string.OK) { _: DialogInterface, _: Int ->
                 changed(value)
             }
-            setNegativeButton(R.string.CANCEL) { v: DialogInterface, i: Int ->
+            setNegativeButton(R.string.CANCEL) { _: DialogInterface, _: Int ->
 
             }
         }
     }
 
-
     override fun onResume() {
         super.onResume()
 
         this.dialog?.apply {
-
-            //            window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
-//            window?.setSoftInputMode(
-//                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN
-//            )
-//            window?.setGravity(Gravity.BOTTOM)
-//            window?.setGravity(Gravity.CENTER)
             context.let {
                 window?.setBackgroundDrawable(
                     ColorDrawable(
@@ -211,7 +200,7 @@ class DialogEditCell(
 
 fun EditText.showKeyboard() {
 
-    postDelayed(150) {
+    post {
         requestFocus()
         val imm =
             context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?

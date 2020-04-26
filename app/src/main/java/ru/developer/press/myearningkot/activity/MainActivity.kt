@@ -14,7 +14,6 @@ import android.widget.TableLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.postDelayed
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager2.widget.ViewPager2
@@ -39,7 +38,7 @@ import ru.developer.press.myearningkot.dialogs.DialogCreateCard
 import ru.developer.press.myearningkot.dialogs.DialogSetName
 import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.DataController
-import ru.developer.press.myearningkot.otherHelpers.getColorFromRes
+import ru.developer.press.myearningkot.helpers.getColorFromRes
 
 // GITHUB
 const val ID_UPDATE_CARD = "id_card"
@@ -65,7 +64,7 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         // он должен быть тут первым а то статусбар внизу оказывается из за поздей инициализации
-        drawer = initDrawer()
+        initDrawer()
         toolbar.setTitleTextColor(Color.WHITE)
 
         initializerViewModel.start()
@@ -153,9 +152,9 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
         })
     }
 
-    private fun initDrawer(): Drawer {
+    private fun initDrawer() {
         val lightGray = R.color.centDark
-        return drawer {
+        drawer = drawer {
             selectedItem = -1
             toolbar = this@MainActivity.toolbar
             closeOnClick = false
@@ -255,6 +254,8 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
     override fun onResume() {
         super.onResume()
         initializerViewModel.invokeOnCompletion {
+            initTabAndViewPager()
+
             viewModel.calcAllCards()
             viewInit()
             val instance = App.instance
@@ -269,11 +270,17 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
                 }
                 instance.setUpdateCardId(-1)
             }
-
             adapterViewPagerMain.notifyDataSetChanged()
-            viewPager.postDelayed(500) {
-                toast("cards in page for viewModel = ${viewModel.getPages()[0].cards.size} \n cards in page for viewPager = ${adapterViewPagerMain.fragments[0].cards.size}")
-            }
+
+//            viewPager.postDelayed(500) {
+//                val sizeVM = viewModel.getPages()[0].cards.size
+//                val sizeVP = adapterViewPagerMain.fragments[0].cards.size
+//
+//                if (sizeVM != sizeVP) {
+//                    initTabAndViewPager()
+//                }
+////                toast("cards in page for viewModel = $sizeVM \n cards in page for viewPager = $sizeVP")
+//            }
         }
 
     }

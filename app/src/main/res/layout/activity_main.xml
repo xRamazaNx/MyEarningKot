@@ -36,6 +36,7 @@
                 android:id="@+id/tabs"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@id/addPageButton"
                 android:background="@color/transparent"
@@ -43,7 +44,8 @@
                 android:paddingEnd="4dp"
                 app:tabGravity="fill"
                 app:tabIndicatorColor="@color/color_activated"
-                app:tabMode="scrollable" />
+                app:tabMode="scrollable"
+                />
 
             <ImageButton
                 android:id="@+id/addPageButton"

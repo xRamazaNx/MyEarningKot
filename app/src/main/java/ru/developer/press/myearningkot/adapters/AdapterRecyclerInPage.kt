@@ -14,6 +14,7 @@ import ru.developer.press.myearningkot.CardClickListener
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.activity.setShowTotalInfo
 import ru.developer.press.myearningkot.model.Card
+import ru.developer.press.myearningkot.model.createViewInPlate
 
 class AdapterRecyclerInPage(
     private val cards: MutableList<Card>,
@@ -79,7 +80,7 @@ class AdapterRecyclerInPage(
 
         fun bind(card: Card) {
 
-            card.customizeTotalAmount(itemView)
+            card.createViewInPlate(itemView)
 
             idCard = card.id
 

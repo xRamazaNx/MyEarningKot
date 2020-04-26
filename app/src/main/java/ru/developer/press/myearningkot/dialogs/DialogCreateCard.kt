@@ -20,9 +20,9 @@ import ru.developer.press.myearningkot.App
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.activity.*
 import ru.developer.press.myearningkot.model.Card
-import ru.developer.press.myearningkot.otherHelpers.PrefCardInfo
-import ru.developer.press.myearningkot.otherHelpers.SampleHelper
-import ru.developer.press.myearningkot.otherHelpers.showItemChangeDialog
+import ru.developer.press.myearningkot.helpers.PrefCardInfo
+import ru.developer.press.myearningkot.helpers.SampleHelper
+import ru.developer.press.myearningkot.helpers.showItemChangeDialog
 import ru.developer.press.myearningkot.prefSampleLastChanged
 
 class DialogCreateCard(private val createCard: (Card) -> Unit) : DialogFragment() {
@@ -45,15 +45,12 @@ class DialogCreateCard(private val createCard: (Card) -> Unit) : DialogFragment(
         val dialog = AlertDialog.Builder(context).apply {
             val view = context.layoutInflater.inflate(R.layout.create_card_layout, null)
 
-            val editTextCardName = view.editTextCardName
+            val editTextCardName = view.editTextName
             editTextCardName.hint = getString(R.string.set_name_card)
-//            editTextCardName.setText(asyncSampleList.get()[selectSample].name)
-//            editTextCardName.setText("")
             // выбор шаблона
             val textViewSample = view.textViewSample
             selectedCardTitle.observe(this@DialogCreateCard, Observer {
-                textViewSample.text =
-                    "${getString(R.string.sample_of_card)} ($it)"
+                textViewSample.text = it
             })
             textViewSample.setOnClickListener {
                 val newSampleText = getString(R.string.new_sample)

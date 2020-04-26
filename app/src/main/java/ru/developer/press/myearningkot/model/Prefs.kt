@@ -2,7 +2,7 @@ package ru.developer.press.myearningkot.model
 
 import android.graphics.Typeface
 import android.widget.TextView
-import ru.developer.press.myearningkot.otherHelpers.getColorFromText
+import ru.developer.press.myearningkot.helpers.getColorFromText
 
 class SortPref(
     var isSave: Boolean = false,
@@ -63,8 +63,8 @@ class PhoneTypePref : TextTypePref() {
 
     var name: Boolean = true
     var lastName: Boolean = true
-    var phone: Boolean = false
-    var organization: Boolean = false
+    var phone: Boolean = true
+    var organization: Boolean = true
 
     override fun resetPref() {
         super.resetPref()
@@ -136,8 +136,9 @@ class SwitchTypePref : Prefs() {
 }
 
 class ImageTypePref : Prefs() {
+    var imageViewMode = 0
     override fun resetPref() {
-
+        imageViewMode = 0
     }
 }
 

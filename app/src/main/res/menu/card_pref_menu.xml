@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/deleteColumn"
         android:icon="@drawable/ic_delete_forever_red"
@@ -20,6 +19,11 @@
         android:title="@string/setting"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/renameElement"
+        android:icon="@drawable/ic_edit_white"
+        android:title="@string/setting"
+        app:showAsAction="always" />
     <item
         android:id="@+id/elementSetting"
         android:icon="@drawable/ic_setting_build"

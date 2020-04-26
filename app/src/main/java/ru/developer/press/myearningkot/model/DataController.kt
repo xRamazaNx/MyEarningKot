@@ -3,10 +3,10 @@ package ru.developer.press.myearningkot.model
 import com.google.gson.Gson
 import org.jetbrains.anko.doAsyncResult
 import ru.developer.press.myearningkot.App
-import ru.developer.press.myearningkot.otherHelpers.CardJson
-import ru.developer.press.myearningkot.otherHelpers.ListTypeJson
-import ru.developer.press.myearningkot.otherHelpers.Page
-import ru.developer.press.myearningkot.otherHelpers.getCardFromJson
+import ru.developer.press.myearningkot.helpers.CardJson
+import ru.developer.press.myearningkot.helpers.ListTypeJson
+import ru.developer.press.myearningkot.helpers.Page
+import ru.developer.press.myearningkot.helpers.getCardFromJson
 
 class DataController {
     private val cardJsonDao = App.instance!!.database.cardJsonDao()

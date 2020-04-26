@@ -7,8 +7,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import ru.developer.press.myearningkot.model.*
-import ru.developer.press.myearningkot.otherHelpers.Page
-import ru.developer.press.myearningkot.otherHelpers.SingleLiveEvent
+import ru.developer.press.myearningkot.helpers.Page
+import ru.developer.press.myearningkot.helpers.SingleLiveEvent
 
 
 // этот класс создается (ViewModelProviders.of(this).get(Class::class.java))
@@ -132,13 +132,12 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
     val titleLiveData = MutableLiveData<String>()
     val displayParam = DisplayParam()
     val cardLiveData = MutableLiveData<Card>()
+    val totalLiveData = MutableLiveData<Card>()
     var copyRowList: MutableList<Row>? = null
-    private val sortedList = mutableListOf<Row>()
 
     var columnLDList = mutableListOf<MutableLiveData<Column>>()
 
-    override val rows: List<Row>
-        get() = sortedList
+    override val sortedRows: MutableList<Row> = mutableListOf()
 
     override fun getColumns(): MutableList<Column> = card.columns
     override fun getWidth(): Int {
@@ -165,6 +164,10 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
         cardLiveData.value = card
     }
 
+    fun updateTotals() {
+        totalLiveData.value = card
+    }
+
     private fun updateTypeControl() {
         card.updateTypeControl()
     }
@@ -181,6 +184,7 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
 
     fun updateCard(card: Card = this.card) {
         this.card = card
+        sortList()
         updateCardLD()
     }
 
@@ -192,13 +196,13 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
 
 
     init {
-        sortedList()
+        sortList()
         updateColumnDL()
         updateCardLD()
     }
 
     fun selectionColumn(columnIndex: Int, isSelect: Boolean) {
-        sortedList().forEach { row ->
+        sortList().forEach { row ->
             row.cellList.forEachIndexed { cellIndex, cell ->
                 if (columnIndex == cellIndex)
                     cell.isPrefColumnSelect = isSelect
@@ -216,6 +220,7 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
         return deleteResult
     }
 
+    // prefFun
     fun moveToRightTotal(selectedTotals: List<TotalItem>, result: (Boolean) -> Unit) {
         val totals = card.totals
         selectedTotals.forEach {
@@ -271,7 +276,7 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
             columns[indexOfColumn + 1] = column
             columns[indexOfColumn] = columnRight
 
-            sortedList().forEach { row ->
+            sortList().forEach { row ->
                 val cell = row.cellList[indexOfColumn]
                 val cellRight = row.cellList[indexOfColumn + 1]
 
@@ -285,6 +290,7 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
         result(true)
     }
 
+    // prefFun
     fun moveToLeftTotal(selectedTotals: List<TotalItem>, result: (Boolean) -> Unit) {
         val totals = card.totals
 
@@ -341,7 +347,7 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
             columns[indexOfColumn - 1] = column
             columns[indexOfColumn] = columnLeft
 
-            sortedList().forEach { row ->
+            sortList().forEach { row ->
                 val cell = row.cellList[indexOfColumn]
                 val cellLeft = row.cellList[indexOfColumn - 1]
 
@@ -380,17 +386,17 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
 
     fun addRow(): Row {
         return card.addRow().apply {
-            sortedList()
+            sortList()
             dataController.updateCard(card)
         }
     }
 
-    fun sortedList(): MutableList<Row> {
+    fun sortList(): MutableList<Row> {
         //#postedit
-        sortedList.clear()
-        sortedList.addAll(card.rows)
+        sortedRows.clear()
+        sortedRows.addAll(card.rows)
 
-        return sortedList
+        return this.sortedRows
     }
 
     fun cellClicked(
@@ -402,7 +408,7 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
         this.rowSelectPosition = rowPosition
         this.cellSelectPosition = cellPosition
 
-        val cell = sortedList()[rowPosition].cellList[cellPosition]
+        val cell = sortList()[rowPosition].cellList[cellPosition]
         val isDoubleTap = cell.isSelect
         val oldSelectPosition: Int = card.unSelectCell()
         cell.isSelect = true
@@ -419,7 +425,7 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
 
     fun rowClicked(rowPosition: Int = card.rows.size - 1, function: (Int) -> Unit) {
         rowSelectPosition = rowPosition
-        val row = sortedList()[rowPosition]
+        val row = this.sortedRows[rowPosition]
         val oldStatus = row.status
         row.status = if (oldStatus == Row.Status.SELECT) Row.Status.NONE else Row.Status.SELECT
 
@@ -430,7 +436,10 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
                     card.unSelectCell()
                 }
             }
-            selectMode.value = SelectMode.ROW
+            if (card.getSelectedRows().isEmpty())
+                selectMode.value = SelectMode.NONE
+            else
+                selectMode.value = SelectMode.ROW
         }
         function(rowPosition)
     }
@@ -453,7 +462,7 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
                     if (isCut) {
                         cell.clear()
                         updateTypeControlColumn(index)
-                        updatePlateChanged()
+                        updateTotals()
                     }
                     // заного назначаю чтоб меню создалось заного и иконка вставки если надо станет серой или белой
                     selectMode.value = SelectMode.CELL
@@ -463,62 +472,103 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
         }
     }
 
+    fun isEqualCellAndCopyCell(): Boolean {
+        val selectedCellType = getSelectedCellType()
+        val copyCell = App.instance?.copyCell
+        var eq = false
+        copyCell?.let {
+            eq = it.type == selectedCellType
+        }
+        return eq
+    }
+
     fun pasteCell() {
-        card.rows.forEach { row ->
-            row.cellList.forEachIndexed { index, cell ->
-                if (cell.isSelect) {
-                    App.instance?.copyCell?.let {
-                        cell.sourceValue = it.sourceValue
-                        updateTypeControlColumn(index)
-                        updatePlateChanged()
+        if (isEqualCellAndCopyCell())
+            card.rows.forEach { row ->
+                row.cellList.forEachIndexed { index, cell ->
+                    if (cell.isSelect) {
+                        App.instance?.copyCell?.let {
+                            cell.sourceValue = it.sourceValue
+                            updateTypeControlColumn(index)
+                            updateTotals()
+                        }
+                        return
                     }
-                    return
                 }
             }
-        }
     }
 
     fun getSelectedCellType(): ColumnType? {
         return card.getSelectedCell()?.type
     }
 
-    fun deleteRows(updateView: () -> Unit) {
-        val selectedRows = card.getSelectedRows()
-        selectedRows.forEach {
-            it.status = Row.Status.DELETED
+    fun deleteRows(updateView: (Int) -> Unit) {
+        var delIndex = 0
+        sortedRows.forEach { r ->
+            if (r.status == Row.Status.DELETED) {
+                r.status = Row.Status.NONE
+                updateView(delIndex)
+                delIndex--
+                card.rows.remove(r)
+            }
+            delIndex++
         }
-        updateView()
-        card.rows.removeAll(selectedRows)
+        sortList()
         dataController.updateCard(card)
+        // сортировка листа и обновлении происходит после анимации удаления
     }
 
-    fun copySelectedRows(isCut: Boolean) {
+    fun copySelectedRows() {
         copyRowList = mutableListOf()
         card.getSelectedRows().forEach {
             copyRowList!!.add(it.copy())
         }
-        if (isCut)
-            deleteRows {
-
-            }
     }
 
     fun pasteRows() {
         val selectedRowList = card.getSelectedRows()
         // самый нижний элемент чтобы вставить туда
-        val indexLastRow = card.rows.indexOf(selectedRowList[selectedRowList.size - 1])
+        val i = selectedRowList.size - 1
+        val element = selectedRowList[i]
+        val indexLastRow = card.rows.indexOf(element)
 
         copyRowList?.let { copyList ->
 
+
+            if (isCapabilityPaste()) {
+                // выделенные строки ниже которых надо добавить
+                selectedRowList.forEach { it.status = Row.Status.NONE }
+
+                // отдельный лист чтоб копировать элементы а не ссылки на них потому что в копилист бывают ссылки
+                val list = mutableListOf<Row>()
+                // добавляем в лист копии методом .копи
+                copyList.forEach {
+                    list.add(it.copy().apply {
+                        status = Row.Status.ADDED
+                    }) //  копируемый ров
+                }
+                card.rows.addAll(indexLastRow + 1, list)
+                updateTypeControl()
+                sortList()
+                updateTotals()
+
+            }
+
+        }
+    }
+
+    fun isCapabilityPaste(): Boolean {
+        var equalColumns = false
+        copyRowList?.let { copyList ->
             val copyFirstRow = copyList[0]
-            val currentFirstRow = selectedRowList[0]
+            val currentFirstRow = card.getSelectedRows()[0]
 
             val copyColumnSize = copyFirstRow.cellList.size
             val currentColumnSize = currentFirstRow.cellList.size
 
             // равно ли колличесвто колон в копированном и настоящем положении у строк
             if (copyColumnSize == currentColumnSize) {
-                var equalColumns = true
+                equalColumns = true
                 // проходим по первым строкам у копированного и настоящего выделенного
                 currentFirstRow.cellList.forEachIndexed { index, cell ->
                     // ячейка из скопированной строки
@@ -530,32 +580,21 @@ open class CardViewModel(var card: Card) : ViewModel(), ProvideDataRows {
                         return@forEachIndexed
                     }
                 }
-                if (equalColumns) {
-                    selectedRowList.forEach { it.status = Row.Status.NONE }
-
-                    card.rows.addAll(indexLastRow, copyList.apply {
-                        val list = mutableListOf<Row>()
-                        forEach {
-                            list.add(it.copy())
-                        }
-                        clear()
-                        addAll(list)
-                    })
-                    updateTypeControl()
-                    copyRowList = null
-                    updatePlateChanged()
-                }
             }
         }
+
+        return equalColumns
     }
 
     fun duplicateRows() {
-        copySelectedRows(false)
-        unSelect()
-        rowClicked {}
-//        card.rows.last().isSelect = true
+        copySelectedRows()
+        val rows = card.rows
+        rows.forEach {
+            it.status = Row.Status.NONE
+        }
+        val lastRow = rows[rows.size - 1]
+        lastRow.status = Row.Status.SELECT
         pasteRows()
-
     }
 
     enum class SelectMode {

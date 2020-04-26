@@ -1,4 +1,4 @@
-package ru.developer.press.myearningkot.otherHelpers.PrefLayouts
+package ru.developer.press.myearningkot.helpers.prefLayouts
 
 import android.graphics.drawable.Drawable
 import android.view.View
@@ -6,12 +6,26 @@ import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.model.ColumnType
 
 class PrefSelectedControl {
+    val isRenameMode: Boolean
+        get() {
+            var r = false
+            if (selectedElementList.size == 1) {
+                val selectedElement = selectedElementList[0]
+                if (selectedElement.elementType == ElementType.COLUMN_TITLE
+                    || selectedElement.elementType == ElementType.NAME
+                    || selectedElement.elementType == ElementType.TOTAL_TITLE
+                ) {
+                    r = true
+                }
+            }
+            return r
+        }
     val selectPrefType: ElementPrefType
         get() =
             when {
                 selectedElementList.any { it.elementType == ElementType.COLUMN } -> ElementPrefType.COLUMN
                 selectedElementList.any { it.elementType == ElementType.TOTAL } -> ElementPrefType.TOTAL
-                selectedElementList.any { it.elementType == ElementType.DATE} -> ElementPrefType.DATE_PERIOD
+                selectedElementList.any { it.elementType == ElementType.DATE } -> ElementPrefType.DATE_PERIOD
                 else -> ElementPrefType.TEXT_VIEW
             }
     private val selectedElementList = mutableListOf<SelectedElement>()
@@ -84,9 +98,9 @@ class PrefSelectedControl {
                 selectCallback?.select(_selectedElement)
 
             }
-            ElementType.DATE ->{
+            ElementType.DATE -> {
                 // если до этого было выделено другое
-                if (selectedElementList.any { it.elementType != ElementType.DATE}) {
+                if (selectedElementList.any { it.elementType != ElementType.DATE }) {
                     // убираем все выделения
                     unSelectAll()
                 }
@@ -171,7 +185,8 @@ class PrefSelectedControl {
                                 ColumnType.NONE -> {
                                     elementPref.columnType = ColumnType.NONE
                                 }
-                                ColumnType.TEXT -> {}
+                                ColumnType.TEXT -> {
+                                }
                             }
                         }
                         ColumnType.NUMBER -> {
@@ -190,7 +205,8 @@ class PrefSelectedControl {
                                 ColumnType.NONE -> {
                                     elementPref.columnType = ColumnType.NONE
                                 }
-                                ColumnType.NUMBER -> {}
+                                ColumnType.NUMBER -> {
+                                }
                             }
                         }
                         ColumnType.PHONE -> {
@@ -209,7 +225,8 @@ class PrefSelectedControl {
                                 ColumnType.NONE -> {
                                     elementPref.columnType = ColumnType.NONE
                                 }
-                                else -> {}
+                                else -> {
+                                }
                             }
                         }
                         ColumnType.DATE -> {
@@ -228,7 +245,8 @@ class PrefSelectedControl {
                                 ColumnType.NONE -> {
                                     elementPref.columnType = ColumnType.NONE
                                 }
-                                else -> {}
+                                else -> {
+                                }
                             }
                         }
                         ColumnType.LIST -> {
@@ -247,7 +265,8 @@ class PrefSelectedControl {
                                 ColumnType.NONE -> {
                                     elementPref.columnType = ColumnType.NONE
                                 }
-                                else -> {}
+                                else -> {
+                                }
                             }
                         }
                         ColumnType.NUMERATION -> {
@@ -266,7 +285,8 @@ class PrefSelectedControl {
                                 ColumnType.NONE -> {
                                     elementPref.columnType = ColumnType.NONE
                                 }
-                                else -> {}
+                                else -> {
+                                }
                             }
                         }
                         ColumnType.COLOR ->
@@ -306,6 +326,10 @@ class PrefSelectedControl {
             selectCallback?.select(it)
         }
     }
+
+    fun rename() {
+        selectCallback?.rename(selectedElementList)
+    }
 }
 
 abstract class SelectedElement(
@@ -342,6 +366,7 @@ interface SelectCallback {
     fun moveToRight(selectedElementList: List<SelectedElement>)
     fun moveToLeft(selectedElementList: List<SelectedElement>)
     fun delete(selectedElementList: List<SelectedElement>)
+    fun rename(selectedElementList: MutableList<SelectedElement>)
 }
 
 enum class ElementType {

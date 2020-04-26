@@ -75,4 +75,20 @@
     <string name="select_row">Выделить запись</string>
     <string name="cut">Вырезать</string>
     <string name="first_name">Имя</string>
+    <string name="expenses">Расход</string>
+    <string name="budget">Бюджет</string>
+    <string name="category">Категория</string>
+    <string name="BUDGET">БЮДЖЕТ</string>
+    <string name="EXPENSES">РАСХОД</string>
+    <string name="earning">Доход</string>
+    <string name="active">Активные</string>
+    <string name="move">Переместить</string>
+    <string name="plate_setting">Настройки таблички</string>
+    <string name="put_in_cell">Поместить в ячейку</string>
+    <string name="cut_image">Обрезать изображение</string>
+    <string name="setting_image_in_cell">Настройка изображения в ячейке</string>
+    <string name="setting_view_phone_data">Настройка отображения данных контакта</string>
+    <string name="ignore_switch_work">Игнорировать работу переключателя</string>
+    <string name="cannot_delete_numbering_column">Нельзя удалить столбец для нумерации</string>
+    <string name="formula_works_for_this_column">Для этой колоны работает формула!</string>
 </resources>

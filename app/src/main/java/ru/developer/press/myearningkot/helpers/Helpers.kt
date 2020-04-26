@@ -1,4 +1,4 @@
-package ru.developer.press.myearningkot.otherHelpers
+package ru.developer.press.myearningkot.helpers
 
 import android.app.AlertDialog
 import android.content.Context
@@ -206,7 +206,7 @@ inline fun <reified T> Any.equalGson(equalObject: T): Boolean {
     return sourceAny == any
 }
 
-fun getURLForResource(resourceId: Int): String? {
+fun getPathForResource(resourceId: Int): String? {
     return Uri.parse("android.resource://" + R::class.java.getPackage()!!.name + "/" + resourceId)
         .toString()
 }

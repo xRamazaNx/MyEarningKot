@@ -141,7 +141,7 @@
                 android:background="?android:attr/selectableItemBackground"
                 android:contentDescription="@string/setting_total"
                 android:padding="8dp"
-                android:src="@drawable/ic_setting_build" />
+                android:src="@drawable/ic_setting" />
 
             <ImageButton
                 android:id="@+id/addTotal"
@@ -169,7 +169,7 @@
         app:layout_anchor="@id/containerPlate" />
 
 
-    <ru.developer.press.myearningkot.otherHelpers.PrefLayouts.WidthLineDrawer
+    <ru.developer.press.myearningkot.helpers.prefLayouts.WidthLineDrawer
         android:id="@+id/widthDrawer"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

@@ -1,4 +1,4 @@
-package ru.developer.press.myearningkot.otherHelpers.PrefLayouts
+package ru.developer.press.myearningkot.helpers.prefLayouts
 
 import android.content.Context
 import android.graphics.Color
@@ -21,8 +21,8 @@ import ru.developer.press.myearningkot.model.Formula.Companion.OTHER
 import ru.developer.press.myearningkot.model.Formula.Companion.TOTAL_ID
 import ru.developer.press.myearningkot.model.NumberColumn
 import ru.developer.press.myearningkot.model.TotalItem
-import ru.developer.press.myearningkot.otherHelpers.Calc
-import ru.developer.press.myearningkot.otherHelpers.getColorFromRes
+import ru.developer.press.myearningkot.helpers.Calc
+import ru.developer.press.myearningkot.helpers.getColorFromRes
 import splitties.alertdialog.appcompat.alertDialog
 import java.lang.Exception
 import java.lang.StringBuilder

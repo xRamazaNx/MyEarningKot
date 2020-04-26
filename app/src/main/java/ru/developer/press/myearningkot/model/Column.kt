@@ -5,7 +5,7 @@ import android.view.View
 import com.google.gson.annotations.SerializedName
 import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.adapters.ParamModel
-import ru.developer.press.myearningkot.otherHelpers.*
+import ru.developer.press.myearningkot.helpers.*
 import java.lang.Exception
 import java.lang.StringBuilder
 import java.util.*
