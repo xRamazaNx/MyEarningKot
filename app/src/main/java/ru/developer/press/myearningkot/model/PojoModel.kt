@@ -124,6 +124,28 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
 
     }
 
+    fun addColumnSample(type: ColumnType, name: String, position: Int = columns.size) {
+        val column = when (type) {
+            ColumnType.NUMERATION -> NumerationColumn(name)
+            ColumnType.NUMBER -> NumberColumn(name)
+            ColumnType.PHONE -> PhoneColumn(name)
+            ColumnType.DATE -> DateColumn(name)
+            ColumnType.COLOR -> ColorColumn(name)
+            ColumnType.SWITCH -> SwitchColumn(name)
+            ColumnType.IMAGE -> ImageColumn(name)
+            ColumnType.LIST -> ListColumn(name)
+            ColumnType.TEXT -> TextColumn(name)
+            // не будет ни когда использоваться
+            ColumnType.NONE -> TextColumn(name)
+        }
+        column.titlePref.color = Color.LTGRAY
+        column.updateTypeControl(this)
+        columns.add(position, column)
+        rows.forEach {
+            it.cellList.add(position, getCellOfSample(position))
+        }
+    }
+
     private fun getNewCell(column: Column): Cell = Cell().apply {
         val gson = Gson()
         sourceValue = when (column) {
@@ -220,7 +242,10 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
                     getPathForResource(R.drawable.ic_image).toString()
                 }
                 is SwitchColumn -> {
-                    "true"
+
+                    val newVal = (0..20).random() > 10
+                    newVal.toString()
+
                 }
                 is ColorColumn -> {
                     Color.GREEN.toString()
@@ -229,7 +254,7 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
                     "Выбранный элемент"
                 }
                 is DateColumn -> {
-                    getDateTypeList()[0]
+                    Date().time.toString()
                 }
                 is NumberColumn -> {
                     "12345.987"
@@ -419,6 +444,10 @@ data class Cell(
     @Transient
     lateinit var cellTypeControl: CellTypeControl
 
+
+    @Transient
+    var displayValue: String = ""
+
     fun updateTypeValue(typePref: Prefs) {
         when (typePref) {
             is NumberTypePref -> {
@@ -508,9 +537,6 @@ data class Cell(
 
         }
     }
-
-    @Transient
-    var displayValue: String = ""
 
     fun displayCellView(view: View) {
         cellTypeControl.display(view, displayValue)
@@ -638,15 +664,6 @@ class TotalItem {
 }
 
 class Row {
-    fun copy(): Row {
-        return Row().apply {
-            this.dateModify = this@Row.dateModify
-            this.status = Status.NONE
-            this@Row.cellList.forEach {
-                cellList.add(it.copy())
-            }
-        }
-    }
 
     @Transient
     var id = -1
@@ -662,6 +679,17 @@ class Row {
 
     @SerializedName("sl")
     var cellList = mutableListOf<Cell>()
+
+
+    fun copy(): Row {
+        return Row().apply {
+            this.dateModify = this@Row.dateModify
+            this.status = Status.NONE
+            this@Row.cellList.forEach {
+                cellList.add(it.copy())
+            }
+        }
+    }
 
     enum class Status {
         SELECT, DELETED, NONE, ADDED
@@ -705,6 +733,10 @@ class PhoneTypeValue(
     }
 }
 
+// примечание: фото копируются в папку в дирректории программы, и потом ячейка ссылается на него
+// если копировать эту ячейку, копируется путь к папке в дирректории в программе
+// при удалении строки в которой есть изображение - изображение не удаляется из папки, оно остается там как мусор
+// надо будет раз в неделю чтоб папка очищалась
 class ImageTypeValue {
     fun removePath(selectedTabPosition: Int) {
         imagePathList.removeAt(selectedTabPosition)

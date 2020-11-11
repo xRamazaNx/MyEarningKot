@@ -82,17 +82,18 @@ class ImageFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        return FrameLayout(context!!).apply {
-            layoutParams = LinearLayout.LayoutParams(matchParent, matchParent).apply {
-                gravity = Gravity.CENTER
-            }
-            addView(ImageView(context).apply {
-                val dpsToPixels = context!!.dpsToPixels(300)
-                layoutParams = FrameLayout.LayoutParams(dpsToPixels, matchParent).apply {
+        return context?.let { ctx ->
+            FrameLayout(ctx).apply {
+                layoutParams = LinearLayout.LayoutParams(matchParent, matchParent).apply {
                     gravity = Gravity.CENTER
                 }
-            })
+                addView(ImageView(ctx).apply {
+                    val dpsToPixels = context.dpsToPixels(300)
+                    layoutParams = FrameLayout.LayoutParams(dpsToPixels, matchParent).apply {
+                        gravity = Gravity.CENTER
+                    }
+                })
+            }
         }
     }
 

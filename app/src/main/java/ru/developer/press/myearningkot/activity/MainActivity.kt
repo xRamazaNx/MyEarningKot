@@ -39,6 +39,8 @@ import ru.developer.press.myearningkot.dialogs.DialogSetName
 import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.DataController
 import ru.developer.press.myearningkot.helpers.getColorFromRes
+import ru.developer.press.myearningkot.viewmodels.PageViewModelController
+import ru.developer.press.myearningkot.viewmodels.ViewModelMainFactory
 
 // GITHUB
 const val ID_UPDATE_CARD = "id_card"
@@ -52,13 +54,18 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
             DataController().getPageList()
         }
         viewModel = withContext(Dispatchers.IO) {
-            ViewModelProviders.of(this@MainActivity, ViewModelMainFactory(pageList))
-                .get(PageViewModel::class.java)
+            ViewModelProviders.of(
+                this@MainActivity,
+                ViewModelMainFactory(
+                    pageList
+                )
+            )
+                .get(PageViewModelController::class.java)
         }
         progressBar.visibility = GONE
     }
 
-    private lateinit var viewModel: PageViewModel
+    private lateinit var viewModel: PageViewModelController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,7 +130,6 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
         addPageButton.setOnClickListener {
             DialogSetName { pageName ->
                 GlobalScope.launch(Dispatchers.Main) {
-
                     withContext(Dispatchers.IO) {
                         viewModel.addPage(pageName)
                     }
@@ -289,29 +295,28 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
 
 fun linkViewPagerAndTabs(tabs: TabLayout, viewPager: ViewPager2, nameList: List<String>) {
     val context = tabs.context
-    TabLayoutMediator(tabs, viewPager,
-        TabLayoutMediator.TabConfigurationStrategy { tab, position ->
-            val tabTextView = TextView(context).apply {
-                isSingleLine = true
-                layoutParams = TableLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT).apply {
-                    weight = 0f
-                }
-                gravity = Gravity.CENTER
-                text = nameList[position]
-                textColorResource =
-                    R.color.dark_text
-                if (position == 0) {
-                    textColorResource =
-                        R.color.white
-
-                }
+    TabLayoutMediator(tabs, viewPager) { tab, position ->
+        val tabTextView = TextView(context).apply {
+            isSingleLine = true
+            layoutParams = TableLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT).apply {
+                weight = 0f
             }
-            tab.customView = tabTextView
-            tab.view.layoutParams =
-                LinearLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT).apply {
-                    weight = 0f
-                }
-        }).attach()
+            gravity = Gravity.CENTER
+            text = nameList[position]
+            textColorResource =
+                R.color.dark_text
+            if (position == 0) {
+                textColorResource =
+                    R.color.white
+
+            }
+        }
+        tab.customView = tabTextView
+        tab.view.layoutParams =
+            LinearLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT).apply {
+                weight = 0f
+            }
+    }.attach()
 
 
     tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {

@@ -46,7 +46,7 @@ class ScrollContainer(
         if (ev.action == MotionEvent.ACTION_MOVE) {
             isMove =
                 // диапозон который используется для определения движения пальца
-                !(ev.x - motionEventFromActionDown.x in -10..10 && ev.y - motionEventFromActionDown.y in -10..10)
+                !(ev.x - motionEventFromActionDown.x in -10f..10f && ev.y - motionEventFromActionDown.y in -10f..10f)
         }
         if (ev.action == MotionEvent.ACTION_DOWN) {
             isLong.value = false
@@ -57,7 +57,6 @@ class ScrollContainer(
         if (isMove || ev.action == MotionEvent.ACTION_UP) {
             hand.removeCallbacks(mLongPressed)
         }
-
 //        logD("clickEvent x = ${ev.x} ")
 //        logD("clickEvent y = ${ev.y} ")
 //

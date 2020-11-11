@@ -16,7 +16,6 @@ import android.widget.PopupWindow
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.view.forEach
-import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.appbar.AppBarLayout
 import com.google.gson.Gson
@@ -25,7 +24,6 @@ import kotlinx.android.synthetic.main.card.*
 import kotlinx.android.synthetic.main.card.datePeriodCard
 import kotlinx.android.synthetic.main.card.nameCard
 import kotlinx.android.synthetic.main.card.view.*
-import kotlinx.android.synthetic.main.set_name_layout.view.*
 import kotlinx.android.synthetic.main.total_item.view.totalValue
 import kotlinx.android.synthetic.main.total_item_layout.view.*
 import kotlinx.coroutines.CoroutineScope
@@ -36,9 +34,9 @@ import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import org.jetbrains.anko.backgroundColorResource
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.wrapContent
-import ru.developer.press.myearningkot.CardViewModel
+import ru.developer.press.myearningkot.viewmodels.CardViewModel
 import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.ViewModelCardFactory
+import ru.developer.press.myearningkot.viewmodels.ViewModelCardFactory
 import ru.developer.press.myearningkot.dialogs.DialogBasicPrefCard
 import ru.developer.press.myearningkot.dialogs.DialogBasicPrefPlate
 import ru.developer.press.myearningkot.dialogs.DialogSetName
@@ -94,7 +92,12 @@ class PrefCardActivity : BasicCardActivity() {
                 }
             }
             viewModel =
-                ViewModelProviders.of(this@PrefCardActivity, ViewModelCardFactory(card!!)).get(
+                ViewModelProviders.of(
+                    this@PrefCardActivity,
+                    ViewModelCardFactory(
+                        card!!
+                    )
+                ).get(
                     CardViewModel::
                     class.java
                 )
@@ -296,7 +299,11 @@ class PrefCardActivity : BasicCardActivity() {
                 val list = getColumnTypeList()
                 showItemChangeDialog(getString(R.string.change_type_data), list, -1, null) {
                     val columnType = getColumnTypeEnumList()[it]
-                    viewModel?.addColumn(columnType, list[it])
+                    // если семпл настраиваем то добавляем колону с семплами
+                    if (prefCardInfo.cardCategory == PrefCardInfo.CardCategory.SAMPLE)
+                        viewModel?.addColumnSample(columnType, list[it])
+                    else
+                        viewModel?.addColumn(columnType, list[it])
 
                     createTitles()
                     updateHorizontalScrollSwitched()

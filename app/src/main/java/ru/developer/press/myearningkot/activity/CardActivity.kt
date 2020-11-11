@@ -22,7 +22,7 @@ import kotlinx.android.synthetic.main.activity_card.view.*
 import kotlinx.android.synthetic.main.card.view.*
 import kotlinx.coroutines.*
 import ru.developer.press.myearningkot.*
-import ru.developer.press.myearningkot.CardViewModel.SelectMode
+import ru.developer.press.myearningkot.viewmodels.CardViewModel.SelectMode
 import ru.developer.press.myearningkot.adapters.animationAdd
 import ru.developer.press.myearningkot.adapters.animationDelete
 import ru.developer.press.myearningkot.dialogs.PICK_IMAGE_MULTIPLE
@@ -31,6 +31,8 @@ import ru.developer.press.myearningkot.dialogs.startPrefActivity
 import ru.developer.press.myearningkot.model.*
 import ru.developer.press.myearningkot.helpers.EditCellControl
 import ru.developer.press.myearningkot.helpers.getColorFromRes
+import ru.developer.press.myearningkot.viewmodels.CardViewModel
+import ru.developer.press.myearningkot.viewmodels.ViewModelCardFactory
 import uk.co.markormesher.android_fab.SpeedDialMenuAdapter
 import uk.co.markormesher.android_fab.SpeedDialMenuItem
 import java.lang.Runnable
@@ -108,7 +110,7 @@ open class CardActivity : BasicCardActivity() {
                 SelectMode.CELL -> {
                     menuInflater.inflate(R.menu.cell_menu, menu)
                     // ставим иконку вставить в зависимости доступности вставки
-                    if (viewModel!!.isEqualCellAndCopyCell()) {
+                    if (viewModel!!.isEqualTypeCellAndCopyCell()) {
                         menu.findItem(R.id.pasteCell).setIcon(R.drawable.ic_paste_white)
                     } else
                         menu.findItem(R.id.pasteCell).setIcon(R.drawable.ic_paste_white_disabled)
@@ -119,7 +121,7 @@ open class CardActivity : BasicCardActivity() {
                             add(
                                 SpeedDialMenuItem(
                                     this@CardActivity,
-                                    if (viewModel!!.isEqualCellAndCopyCell())
+                                    if (viewModel!!.isEqualTypeCellAndCopyCell())
                                         getDrawable(R.drawable.ic_paste_white)!!
                                     else
                                         getDrawable(R.drawable.ic_paste_white_disabled)!!
@@ -292,7 +294,12 @@ open class CardActivity : BasicCardActivity() {
 
     private fun createViewModel(card: Card) {
         viewModel =
-            ViewModelProviders.of(this@CardActivity, ViewModelCardFactory(card))
+            ViewModelProviders.of(
+                this@CardActivity,
+                ViewModelCardFactory(
+                    card
+                )
+            )
                 .get(CardViewModel::class.java)
     }
 
@@ -421,7 +428,11 @@ open class CardActivity : BasicCardActivity() {
     }
 
     private fun pasteCell() {
-        viewModel?.pasteCell()
+        // на вход принимается функция которая должна обновить строку после вставки
+        viewModel?.pasteCell {
+            // обновление строки после вставки данных
+            adapter.notifyItemChanged(it)
+        }
     }
 
     private fun removeSelectedRows() {

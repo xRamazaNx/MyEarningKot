@@ -142,7 +142,7 @@ class SampleHelper {
             sampleJsonDao.insert(SampleJson().apply {
                 json = Gson().toJson(card.apply {
                     repeat(30) {
-                        addRow()
+                        addSampleRow()
                     }
                 })
             })

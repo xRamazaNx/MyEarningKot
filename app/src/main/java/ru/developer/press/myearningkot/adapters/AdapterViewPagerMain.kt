@@ -14,7 +14,7 @@ class AdapterViewPagerMain(
     private val pageInterface: AdapterPageInterface
 ) : FragmentStateAdapter(fragmentManager, lifecycle) {
 
-    val fragments = mutableListOf<PageFragment>()
+    private val fragments = mutableListOf<PageFragment>()
 
     //
     init {

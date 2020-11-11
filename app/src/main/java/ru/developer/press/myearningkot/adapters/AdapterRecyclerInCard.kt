@@ -110,7 +110,7 @@ class AdapterRecyclerInCard(
 
 val animationDelete: Animation =
     AnimationUtils.loadAnimation(App.instance?.baseContext, R.anim.anim_delete)
-val animationAdd: Animation = AnimationUtils.loadAnimation(App.instance?.baseContext, R.anim.anim_add)
+val animationAdd: Animation = AnimationUtils.loadAnimation(App.instance?.baseContext, R.anim. anim_add)
 
 class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataListener {
     var viewList = mutableListOf<View>()
@@ -190,7 +190,6 @@ class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataList
                 itemView.backgroundColor = Color.TRANSPARENT
             }
         }
-
 
     }
 
