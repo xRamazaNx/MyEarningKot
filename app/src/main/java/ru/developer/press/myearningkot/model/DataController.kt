@@ -1,5 +1,6 @@
 package ru.developer.press.myearningkot.model
 
+import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import org.jetbrains.anko.doAsyncResult
 import ru.developer.press.myearningkot.App
@@ -55,7 +56,7 @@ class DataController {
         pageList.forEach { page ->
             cardList.forEach { card ->
                 if (page.id == card.idPage)
-                    page.cards.add(card)
+                    page.cards.add(MutableLiveData<Card>().apply { postValue(card) })
             }
         }
         return pageList

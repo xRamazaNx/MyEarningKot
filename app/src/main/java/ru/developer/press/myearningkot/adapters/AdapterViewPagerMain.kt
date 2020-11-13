@@ -22,7 +22,6 @@ class AdapterViewPagerMain(
         repeat(pageInterface.getPages().size) {
             addPage()
         }
-
     }
 
     override fun getItemCount(): Int {
@@ -32,7 +31,7 @@ class AdapterViewPagerMain(
     override fun createFragment(pagePosition: Int): Fragment {
 
         return fragments[pagePosition].apply {
-            cards = pageInterface.getPages()[pagePosition].cards
+            page = pageInterface.getPages()[pagePosition]
         }
     }
 

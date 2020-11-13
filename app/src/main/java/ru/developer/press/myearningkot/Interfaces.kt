@@ -2,6 +2,7 @@ package ru.developer.press.myearningkot
 
 import android.content.Context
 import android.view.View
+import androidx.lifecycle.MutableLiveData
 import ru.developer.press.myearningkot.model.*
 //import ru.developer.press.myearningkot.model.card
 import ru.developer.press.myearningkot.helpers.Page
@@ -9,7 +10,7 @@ import ru.developer.press.myearningkot.helpers.Page
 // для viewPage обратная связь реализатор PageViewModel
 interface AdapterPageInterface {
     fun getPageCount(): Int
-    fun getPages(): MutableList<Page>
+    fun getPages(): MutableList<MutableLiveData<Page>>
 }
 
 interface ProvideData {

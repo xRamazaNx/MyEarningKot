@@ -1,5 +1,6 @@
 package ru.developer.press.myearningkot.viewmodels
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ru.developer.press.myearningkot.AdapterPageInterface
 import ru.developer.press.myearningkot.CardClickListener
@@ -11,9 +12,16 @@ import ru.developer.press.myearningkot.model.NumberColumn
 
 // этот класс создается (ViewModelProviders.of(this).get(Class::class.java))
 // и существует пока существует активити до уничтожения он только обновляет данные представления
-class PageViewModelController(private val pageList: MutableList<Page> = mutableListOf()) : ViewModel(),
+class PageViewModelController(list: MutableList<Page>) : ViewModel(),
     AdapterPageInterface,
     CardClickListener {
+    private val pageList: MutableList<MutableLiveData<Page>> = mutableListOf()
+
+    init {
+        list.forEach {
+            pageList.add(MutableLiveData<Page>().apply { value = it })
+        }
+    }
 
     // нажали на карточку
     override fun cardClick(idCard: Long) {
@@ -29,16 +37,16 @@ class PageViewModelController(private val pageList: MutableList<Page> = mutableL
 
     }
 
-    override fun getPages(): MutableList<Page> {
+    override fun getPages(): MutableList<MutableLiveData<Page>> {
         return pageList
     }
 
     fun getTabName(position: Int): String {
-        return pageList[position].pageName
+        return pageList[position].value!!.pageName
     }
 
     private fun getPositionCardInPage(indexPage: Int, card: Card): Int {
-        val cardsInPage = pageList[indexPage].cards
+        val cardsInPage = pageList[indexPage].value!!.cards
         // тут будет логика определения позиции с учетом сортировки
 //        cardsInPage.forEachIndexed { index, cardTemp ->
 //            if (card === cardTemp) {
@@ -59,31 +67,35 @@ class PageViewModelController(private val pageList: MutableList<Page> = mutableL
         // для того что бы удвлить времянки
         card.rows.clear()
         // добавляем в базу данных новую Card присовение ид очень важно
-        val page = pageList[indexPage]
+        val mutableLiveData = pageList[indexPage]
+        val page = mutableLiveData.value!!
         card.idPage = page.id
         // добавляем в базу
         dataController.addCard(card)
         // узнать позицию для добавления во вкладку и для ее обновления во вью... а ее надо узнавать смотря какая сортировка
         val position = getPositionCardInPage(indexPage, card)
         // добавляем во вкладку
-        page.cards.add(position, card)
+        page.cards.add(position, MutableLiveData<Card>().apply { postValue(card) })
+        mutableLiveData.postValue(page)
         updateView(position)
 
     }
 
     fun addPage(pageName: String): Page {
         val page: Page = dataController.addPage(pageName)
-        pageList.add(page)
+        pageList.add(MutableLiveData<Page>().apply { postValue(page) })
 
         return page
     }
 
     fun updateCardInPage(idCard: Long, selectedTabPosition: Int): Int {
         var position = 0
-        val cards = pageList[selectedTabPosition].cards
+        val cards = pageList[selectedTabPosition].value!!.cards
         cards.forEachIndexed { index, card ->
-            if (card.id == idCard) {
-                cards[index] = dataController.getCard(idCard)
+            if (card.value!!.id == idCard) {
+                val updatedCard = dataController.getCard(idCard)
+                calcCard(updatedCard)
+                cards[index].postValue(updatedCard)
                 position = index
                 return@forEachIndexed
             }
@@ -92,17 +104,32 @@ class PageViewModelController(private val pageList: MutableList<Page> = mutableL
     }
 
     fun getCardInPage(selectedTabPosition: Int, position: Int): Card {
-        return pageList[selectedTabPosition].cards[position]
+        return pageList[selectedTabPosition].value!!.cards[position].value!!
     }
 
+    private fun calcCard (card: Card){
+        card.apply {
+            columns.filterIsInstance<NumberColumn>().forEach { column ->
+                updateTypeControlColumn(column)
+            }
+        }
+    }
     fun calcAllCards() {
         pageList.forEach { page ->
-            page.cards.forEach { card ->
-                card.columns.filterIsInstance<NumberColumn>().forEach { column ->
-                    card.updateTypeControlColumn(column)
+            page.value!!.cards.forEach { card ->
+                card.value?.let {
+                    calcCard(it)
                 }
             }
         }
+    }
+
+    fun pageColorChanged(color: Int, selectedPage: Int) {
+        val mutableLiveData = pageList[selectedPage]
+        val value = mutableLiveData.value
+        value?.background = color
+        mutableLiveData.postValue(value)
+
     }
 
 //    fun deletePage(position: Int, deleteEvent: (Boolean) -> Unit) {

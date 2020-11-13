@@ -6,11 +6,12 @@
      android:shareInterpolator="false"
     >
     <translate
-        android:fromXDelta="-100%p"
+        android:fromXDelta="-70%p"
         android:toXDelta="0%p"
         />
-    <!--<alpha-->
-        <!--android:fromAlpha="1.0"-->
-        <!--android:toAlpha="0.9"/>-->
+
+    <alpha
+        android:fromAlpha="0.0"
+        android:toAlpha="1.0"/>
 
 </set>

@@ -2,24 +2,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/cent"
     android:orientation="horizontal">
 
     <TextView
-        android:layout_weight="1"
-        android:textColor="@color/white"
         android:id="@+id/totalValue"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_weight="1"
         android:gravity="center"
         android:padding="4dp"
-        android:text="TextView" />
+        android:text="TextView"
+        android:textColor="@color/white" />
 
     <FrameLayout
-        android:layout_marginBottom="4dp"
         android:id="@+id/_verLine"
         android:layout_width="1px"
         android:layout_height="match_parent"
+        android:layout_marginBottom="4dp"
         android:background="@color/color_polosa_razdelitel">
 
     </FrameLayout>

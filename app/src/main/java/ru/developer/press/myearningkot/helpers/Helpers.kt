@@ -1,25 +1,36 @@
 package ru.developer.press.myearningkot.helpers
 
+import android.animation.ValueAnimator
 import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Interpolator
+import android.graphics.drawable.ColorDrawable
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.net.Uri
+import android.os.Build
 import android.text.format.DateFormat
 import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.view.View.GONE
+import android.view.animation.AccelerateInterpolator
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.MainThread
+import androidx.annotation.RequiresApi
+import androidx.core.animation.addListener
+import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import com.bumptech.glide.request.transition.ViewPropertyTransition
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.list_item_change_layout.view.*
+import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.backgroundColorResource
 import org.jetbrains.anko.textColorResource
 import ru.developer.press.myearningkot.App
@@ -91,7 +102,6 @@ fun getDateTypeList(): MutableList<String> {
         add(getDate(2, enableTime = false))
     }
 }
-
 
 
 fun getDate(variantDate: Int, time: Long = Date().time, enableTime: Boolean): String {
@@ -244,4 +254,19 @@ fun View.addRipple() = with(TypedValue()) {
     setBackgroundResource(resourceId)
 }
 
+fun View.animateColor(colorFrom: Int, colorTo: Int, duration: Long = 325) {
+    val drawable = background
+    val valueAnimator: ValueAnimator = ValueAnimator.ofFloat(0.0f, 1.0f)
+    valueAnimator.duration = duration
+    valueAnimator.interpolator = AccelerateInterpolator()
+    valueAnimator.addUpdateListener {
+        val fractionAnim = valueAnimator.animatedValue as Float
+        backgroundColor = ColorUtils.blendARGB(colorFrom, colorTo, fractionAnim)
+
+    }
+    valueAnimator.doOnEnd {
+        background = drawable
+    }
+    valueAnimator.start()
+}
 // # ширину колоны для цвета можно выбирать такой какая высота ячеек

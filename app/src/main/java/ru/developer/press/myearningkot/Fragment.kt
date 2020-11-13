@@ -9,6 +9,8 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -18,14 +20,16 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.stfalcon.imageviewer.StfalconImageViewer
 import kotlinx.android.synthetic.main.main_cards_layout.*
+import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.matchParent
 import ru.developer.press.myearningkot.activity.MainActivity
 import ru.developer.press.myearningkot.adapters.AdapterRecyclerInPage
+import ru.developer.press.myearningkot.helpers.Page
 import ru.developer.press.myearningkot.model.Card
 
 
 class PageFragment : Fragment() {
-    var cards: MutableList<Card> = mutableListOf()
+    lateinit var page: MutableLiveData<Page>
     private lateinit var cardClickListener: CardClickListener
     private var adapterRecyclerInPage: AdapterRecyclerInPage? = null
     private var recycler: RecyclerView? = null
@@ -47,7 +51,11 @@ class PageFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         recycler = recyclerCards
         recycler?.layoutManager = LinearLayoutManager(context)
-        adapterRecyclerInPage = AdapterRecyclerInPage(cards, cardClickListener)
+        adapterRecyclerInPage = AdapterRecyclerInPage(page.value!!.cards, cardClickListener)
+
+        page.observe(activity!!, Observer {
+            view.backgroundColor = it.background
+        })
         updateRecycler()
         super.onViewCreated(view, savedInstanceState)
     }
@@ -57,7 +65,6 @@ class PageFragment : Fragment() {
         recycler?.adapter = adapterRecyclerInPage
 
     }
-
     fun scrollToPosition(cardPosition: Int) {
         recycler?.smoothScrollToPosition(cardPosition)
         adapterRecyclerInPage?.animateCardUpdated(cardPosition)

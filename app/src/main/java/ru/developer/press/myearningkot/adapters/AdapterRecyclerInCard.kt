@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeAdapter
 import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.*
+import ru.developer.press.myearningkot.helpers.animateColor
 import ru.developer.press.myearningkot.model.Column
 import ru.developer.press.myearningkot.model.NumerationColumn
 import ru.developer.press.myearningkot.model.Row
@@ -150,26 +151,23 @@ class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataList
         when (row.status) {
             Row.Status.SELECT -> {
                 rowNumber?.text = "✔"
-                //            rowNumber?.text = ""
                 rowNumber?.setTextColor(
                     ContextCompat.getColor(
                         itemView.context,
                         R.color.shape_select_border
                     )
                 )
-                //            itemView.backgroundColorResource = R.color.color_long_click_item
-                itemView.backgroundResource = R.drawable.shape_select
-                //            itemView.backgroundColorResource = R.color.shape_select_solid
-                //            rowNumber?.backgroundResource = R.drawable.ic_check_ring
+                itemView.backgroundColorResource = R.color.shape_select_back
             }
             Row.Status.ADDED -> {
                 itemView.startAnimation(animationAdd)
+                itemView.animateColor(Color.GREEN, Color.TRANSPARENT, 500)
                 row.status = Row.Status.NONE
                 bind(row, columns)
             }
             Row.Status.DELETED -> {
-                itemView.backgroundColorResource = R.color.md_red_200
                 itemView.startAnimation(animationDelete)
+                itemView.animateColor(Color.TRANSPARENT, Color.RED, 500)
             }
             else -> {
                 // если есть хоть один свитч который настроен на поведение меняющее запись

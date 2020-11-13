@@ -1,5 +1,7 @@
 package ru.developer.press.myearningkot.helpers
 
+import android.graphics.Color
+import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 import androidx.room.Database
 import com.google.gson.Gson
@@ -30,8 +32,9 @@ class Page {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0L
     var pageName = ""
-    @Ignore
-    val cards = mutableListOf<Card>()
+    var background = Color.WHITE
+
+    @Ignore val cards = mutableListOf<MutableLiveData<Card>>()
 }
 
 

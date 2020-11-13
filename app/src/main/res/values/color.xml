@@ -5,6 +5,7 @@
     <color name="shape_cell_select_solid">#1EFFE814</color>
     <color name="shape_cell_select_border">#A60000</color>
     <color name="shape_select_border">#005698</color>
+    <color name="shape_select_back">#86BDE6</color>
     <color name="yellow">@color/md_yellow_500</color>
 
     <color name="gray_select">#2DB8B8B8</color>

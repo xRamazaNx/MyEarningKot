@@ -1,23 +1,38 @@
 package ru.developer.press.myearningkot.adapters
 
+import android.animation.Animator
+import android.animation.ValueAnimator
+import android.app.Activity
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import androidx.annotation.FloatRange
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.forEach
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_card.view.*
 import kotlinx.android.synthetic.main.card.view.*
+import org.jetbrains.anko.backgroundColor
+import org.jetbrains.anko.backgroundColorResource
+import ru.developer.press.myearningkot.App
 import ru.developer.press.myearningkot.CardClickListener
 import ru.developer.press.myearningkot.R
+import ru.developer.press.myearningkot.activity.MainActivity
 import ru.developer.press.myearningkot.activity.setShowTotalInfo
+import ru.developer.press.myearningkot.helpers.animateColor
 import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.createViewInPlate
 
 class AdapterRecyclerInPage(
-    private val cards: MutableList<Card>,
+    private val cards: MutableList<MutableLiveData<Card>>,
     private val cardClickListener: CardClickListener
 ) : RecyclerView.Adapter<AdapterRecyclerInPage.CardHolder>() {
 
@@ -42,8 +57,8 @@ class AdapterRecyclerInPage(
     }
 
     private fun animate(view: View) {
-        val animate = AnimationUtils.loadAnimation(view.context, R.anim.anim_add)
-        view.startAnimation(animate)
+        val color = ContextCompat.getColor(view.context, R.color.cent)
+        view.animateColor(Color.WHITE, color, 500)
     }
 
     fun animateCardUpdated(cardPosition: Int) {
@@ -58,18 +73,6 @@ class AdapterRecyclerInPage(
     ) : RecyclerView.ViewHolder(view) {
         private var idCard: Long = -1
 
-//        private val nameCard = itemView.nameCard
-//        private val dateOfPeriod = itemView.datePeriodCard
-//
-//        private val sumTitle = itemView.sumTitle
-//        private val sum = itemView.sum
-//
-//        private val avansTitle = itemView.avansTitle
-//        private val avans = itemView.avans
-//
-//        private val balanceTitle = itemView.balanceTitle
-//        private val balance = itemView.balance
-
         init {
             val click: (View) -> Unit = {
                 cardClickListener.cardClick(idCard)
@@ -78,13 +81,14 @@ class AdapterRecyclerInPage(
             itemView.totalContainerScroll.setOnClickListener(click)
         }
 
-        fun bind(card: Card) {
+        fun bind(card: MutableLiveData<Card>) {
 
-            card.createViewInPlate(itemView)
+            card.observe(itemView.context as AppCompatActivity, Observer {
+                it.createViewInPlate(itemView)
+                idCard = it.id
+                itemView.setShowTotalInfo(it.isShowTotalInfo)
+            })
 
-            idCard = card.id
-
-            itemView.setShowTotalInfo(card.isShowTotalInfo)
 
         }
 

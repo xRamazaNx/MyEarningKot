@@ -2,16 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/cent"
     android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/totalTitleContainer"
-        android:gravity="center_vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-    </LinearLayout>
+        android:gravity="center_vertical"
+        android:orientation="horizontal"></LinearLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -21,10 +19,10 @@
     </FrameLayout>
 
     <LinearLayout
-        android:gravity="center_vertical"
         android:id="@+id/totalValueContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
     </LinearLayout>
