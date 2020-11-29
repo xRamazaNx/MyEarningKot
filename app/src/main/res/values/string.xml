@@ -287,7 +287,8 @@
         <string name="name_sample">Имя шаблона</string>
         <string name="visual_setting">Настройка внешнего вида</string>
         <string name="change_valuta">Выберите валюту</string>
-        <string name="enable_horizontal_scroll">Разрешить горизонтальную прокрутку</string>
+        <string name="enable_horizontal_scroll_items">Горизонтальная прокрутка записей</string>
+        <string name="enable_horizontal_scroll_totals">Горизонтальная прокрутка итогов</string>
         <string name="enable_some_stroke">Разрешить перенос строки</string>
         <string name="dynamic_height_of_row">Динамическая высота записи</string>
 </resources>

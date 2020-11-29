@@ -8,11 +8,11 @@ import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.core.content.ContextCompat
-import androidx.core.view.postDelayed
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.DialogFragment
 import com.google.gson.Gson
@@ -61,8 +61,7 @@ class DialogEditCell(
             }
         }
         return DatePickerDialog(
-            context!!,
-            DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
+            context!!, { _, year, month, dayOfMonth ->
                 calendar.set(year, month, dayOfMonth)
                 value = calendar.timeInMillis.toString()
                 changed(value)
@@ -91,7 +90,7 @@ class DialogEditCell(
             val view = context.layoutInflater.inflate(R.layout.edit_cell_number, null)
             view.titleNumberEdit.text = column.name
             val editCellText = view.editCellText
-            initClickOperation(view) {
+            val callBackOperatorClick: (String) -> Unit = {
                 val stringBuilder = StringBuilder()
                 val toMutableList = value.toMutableList()
                 toMutableList.add(editCellText.selectionStart, it[0])
@@ -102,6 +101,7 @@ class DialogEditCell(
                 editCellText?.setText(value)
                 editCellText.setSelection(value.length)
             }
+            initClickOperation(view, callBackOperatorClick)
             editCellText.setText(value)
             editCellText.addTextChangedListener {
                 value = it.toString()
@@ -122,7 +122,7 @@ class DialogEditCell(
 
             val phoneTypeValue = Gson().fromJson(value, PhoneTypeValue::class.java)
 
-            phone.setText(phoneTypeValue.phone.toString())
+            phone.setText(phoneTypeValue.phone)
             name.setText(phoneTypeValue.name)
             family.setText(phoneTypeValue.lastName)
             org.setText(phoneTypeValue.organization)

@@ -451,14 +451,13 @@ data class Cell(
     fun updateTypeValue(typePref: Prefs) {
         when (typePref) {
             is NumberTypePref -> {
-                val calc = Calc()
                 displayValue =
                     if (sourceValue == "")
                         ""
                     else
                         try {
                             //                    val double = sourceValue.toDouble()
-                            val value = calc.evaluate(sourceValue)!!
+                            val value = Calc.evaluate(sourceValue)!!
                             getDecimalFormatNumber(value, typePref)
                         } catch (exception: Exception) {
                             "Error numbers"
@@ -579,7 +578,6 @@ class TotalItem {
     var isIgnoreSwitchWork: Boolean = false
 
     fun calcFormula(card: Card) {
-        val calc = Calc()
         val string = java.lang.StringBuilder()
         formula.formulaElements.forEach { element ->
             val elementVal = element.value
@@ -608,7 +606,7 @@ class TotalItem {
                 string.append(elementVal)
         }
         value = try {
-            val d = calc.evaluate(string.toString())!!
+            val d = Calc.evaluate(string.toString())!!
             getDecimalFormatNumber(d, totalPref)
         } catch (exception: Exception) {
 
@@ -619,7 +617,6 @@ class TotalItem {
     private fun Card.getSumFromColumn(id: Long, ignoreSwitchWork: Boolean): String {
 
         var index = -1
-        val calc = Calc()
         var value = 0.0
         columns.forEachIndexed { i, column ->
             if (column.id == id) {
@@ -652,7 +649,7 @@ class TotalItem {
                 // если надо прибавить и сорц не пустой
                 if (isAddSum && source.isNotEmpty())
                     value += try {
-                        calc.evaluate(source)!!
+                        Calc.evaluate(source)!!
                     } catch (exc: Exception) {
                         return "Error"
                     }

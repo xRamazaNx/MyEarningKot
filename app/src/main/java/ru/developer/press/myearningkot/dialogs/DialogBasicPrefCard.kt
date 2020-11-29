@@ -5,7 +5,6 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.card_basic_pref_layout.view.*
@@ -14,9 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.layoutInflater
-import org.jetbrains.anko.textColorResource
 import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.dpsToPixels
 import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.helpers.getValutaTypeList
 import ru.developer.press.myearningkot.helpers.showItemChangeDialog
@@ -28,14 +25,14 @@ class DialogBasicPrefCard(
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = AlertDialog.Builder(context).apply {
-            setCustomTitle(TextView(context).apply {
-                text = "Общие настройки"
-                textColorResource = R.color.light_gray
-                val dp24 = context.dpsToPixels(24)
-                val dp8 = context.dpsToPixels(8)
-                setPadding(dp24, dp24, dp24, dp8)
-                textSize = 20f
-            })
+//            setCustomTitle(TextView(context).apply {
+//                text = context.getString(R.string.general_setting)
+//                textColorResource = R.color.light_gray
+//                val dp24 = context.dpsToPixels(24)
+//                val dp8 = context.dpsToPixels(8)
+//                setPadding(dp24, dp24, dp24, dp8)
+//                textSize = 20f
+//            })
             val view = context.layoutInflater.inflate(R.layout.card_basic_pref_layout, null)
 
             // выбор валюты
@@ -58,7 +55,7 @@ class DialogBasicPrefCard(
             }
 
 
-            val switchEnableHorizontalScroll = view.switchEnableHorizontalScroll
+            val switchEnableHorizontalScroll = view.switchEnableHorizontalScrollItems
             val switchEnableSomeStroke = view.switchEnableSomeStroke
 
             switchEnableHorizontalScroll.isChecked = card.enableHorizontalScroll
@@ -76,17 +73,17 @@ class DialogBasicPrefCard(
             val heightDown = view.heightSizeDown
             val heightSize = view.heightSize
 
-            fun updateHeightInfo (){
+            fun updateHeightInfo() {
                 heightSize.text = card.heightCells.toString()
             }
             updateHeightInfo()
             heightUp.setOnClickListener {
-                card.heightCells +=1
+                card.heightCells += 1
                 updateHeightInfo()
                 updateCard()
             }
             heightDown.setOnClickListener {
-                card.heightCells -=1
+                card.heightCells -= 1
                 updateHeightInfo()
                 updateCard()
             }
@@ -97,6 +94,32 @@ class DialogBasicPrefCard(
 
             }
 
+
+            val switchEnableShowDatePeriod = view.switchEnableDatePeriod
+            val switchEnableHorizontalScrollTotals = view.switchEnableHorizontalScrollTotals
+            val switchShowTotalInfo = view.switchShowTotalInfo
+
+            switchEnableShowDatePeriod.isChecked = card.isShowDatePeriod
+            switchEnableHorizontalScrollTotals.isChecked = card.enableHorizontalScrollTotal
+            switchShowTotalInfo.isChecked = card.isShowTotalInfo
+
+            switchEnableShowDatePeriod.setOnCheckedChangeListener { _, isChecked ->
+                card.isShowDatePeriod = isChecked
+                updateCard()
+            }
+            switchEnableHorizontalScrollTotals.setOnCheckedChangeListener { _, b ->
+                card.enableHorizontalScrollTotal = b
+                updateCard()
+            }
+            switchShowTotalInfo.setOnCheckedChangeListener { _, isChecked ->
+                card.isShowTotalInfo = isChecked
+                updateCard()
+            }
+            setView(view)
+            setPositiveButton(" ") { dialogInterface: DialogInterface, _: Int ->
+                dialogInterface.dismiss()
+
+            }
         }
 
         return dialog.create()

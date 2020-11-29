@@ -141,7 +141,7 @@ class NumberColumn(name: String) : Column(name) {
                 } else
                     string.append(it.value)
             }
-            Calc().evaluate(string.toString()).toString()
+            Calc.evaluate(string.toString()).toString()
         } catch (exception: Exception) {
             "Error formula"
         }

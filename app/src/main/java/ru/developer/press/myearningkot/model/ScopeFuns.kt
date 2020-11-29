@@ -4,15 +4,14 @@ import android.text.TextUtils
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.card.view.*
 import kotlinx.android.synthetic.main.total_item.view.*
 import kotlinx.android.synthetic.main.total_item_layout.view.*
-import org.jetbrains.anko.layoutInflater
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.padding
-import org.jetbrains.anko.wrapContent
+import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.activity.CardActivity
 
@@ -36,16 +35,33 @@ fun Card.createViewInPlate(plateView: View) {
             R.layout.total_item_layout,
             null
         ) as LinearLayout
-    totalContainer.layoutParams = ViewGroup.LayoutParams(matchParent, wrapContent)
+    totalContainer.layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent).apply {
+        weight = 1f
+    }
+
+    val totalContainerDisableScroll = plateView.totalContainerDisableScroll
+    val totalContainerScroll = plateView.totalContainerScroll
 
     //удаляем где бы не были
-    plateView.totalContainerDisableScroll.removeAllViews()
-    plateView.totalContainerScroll.removeAllViews()
-    // добавляем в главный лейаут
+    totalContainerDisableScroll.removeAllViews()
+    totalContainerScroll.removeAllViews()
+
+    val addTotalImageButton = ImageView(context).apply {
+        layoutParams = LinearLayout.LayoutParams(wrapContent, wrapContent).apply {
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        setImageResource(R.drawable.ic_add_fill_style)
+        padding = dip(16)
+        backgroundResource = R.drawable.backgraund_for_card
+        setColorFilter(ContextCompat.getColor(context, R.color.gray))
+    }
+    // добавляем в главный лейаут для тоталов
     if (enableHorizontalScrollTotal) {
-        plateView.totalContainerScroll.addView(totalContainer)
+        totalContainerScroll.addView(totalContainer)
+        totalContainerScroll.addView(addTotalImageButton)
     } else {
-        plateView.totalContainerDisableScroll.addView(totalContainer)
+        totalContainerDisableScroll.addView(totalContainer)
+        totalContainerDisableScroll.addView(addTotalImageButton)
     }
     // контейнер для всех значений
     val totalValueLayout = totalContainer.totalValueContainer
@@ -83,6 +99,7 @@ fun Card.createViewInPlate(plateView: View) {
 
         totalTitleLayout.addView(title)
         totalValueLayout.addView(valueLayout)
+
     }
 
 }
@@ -96,4 +113,13 @@ fun Card.updateTotalAmount(plateView: View) {
         totalItem.calcFormula(this)
         value.text = totalItem.value
     }
+}
+
+fun View.hideAddTotalButton(card: Card) {
+
+    if (card.enableHorizontalScrollTotal)
+        totalContainerScroll.getChildAt(1).visibility = View.GONE
+    else
+        totalContainerDisableScroll.getChildAt(1).visibility = View.GONE
+
 }

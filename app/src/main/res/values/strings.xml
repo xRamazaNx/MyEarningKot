@@ -91,4 +91,9 @@
     <string name="ignore_switch_work">Игнорировать работу переключателя</string>
     <string name="cannot_delete_numbering_column">Нельзя удалить столбец для нумерации</string>
     <string name="formula_works_for_this_column">Для этой колоны работает формула!</string>
+    <string name="cell_height">Высота записи</string>
+    <string name="up_size">Увеличить</string>
+    <string name="down_size">Уменьшить</string>
+    <string name="general_setting">Общие настройки карточки</string>
+    <string name="general_setting_totals">Общие настройки итоговой панели</string>
 </resources>

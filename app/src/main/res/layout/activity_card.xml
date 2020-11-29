@@ -96,67 +96,18 @@
     </ru.developer.press.myearningkot.ScrollContainer>
 
 
-    <LinearLayout
-        android:id="@+id/containerPlate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_anchor="@id/tableView"
-        app:layout_anchorGravity="bottom"
-        android:baselineAligned="false">
-
 
         <include
             android:id="@+id/totalAmountView"
             layout="@layout/card"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:baselineAligned="false"
+            app:layout_anchor="@id/tableView"
+            app:layout_anchorGravity="bottom"
             android:layout_gravity="bottom"
             android:layout_marginStart="-3dp"
-            android:layout_marginEnd="-3dp"
-            android:layout_weight="1" />
-
-        <FrameLayout
-            android:background="@color/cent_light"
-            android:layout_width="1dp"
-            android:layout_height="match_parent"/>
-
-
-        <RelativeLayout
-            android:id="@+id/prefButtonContainer"
-            android:layout_width="35dp"
-            android:layout_height="match_parent"
-            android:background="@color/cent"
-            android:gravity="end"
-            android:orientation="vertical">
-
-
-            <ImageButton
-                android:id="@+id/plateSetting"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentEnd="true"
-                android:background="?android:attr/selectableItemBackground"
-                android:contentDescription="@string/setting_total"
-                android:padding="8dp"
-                android:src="@drawable/ic_setting" />
-
-            <ImageButton
-                android:id="@+id/addTotal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true"
-                android:background="?android:attr/selectableItemBackground"
-                android:contentDescription="@string/setting_total"
-                android:padding="4dp"
-                android:src="@drawable/ic_add_column"
-                />
-        </RelativeLayout>
-    </LinearLayout>
+            android:layout_marginEnd="-3dp" />
 
 
     <uk.co.markormesher.android_fab.FloatingActionButton
@@ -166,7 +117,7 @@
         app:buttonBackgroundColour="@color/greenButton"
         app:buttonIcon="@drawable/ic_add_not_ring"
         app:fabSize="normal"
-        app:layout_anchor="@id/containerPlate" />
+        app:layout_anchor="@id/totalAmountView" />
 
 
     <ru.developer.press.myearningkot.helpers.prefLayouts.WidthLineDrawer

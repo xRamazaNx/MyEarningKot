@@ -91,8 +91,8 @@ abstract class BasicCardActivity : AppCompatActivity() {
                 if (columnDisableScrollContainer.contains(columnContainer)) {
                     columnDisableScrollContainer.removeView(columnContainer)
                 }
-                columnDisableScrollContainer.visibility = View.GONE
-                columnScrollContainer.visibility = View.VISIBLE
+                columnDisableScrollContainer.visibility = GONE
+                columnScrollContainer.visibility = VISIBLE
                 if (!columnScrollContainer.contains(columnContainer))
                     columnScrollContainer.addView(columnContainer)
 
@@ -100,8 +100,8 @@ abstract class BasicCardActivity : AppCompatActivity() {
                 if (columnScrollContainer.contains(columnContainer)) {
                     columnScrollContainer.removeView(columnContainer)
                 }
-                columnScrollContainer.visibility = View.GONE
-                columnDisableScrollContainer.visibility = View.VISIBLE
+                columnScrollContainer.visibility = GONE
+                columnDisableScrollContainer.visibility = VISIBLE
 
                 if (!columnDisableScrollContainer.contains(columnContainer))
                     columnDisableScrollContainer.addView(columnContainer)
@@ -125,7 +125,7 @@ abstract class BasicCardActivity : AppCompatActivity() {
     }
 
     protected fun getAdapterForRecycler(): AdapterRecyclerInCard {
-        return AdapterRecyclerInCard(null, viewModel!!, containerPlate)
+        return AdapterRecyclerInCard(null, viewModel!!, totalAmountView)
     }
 
     fun createTitles() {
@@ -156,10 +156,10 @@ abstract class BasicCardActivity : AppCompatActivity() {
 
     protected fun setShowTotalInfo(showTotalInfo: Boolean){
         totalAmountView.setShowTotalInfo(showTotalInfo)
-        if (showTotalInfo)
-            addTotal.visibility = VISIBLE
-        else
-            addTotal.visibility = GONE
+//        if (showTotalInfo)
+//            addTotal.visibility = VISIBLE
+//        else
+//            addTotal.visibility = GONE
     }
 
     protected fun notifyAdapter() {
@@ -171,10 +171,10 @@ abstract class BasicCardActivity : AppCompatActivity() {
 
 fun View.setShowTotalInfo(showTotalInfo: Boolean) {
     if (showTotalInfo) {
-        totalContainerDisableScroll.visibility = View.VISIBLE
-        totalContainerScroll.visibility = View.VISIBLE
+        totalContainerDisableScroll.visibility = VISIBLE
+        totalContainerScroll.visibility = VISIBLE
     } else {
-        totalContainerDisableScroll.visibility = View.GONE
-        totalContainerScroll.visibility = View.GONE
+        totalContainerDisableScroll.visibility = GONE
+        totalContainerScroll.visibility = GONE
     }
 }

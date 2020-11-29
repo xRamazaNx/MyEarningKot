@@ -11,10 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.widget.LinearLayout
-import android.widget.PopupWindow
-import android.widget.ScrollView
-import android.widget.TextView
+import android.widget.*
 import androidx.core.view.forEach
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.appbar.AppBarLayout
@@ -38,7 +35,6 @@ import ru.developer.press.myearningkot.viewmodels.CardViewModel
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.viewmodels.ViewModelCardFactory
 import ru.developer.press.myearningkot.dialogs.DialogBasicPrefCard
-import ru.developer.press.myearningkot.dialogs.DialogBasicPrefPlate
 import ru.developer.press.myearningkot.dialogs.DialogSetName
 import ru.developer.press.myearningkot.model.*
 import ru.developer.press.myearningkot.helpers.PrefCardInfo
@@ -69,6 +65,13 @@ class PrefCardActivity : BasicCardActivity() {
     private val selectedControl = PrefSelectedControl()
     lateinit var prefWindow: PopupWindow
     override var viewModel: CardViewModel? = null
+    private val addTotalImageButton: ImageView
+        get() {
+            return if (totalContainerDisableScroll.childCount > 0)
+                totalContainerDisableScroll.getChildAt(1) as ImageView
+            else
+                totalContainerScroll.getChildAt(1) as ImageView
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -130,7 +133,7 @@ class PrefCardActivity : BasicCardActivity() {
         prefWindow.isOutsideTouchable = true
         prefWindow.animationStyle = R.style.popup_window_animation
         prefWindow.setOnDismissListener {
-            containerPlate.animate().translationY(0f)
+            totalAmountView.animate().translationY(0f)
             selectedControl.unSelectAll()
         }
     }
@@ -138,7 +141,7 @@ class PrefCardActivity : BasicCardActivity() {
     fun showPrefWindow(view: View, y: Int) {
         if (y > 0) {
             view.post {
-                containerPlate.animate().translationY(-view.height.toFloat())
+                totalAmountView.animate().translationY(-view.height.toFloat())
             }
         }
         view.minimumHeight = (resources.displayMetrics.heightPixels / 3)
@@ -201,34 +204,7 @@ class PrefCardActivity : BasicCardActivity() {
 
         initClickTotals(card)
 
-        plateSetting.setOnClickListener {
-            viewModel?.card.let { card ->
-                val dialogBasicPrefCard = DialogBasicPrefPlate(card!!) {
-
-                    // ps покрывает обновление всех четырех настроек которые настраиваются в диалоге
-                    CoroutineScope(Dispatchers.Main).launch {
-                        withContext(Dispatchers.IO) {
-                            adapter = getAdapterForRecycler()
-                        }
-                        updateHorizontalScrollSwitched()
-                        recycler.adapter = adapter
-                        clickPrefToAdapter()
-                        updatePlate()
-                        setShowTotalInfo(card.isShowTotalInfo)//
-                        initElementClick()
-                        if (card.isShowTotalInfo)
-                            selectedControl.updateSelected()
-                        else
-                            selectedControl.unSelectAll()
-                    }
-
-
-                }
-                dialogBasicPrefCard.show(supportFragmentManager, "dialogBasicPrefCard")
-            }
-        }
-
-        addTotal.setOnClickListener {
+        addTotalImageButton.setOnClickListener {
             viewModel?.addTotal()
             viewModel?.updatePlateChanged()
             initElementClick()
@@ -290,6 +266,15 @@ class PrefCardActivity : BasicCardActivity() {
                             recycler.adapter = adapter
                             clickPrefToAdapter()
                             updatePlate()
+
+
+                            setShowTotalInfo(card.isShowTotalInfo)//
+                            initElementClick()
+                            if (card.isShowTotalInfo)
+                                selectedControl.updateSelected()
+                            else
+                                selectedControl.unSelectAll()
+
                         }
                     }
                     dialogBasicPrefCard.show(supportFragmentManager, "dialogBasicPrefCard")
@@ -495,7 +480,7 @@ class PrefCardActivity : BasicCardActivity() {
                                         isWorkAlignPanel = false
                                 }
                                 if (!isWorkAlignPanel) {
-                                    yOff = containerPlate.height
+                                    yOff = totalAmountView.height
                                 }
                                 val prefList = mutableListOf<PrefForTextView>()
 
@@ -558,7 +543,7 @@ class PrefCardActivity : BasicCardActivity() {
                             }
 
                             TOTAL -> {
-                                yOff = containerPlate.height
+                                yOff = totalAmountView.height
 
                                 val listTotal = mutableListOf<TotalItem>().apply {
                                     elementPref.selectedElementList.filterIsInstance(SelectedElement.ElementTotal::class.java)
@@ -605,7 +590,7 @@ class PrefCardActivity : BasicCardActivity() {
                             }
 
                             DATE_PERIOD -> {
-                                yOff = containerPlate.height
+                                yOff = totalAmountView.height
                                 getPrefDatePeriod(card.cardPref.dateOfPeriodPref,
                                     object : PrefChangedCallBack {
                                         override fun prefChanged() {

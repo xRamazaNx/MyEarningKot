@@ -189,10 +189,9 @@ class FormulaLayout(
                 }
             }
         }
-        val calc = Calc()
 
         return try {
-            calc.evaluate(stringBuilder.toString())
+            Calc.evaluate(stringBuilder.toString())
             formula
         } catch (exception: Exception) {
             null

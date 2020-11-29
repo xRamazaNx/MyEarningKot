@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView.ItemAnimator.ItemAnimatorFinish
 import com.google.android.material.appbar.AppBarLayout
 import kotlinx.android.synthetic.main.activity_card.*
 import kotlinx.android.synthetic.main.activity_card.view.*
+import kotlinx.android.synthetic.main.card.*
 import kotlinx.android.synthetic.main.card.view.*
 import kotlinx.coroutines.*
 import ru.developer.press.myearningkot.*
@@ -61,7 +62,6 @@ open class CardActivity : BasicCardActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // внести все нужные события ид, подписки и т.д.
-        hideUnnecessaryElementsFromTotalAmount()
         launch.start()
         tableView.isLong.observe(this, Observer {
             isLongClick = it
@@ -124,8 +124,7 @@ open class CardActivity : BasicCardActivity() {
                                     if (viewModel!!.isEqualTypeCellAndCopyCell())
                                         getDrawable(R.drawable.ic_paste_white)!!
                                     else
-                                        getDrawable(R.drawable.ic_paste_white_disabled)!!
-                                    ,
+                                        getDrawable(R.drawable.ic_paste_white_disabled)!!,
 //                                    getString(R.string.PASTE)
                                     ""
                                 )
@@ -487,7 +486,9 @@ open class CardActivity : BasicCardActivity() {
             datePeriodCard.visibility = GONE
             divide_line.visibility = GONE
             nameCard.visibility = GONE
-            this@CardActivity.prefButtonContainer.visibility = GONE
+        }
+        viewModel?.card?.let {
+            totalAmountView.hideAddTotalButton(it)
         }
     }
 
@@ -503,9 +504,9 @@ open class CardActivity : BasicCardActivity() {
                         if (!fbAddRow.isShown)
                             fbAddRow.show()
                     } else {
-                        if (containerPlate.translationY == 0f)
+                        if (totalAmountView.translationY == 0f)
                             fbAddRow.show()
-                        if (containerPlate.translationY == containerPlate.height.toFloat())
+                        if (totalAmountView.translationY == totalAmountView.height.toFloat())
                             fbAddRow.hide()
                     }
                 }
@@ -519,7 +520,7 @@ open class CardActivity : BasicCardActivity() {
 
 
         }
-        containerPlate.animate().setListener(animListener)
+        totalAmountView.animate().setListener(animListener)
         appBar.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
 
             val heightToolbar = appBarLayout.toolbar.height
@@ -625,6 +626,7 @@ open class CardActivity : BasicCardActivity() {
             adapter.setCellClickListener(rowClickListener)
             // наблюдатель для события выделения ячейки
             selectedModeObserve()
+            hideUnnecessaryElementsFromTotalAmount()
         }
     }
 

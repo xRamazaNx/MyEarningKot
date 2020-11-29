@@ -1,35 +1,22 @@
 package ru.developer.press.myearningkot.adapters
 
-import android.animation.Animator
-import android.animation.ValueAnimator
-import android.app.Activity
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
-import androidx.annotation.FloatRange
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.ColorUtils
-import androidx.core.view.forEach
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.activity_card.view.*
 import kotlinx.android.synthetic.main.card.view.*
-import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.backgroundColorResource
-import ru.developer.press.myearningkot.App
 import ru.developer.press.myearningkot.CardClickListener
 import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.activity.MainActivity
 import ru.developer.press.myearningkot.activity.setShowTotalInfo
 import ru.developer.press.myearningkot.helpers.animateColor
 import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.createViewInPlate
+import ru.developer.press.myearningkot.model.hideAddTotalButton
 
 class AdapterRecyclerInPage(
     private val cards: MutableList<MutableLiveData<Card>>,
@@ -87,6 +74,7 @@ class AdapterRecyclerInPage(
                 it.createViewInPlate(itemView)
                 idCard = it.id
                 itemView.setShowTotalInfo(it.isShowTotalInfo)
+                itemView.hideAddTotalButton(it)
             })
 
 

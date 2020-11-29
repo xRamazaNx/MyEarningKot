@@ -33,6 +33,9 @@ object UnknownTokenException : CalcException("unknown token")
 object DivisionByZeroException : CalcException("division by zero")
 
 class Calc {
+    companion object {
+        fun evaluate(e: String): Double? = Calc().evaluate(e)
+    }
     private var i = 0
     private lateinit var token: Token
     private lateinit var expr: String
@@ -59,7 +62,8 @@ class Calc {
         roundingMode = RoundingMode.HALF_EVEN
     }
 
-    fun evaluate(e: String): Double? {
+    // general method
+    private fun evaluate(e: String): Double? {
         return try {
             val groupingSeparator =
                 DecimalFormatSymbols.getInstance(Locale.getDefault()).groupingSeparator.toString()

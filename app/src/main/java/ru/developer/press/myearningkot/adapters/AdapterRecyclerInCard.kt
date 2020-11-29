@@ -24,7 +24,7 @@ import ru.developer.press.myearningkot.helpers.prefLayouts.setSelectBackground
 class AdapterRecyclerInCard(
     private var rowClickListener: RowClickListener?,
     private val provideDataRows: ProvideDataRows,
-    private val plate: View
+    private val totalView: View
 ) : RecyclerView.Adapter<RowHolder>() {
     private var cellClickPrefFunction: ((Int) -> Unit)? = null
     fun setCellClickPref(cellClickFun: ((Int) -> Unit)?) {
@@ -101,7 +101,7 @@ class AdapterRecyclerInCard(
 
     override fun onBindViewHolder(holder: RowHolder, position: Int) {
         if (holder.itemViewType == -1) {
-            holder.itemView.layoutParams = FrameLayout.LayoutParams(matchParent, plate.height)
+            holder.itemView.layoutParams = FrameLayout.LayoutParams(matchParent, totalView.height)
             return
         }
         holder.bind(provideDataRows.sortedRows[position], provideDataRows.getColumns())
