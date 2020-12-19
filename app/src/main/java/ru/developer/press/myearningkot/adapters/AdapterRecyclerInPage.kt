@@ -13,21 +13,22 @@ import kotlinx.android.synthetic.main.card.view.*
 import ru.developer.press.myearningkot.CardClickListener
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.activity.setShowTotalInfo
+import ru.developer.press.myearningkot.helpers.Page
 import ru.developer.press.myearningkot.helpers.animateColor
 import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.createViewInPlate
 import ru.developer.press.myearningkot.model.hideAddTotalButton
 
 class AdapterRecyclerInPage(
-    private val cards: MutableList<MutableLiveData<Card>>,
+    private val page:Page,
     private val cardClickListener: CardClickListener
 ) : RecyclerView.Adapter<AdapterRecyclerInPage.CardHolder>() {
+    private val cards: MutableList<MutableLiveData<Card>> = page.cards
 
     private var animatePosition = -1
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.card, parent, false)
-
         return CardHolder(view, cardClickListener)
     }
 
@@ -45,7 +46,7 @@ class AdapterRecyclerInPage(
 
     private fun animate(view: View) {
         val color = ContextCompat.getColor(view.context, R.color.cent)
-        view.animateColor(Color.WHITE, color, 500)
+        view.animateColor(page.background, color, 500)
     }
 
     fun animateCardUpdated(cardPosition: Int) {

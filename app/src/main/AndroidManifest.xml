@@ -21,6 +21,9 @@
         <meta-data
             android:name="com.bugsnag.android.API_KEY"
             android:value="b0d11f6997c56533e75d4fac75e05aee" />
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
 
         <activity android:name=".activity.PrefCardActivity" />
         <activity

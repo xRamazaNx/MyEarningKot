@@ -1,9 +1,11 @@
 package ru.developer.press.myearningkot.model
 
+import android.graphics.Color
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -46,14 +48,16 @@ fun Card.createViewInPlate(plateView: View) {
     totalContainerDisableScroll.removeAllViews()
     totalContainerScroll.removeAllViews()
 
-    val addTotalImageButton = ImageView(context).apply {
-        layoutParams = LinearLayout.LayoutParams(wrapContent, wrapContent).apply {
+    val addTotalImageButton = ImageButton(context).apply {
+        layoutParams = LinearLayout.LayoutParams(dip(40), dip(40)).apply {
             gravity = Gravity.CENTER_VERTICAL
         }
-        setImageResource(R.drawable.ic_add_fill_style)
+        setImageResource(R.drawable.ic_add_not_ring)
         padding = dip(16)
-        backgroundResource = R.drawable.backgraund_for_card
+//        backgroundColor = Color.TRANSPARENT
+        backgroundResource = R.drawable.add_total_backgraund
         setColorFilter(ContextCompat.getColor(context, R.color.gray))
+        //FIXME добавить анимацию нажатия и увеличить делей чтоб анимацию показать нормально
     }
     // добавляем в главный лейаут для тоталов
     if (enableHorizontalScrollTotal) {

@@ -96,4 +96,5 @@
     <string name="down_size">Уменьшить</string>
     <string name="general_setting">Общие настройки карточки</string>
     <string name="general_setting_totals">Общие настройки итоговой панели</string>
+    <string name="background">Фон</string>
 </resources>

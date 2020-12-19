@@ -83,8 +83,7 @@ class PageViewModelController(list: MutableList<Page>) : ViewModel(),
 
     fun addPage(pageName: String): Page {
         val page: Page = dataController.addPage(pageName)
-        pageList.add(MutableLiveData<Page>().apply { postValue(page) })
-
+        pageList.add(MutableLiveData<Page>().apply { value = page })
         return page
     }
 
@@ -126,9 +125,10 @@ class PageViewModelController(list: MutableList<Page>) : ViewModel(),
 
     fun pageColorChanged(color: Int, selectedPage: Int) {
         val mutableLiveData = pageList[selectedPage]
-        val value = mutableLiveData.value
-        value?.background = color
-        mutableLiveData.postValue(value)
+        val page: Page? = mutableLiveData.value
+        dataController.updatePage(page!!)
+        page.background = color
+        mutableLiveData.postValue(page)
 
     }
 

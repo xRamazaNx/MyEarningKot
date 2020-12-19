@@ -51,7 +51,7 @@ class PageFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         recycler = recyclerCards
         recycler?.layoutManager = LinearLayoutManager(context)
-        adapterRecyclerInPage = AdapterRecyclerInPage(page.value!!.cards, cardClickListener)
+        adapterRecyclerInPage = AdapterRecyclerInPage(page.value!!, cardClickListener)
 
         page.observe(activity!!, Observer {
             view.backgroundColor = it.background

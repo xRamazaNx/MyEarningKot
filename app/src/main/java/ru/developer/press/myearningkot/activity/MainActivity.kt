@@ -16,10 +16,13 @@ import android.widget.TableLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.BlendModeColorFilterCompat
+import androidx.core.graphics.BlendModeCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.viewpager2.widget.ViewPager2
+import androidx.viewpager2.widget.CompositePageTransformer
+import androidx.viewpager2.widget.MarginPageTransformer
 import co.zsmb.materialdrawerkt.builders.accountHeader
 import co.zsmb.materialdrawerkt.builders.drawer
 import co.zsmb.materialdrawerkt.builders.footer
@@ -36,14 +39,17 @@ import com.mikepenz.materialdrawer.Drawer
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.coroutines.*
-import org.jetbrains.anko.textColorResource
+import org.jetbrains.anko.collections.forEachByIndex
+import org.jetbrains.anko.dip
+import org.jetbrains.anko.textColor
 import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.adapters.AdapterViewPagerMain
 import ru.developer.press.myearningkot.dialogs.DialogCreateCard
 import ru.developer.press.myearningkot.dialogs.DialogSetName
+import ru.developer.press.myearningkot.helpers.Page
+import ru.developer.press.myearningkot.helpers.getColorFromRes
 import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.DataController
-import ru.developer.press.myearningkot.helpers.getColorFromRes
 import ru.developer.press.myearningkot.viewmodels.PageViewModelController
 import ru.developer.press.myearningkot.viewmodels.ViewModelMainFactory
 
@@ -79,6 +85,7 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setSupportActionBar(toolbar)
         // он должен быть тут первым а то статусбар внизу оказывается из за поздей инициализации
         initDrawer()
         toolbar.setTitleTextColor(Color.WHITE)
@@ -87,6 +94,7 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
         initObserver.observe(this, Observer {
             it?.invoke()
         })
+
     }
 
     private fun viewInit() {
@@ -143,15 +151,19 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
         addPageButton.setOnClickListener {
             DialogSetName { pageName ->
                 GlobalScope.launch(Dispatchers.Main) {
-                    withContext(Dispatchers.IO) {
-                        viewModel.addPage(pageName)
-                    }
+                    viewModel.addPage(pageName)
                     adapterViewPagerMain.addPage()
                     linkViewPagerAndTabs()
-                    delay(150)
-                    tabs.getTabAt(tabs.tabCount - 1)?.select()
+                    tabs.postDelayed({
+                        tabs.getTabAt(tabs.tabCount - 1)?.select()
+                    }, 200)
                 }
             }.show(supportFragmentManager, "setName")
+        }
+        viewModel.getPages().forEachIndexed { index, it ->
+            it.observe(this@MainActivity, Observer {
+                tabs.getTabAt(index)?.select()
+            })
         }
     }
 
@@ -162,6 +174,7 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
             viewModel
         )
         viewPager.adapter = adapterViewPagerMain
+        viewPager.setPageTransformer(MarginPageTransformer(dip(4)))
 
         linkViewPagerAndTabs()
     }
@@ -293,20 +306,41 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.page_bacground_color -> {
-                ColorPickerDialog().apply {
-                    setColorPickerDialogListener(object : ColorPickerDialogListener {
-                        override fun onColorSelected(dialogId: Int, color: Int) {
-                            viewModel.pageColorChanged(color, tabs.selectedTabPosition)
-                        }
+                val tabs = tabs
+                val position = tabs.selectedTabPosition
+                ColorPickerDialog.newBuilder()
+                    .setColor(viewModel.getPages()[position].value!!.background)
+                    .create().apply {
+                        setColorPickerDialogListener(object : ColorPickerDialogListener {
+                            override fun onColorSelected(dialogId: Int, color: Int) {
+//                                tabs.getTabAt(tabs.selectedTabPosition)?.select()
+                                viewModel.pageColorChanged(color, position)
 
-                        override fun onDialogDismissed(dialogId: Int) {
+                            }
 
-                        }
-                    })
-                }
+                            override fun onDialogDismissed(dialogId: Int) {
+
+                            }
+                        })
+                    }.show(supportFragmentManager, "pageBackgroundColorDialog")
             }
         }
         return true
+    }
+
+    private fun TabLayout.Tab.tabSelected() {
+        val textView = customView as TextView
+        textView.textColor = Color.WHITE
+        val background = viewModel.getPages()[position].value!!.background
+        parent?.apply {
+            setSelectedTabIndicatorColor(background)
+            setSelectedTabIndicatorHeight(dip(2))
+        }
+        badge?.colorFilter =
+            BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+                background,
+                BlendModeCompat.DST_ATOP
+            )
     }
 
     private fun linkViewPagerAndTabs() {
@@ -324,35 +358,37 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
                 }
                 gravity = Gravity.CENTER
                 text = nameList[position]
-                textColorResource =
-                    R.color.dark_text
-                if (position == 0) {
-                    textColorResource =
-                        R.color.white
-
-                }
+                val background = viewModel.getPages()[position].value!!.background
+                textColor = background
             }
             tab.customView = tabTextView
-            tab.view.layoutParams =
-                LinearLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT).apply {
-                    weight = 0f
+            tab.view.apply {
+                layoutParams =
+                    LinearLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT).apply {
+                        weight = 0f
+                    }
+            }
+            if (position == 0) {
+                tab.view.post {
+                    tab.tabSelected()
                 }
+            }
         }.attach()
 
-
         tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            val white = R.color.white
+
             override fun onTabReselected(tab: TabLayout.Tab?) {
-                (tab?.customView as TextView).textColorResource = white
+                tab?.tabSelected()
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
-                (tab?.customView as TextView).textColorResource =
-                    R.color.dark_text
+                val textView = tab?.customView as TextView
+                val background = viewModel.getPages()[tab.position].value!!.background
+                textView.textColor = background
             }
 
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                (tab?.customView as TextView).textColorResource = white
+                tab?.tabSelected()
             }
 
         })

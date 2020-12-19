@@ -27,7 +27,6 @@ abstract class Column(var name: String) {
     fun createCellView(context: Context): View {
         return columnTypeControl.createCellView(context)
     }
-
     protected fun getProvideProperty(provideCardPropertyForCell: ProvideCardPropertyForCell): ProvideValueProperty {
 
         return object : ProvideValueProperty {

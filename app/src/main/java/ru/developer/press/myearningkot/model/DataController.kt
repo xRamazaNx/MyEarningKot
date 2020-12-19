@@ -2,6 +2,7 @@ package ru.developer.press.myearningkot.model
 
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.doAsyncResult
 import ru.developer.press.myearningkot.App
 import ru.developer.press.myearningkot.helpers.CardJson
@@ -88,7 +89,9 @@ class DataController {
             this.json = json
         }
         listTypeDao.insert(listTypeJson)
+    }
 
-
+    fun updatePage(page: Page) {
+        doAsync { pageDao.update(page) }
     }
 }

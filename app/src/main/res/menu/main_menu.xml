@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
+
+<!--    <item-->
+<!--        android:id="@+id/search_in_page"-->
+<!--        android:icon="@drawable/ic_search"-->
+<!--        android:title="@string/search"-->
+<!--        app:showAsAction="always" />-->
+<!--    -->
 
     <item
         android:id="@+id/page_bacground_color"
         android:icon="@drawable/ic_page_background_color"
-        android:title="background"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        android:title="@string/background"
+        tools:ignore="AlwaysShowAction" />
 </menu>
