@@ -6,6 +6,9 @@ import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.model.ColumnType
 
 class PrefSelectedControl {
+     var showWidthSeekBar:((List<SelectedElement>))->Unit = {}
+     var hideWidthSeekBar:((List<SelectedElement>))->Unit = {}
+
     val isRenameMode: Boolean
         get() {
             var r = false
@@ -35,36 +38,36 @@ class PrefSelectedControl {
         }
     var selectCallback: SelectCallback? = null
 
-    fun select(_selectedElement: SelectedElement) {
+    fun select(selectedElement: SelectedElement) {
         // если нажали на то что было уже выделено то убираем
 //        if (selectedElementList.any { it == selectedElement }) {
 //        }
         selectedElementList.forEach {
-            if (it.elementType == _selectedElement.elementType) {
+            if (it.elementType == selectedElement.elementType) {
                 if (it is SelectedElement.ElementColumn &&
-                    _selectedElement is SelectedElement.ElementColumn
+                    selectedElement is SelectedElement.ElementColumn
                 ) {
                     it.apply {
-                        if (columnType == _selectedElement.columnType
-                            && columnIndex == _selectedElement.columnIndex
+                        if (columnType == selectedElement.columnType
+                            && columnIndex == selectedElement.columnIndex
                         ) {
                             unSelect(it)
                             return
                         }
                     }
                 } else if (it is SelectedElement.ElementColumnTitle &&
-                    _selectedElement is SelectedElement.ElementColumnTitle
+                    selectedElement is SelectedElement.ElementColumnTitle
                 ) {
                     it.apply {
-                        if (columnIndex == _selectedElement.columnIndex) {
+                        if (columnIndex == selectedElement.columnIndex) {
                             unSelect(it)
                             return
                         }
                     }
                 } else if (it is SelectedElement.ElementTotal &&
-                    _selectedElement is SelectedElement.ElementTotal
+                    selectedElement is SelectedElement.ElementTotal
                 ) {
-                    if (it.index == _selectedElement.index) {
+                    if (it.index == selectedElement.index) {
                         unSelect(it)
                         return
                     }
@@ -76,16 +79,15 @@ class PrefSelectedControl {
         }
 
         // суета для того что бы понять убрать с других элементов выделение
-        when (_selectedElement.elementType) {
+        when (selectedElement.elementType) {
             ElementType.COLUMN -> {
                 // если до этого было выделено другое
                 if (selectedElementList.any { it.elementType != ElementType.COLUMN }) {
                     // убираем все выделения
                     unSelectAll()
                 }
-                selectedElementList.add(_selectedElement)
-                selectCallback?.select(_selectedElement)
-
+                selectedElementList.add(selectedElement)
+                selectCallback?.select(selectedElement)
             }
             ElementType.TOTAL -> {
                 // если нажали на не колону и в нем присутсвует колона
@@ -94,8 +96,8 @@ class PrefSelectedControl {
                     unSelectAll()
                 }
 
-                selectedElementList.add(_selectedElement)
-                selectCallback?.select(_selectedElement)
+                selectedElementList.add(selectedElement)
+                selectCallback?.select(selectedElement)
 
             }
             ElementType.DATE -> {
@@ -104,8 +106,8 @@ class PrefSelectedControl {
                     // убираем все выделения
                     unSelectAll()
                 }
-                selectedElementList.add(_selectedElement)
-                selectCallback?.select(_selectedElement)
+                selectedElementList.add(selectedElement)
+                selectCallback?.select(selectedElement)
             }
             else -> {
 
@@ -114,11 +116,15 @@ class PrefSelectedControl {
                     || selectedElementList.any { it.elementType == ElementType.COLUMN }) {
                     unSelectAll()
                 }
-                selectedElementList.add(_selectedElement)
-                selectCallback?.select(_selectedElement)
+                selectedElementList.add(selectedElement)
+                selectCallback?.select(selectedElement)
             }
         }
         selectCallback?.setVisiblePrefButton(isSelect)
+        if (selectedElement.elementType == ElementType.COLUMN || selectedElement.elementType == ElementType.TOTAL)
+            showWidthSeekBar.invoke(selectedElementList)
+        else
+            hideWidthSeekBar.invoke(selectedElementList)
     }
 
     private fun unSelect(selectedElement: SelectedElement) {
@@ -128,6 +134,12 @@ class PrefSelectedControl {
         }
 
         selectCallback?.setVisiblePrefButton(isSelect)
+
+        val find =
+            selectedElementList.find { it.elementType == ElementType.COLUMN || it.elementType == ElementType.TOTAL }
+        if (find == null)
+            hideWidthSeekBar.invoke(selectedElementList)
+
     }
 
     fun unSelectAll(): Boolean {
@@ -139,6 +151,7 @@ class PrefSelectedControl {
             unSelect(it)
         }
         selectCallback?.setVisiblePrefButton(isSelect)
+        hideWidthSeekBar.invoke(selectedElementList)
         return isContain
     }
 

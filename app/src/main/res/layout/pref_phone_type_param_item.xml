@@ -2,11 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal" android:layout_width="match_parent"
-    android:background="@color/cent"
+    android:background="@color/colorTransparent"
 
     android:layout_height="wrap_content">
 
     <CheckBox
+        style="@style/switch_style"
+        android:background="?android:attr/selectableItemBackground"
+        android:fontFamily="@font/roboto_light"
+        android:padding="16dp"
+        android:textSize="16sp"
+        app:fontFamily="@font/roboto_light"
         android:id="@+id/phoneParamCheckBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -14,12 +20,13 @@
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         android:text="param check"
-        android:textColor="@color/light_gray" />
+        android:textColor="@color/textColorPrimary" />
 
     <ImageButton
+        android:tint="@color/colorIconItemMenu"
         android:id="@+id/moveItem"
         android:padding="8dp"
-        android:background="@color/transparent"
+        android:background="@color/colorTransparent"
         android:src="@drawable/ic_move"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

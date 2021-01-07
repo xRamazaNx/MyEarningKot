@@ -18,6 +18,7 @@ import ru.developer.press.myearningkot.model.Formula.Companion.TOTAL_ID
 import ru.developer.press.myearningkot.helpers.*
 import ru.developer.press.myearningkot.helpers.prefLayouts.multiplyChar
 import ru.developer.press.myearningkot.helpers.prefLayouts.subtractChar
+import java.math.BigDecimal
 import java.util.*
 import kotlin.Exception
 import kotlin.random.Random
@@ -29,7 +30,7 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
     var idPage = -1L
     var id = -1L
     var isShowTotalInfo = true
-    val cardPref = PrefForCard().initDefault()
+    val cardPref = PrefForCard()
 
     var valuta = 0
     var enableSomeStroke = true
@@ -113,7 +114,6 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
             // не будет ни когда использоваться
             ColumnType.NONE -> TextColumn(name)
         }
-        column.titlePref.color = Color.LTGRAY
         column.updateTypeControl(this)
         columns.add(position, column)
         rows.forEach {
@@ -138,7 +138,6 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
             // не будет ни когда использоваться
             ColumnType.NONE -> TextColumn(name)
         }
-        column.titlePref.color = Color.LTGRAY
         column.updateTypeControl(this)
         columns.add(position, column)
         rows.forEach {
@@ -417,13 +416,16 @@ class PrefForCard(
     var dateOfPeriodPref: DateTypePref = DateTypePref()
 
 ) {
-    fun initDefault(): PrefForCard {
-        namePref.color = Color.WHITE
-        val app = App.instance
-        if (app != null) {
-            dateOfPeriodPref.prefForTextView.color = app.getColorFromRes(R.color.gray)
+
+    init {
+        initDefault()
+    }
+
+    private fun initDefault() {
+        dateOfPeriodPref.prefForTextView.textSize = 14
+        App.instance?.apply {
+            dateOfPeriodPref.prefForTextView.color = getColorFromRes(R.color.textColorSecondary)
         }
-        return this
     }
 }
 
@@ -456,7 +458,6 @@ data class Cell(
                         ""
                     else
                         try {
-                            //                    val double = sourceValue.toDouble()
                             val value = Calc.evaluate(sourceValue)!!
                             getDecimalFormatNumber(value, typePref)
                         } catch (exception: Exception) {
@@ -570,44 +571,46 @@ class TotalItem {
     var title: String = "ИТОГ"
     var value: String = "0"
     var titlePref: PrefForTextView = PrefForTextView().apply {
-        color = Color.WHITE
+        textSize = 14
+        isBold = true
+        color = Color.parseColor("#8c8d8f")
     }
-    var totalPref: NumberTypePref = NumberTypePref().apply {
-        prefForTextView.color = Color.WHITE
-    }
+    var totalPref: NumberTypePref = NumberTypePref()
     var isIgnoreSwitchWork: Boolean = false
 
     fun calcFormula(card: Card) {
-        val string = java.lang.StringBuilder()
+        val stringBuilder = java.lang.StringBuilder()
         formula.formulaElements.forEach { element ->
             val elementVal = element.value
+
             if (element.type == COLUMN_ID) {
                 val elementId = elementVal.toLong()
                 if (card.columns.any { it.id == elementId }) {
-                    string.append(card.getSumFromColumn(elementId, isIgnoreSwitchWork))
+                    val sumFromColumn = card.getSumFromColumn(elementId, isIgnoreSwitchWork)
+                    stringBuilder.append(sumFromColumn)
                 } else {
                     formula.formulaElements.remove(element)
                     calcFormula(card)
                     return
                 }
-            }
-            if (element.type == TOTAL_ID) {
+            } else if (element.type == TOTAL_ID) {
                 val elementId = elementVal.toLong()
                 if (card.totals.any { it.id == elementId }) {
                     val findTotal = card.totals.find { it.id == elementId }!!
                     findTotal.calcFormula(card)
-                    string.append(findTotal.value)
+                    stringBuilder.append(findTotal.value)
                 } else {
                     formula.formulaElements.remove(element)
                     calcFormula(card)
                     return
                 }
             } else
-                string.append(elementVal)
+                stringBuilder.append(elementVal)
         }
         value = try {
-            val d = Calc.evaluate(string.toString())!!
+            val d = Calc.evaluate(stringBuilder.toString())!!
             getDecimalFormatNumber(d, totalPref)
+
         } catch (exception: Exception) {
 
             "Error formula"
@@ -654,7 +657,7 @@ class TotalItem {
                         return "Error"
                     }
             }
-            value.toString()
+            BigDecimal(value).toPlainString()
         } else
             "Error"
     }
@@ -784,7 +787,8 @@ class Formula {
                             strBuilder.append(title)
                             spannable.append(SpannableString(title).apply {
                                 setSpan(
-                                    ForegroundColorSpan(instance.getColorFromRes(R.color.md_blue_200)),
+                                    // fixme добавить нормальные цветовые различия
+                                    ForegroundColorSpan(instance.getColorFromRes(R.color.colorSecondaryLight)),
                                     0,
                                     title.length,
                                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -802,7 +806,7 @@ class Formula {
                     strBuilder.append(value)
                     spannable.append(SpannableString(value).apply {
                         setSpan(
-                            ForegroundColorSpan(Color.WHITE),
+                            ForegroundColorSpan(Color.YELLOW),
                             0,
                             value.length,
                             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE

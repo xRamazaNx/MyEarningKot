@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark"
 
     >
 
@@ -26,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:layout_scrollFlags="scroll|enterAlways"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
             app:theme="@style/Theme.MaterialComponents.NoActionBar" />
 
 
@@ -38,7 +39,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/column_height"
         android:layout_gravity="bottom"
-        android:background="@color/cent"
+        android:background="@color/primary"
         app:layout_anchor="@id/toolbar"
         app:layout_anchorGravity="bottom">
 
@@ -56,7 +57,7 @@
             android:id="@+id/columnDisableScrollContainer"
             android:layout_width="match_parent"
             android:layout_height="@dimen/column_height"
-            android:background="@color/cent"
+            android:background="@color/primary"
             android:orientation="horizontal">
 
         </LinearLayout>
@@ -77,11 +78,12 @@
                     android:id="@+id/columnScrollContainer"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/column_height"
-                    android:background="@color/cent"
+                    android:background="@color/primary"
                     android:orientation="horizontal" />
 
 
                 <androidx.recyclerview.widget.RecyclerView
+
                     android:id="@+id/recycler"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
@@ -96,26 +98,12 @@
     </ru.developer.press.myearningkot.ScrollContainer>
 
 
-
-        <include
-            android:id="@+id/totalAmountView"
-            layout="@layout/card"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:baselineAligned="false"
-            app:layout_anchor="@id/tableView"
-            app:layout_anchorGravity="bottom"
-            android:layout_gravity="bottom"
-            android:layout_marginStart="-3dp"
-            android:layout_marginEnd="-3dp" />
-
-
     <uk.co.markormesher.android_fab.FloatingActionButton
         android:id="@+id/fbAddRow"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:buttonBackgroundColour="@color/greenButton"
-        app:buttonIcon="@drawable/ic_add_not_ring"
+        app:buttonBackgroundColour="@color/colorSecondaryDark"
+        app:buttonIcon="@drawable/ic_add_not_ring_white"
         app:fabSize="normal"
         app:layout_anchor="@id/totalAmountView" />
 
@@ -124,4 +112,26 @@
         android:id="@+id/widthDrawer"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <!--    <include-->
+    <!--        android:id="@+id/seekbarLayout"-->
+    <!--        layout="@layout/width_seek_bar_layout"-->
+    <!--        app:elevation="1dp"-->
+    <!--        app:layout_anchorGravity="bottom"-->
+    <!--        app:layout_anchor="@id/totalAmountView"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"/>-->
+    <include
+
+        android:id="@+id/totalAmountView"
+        layout="@layout/card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="-3dp"
+        android:layout_marginEnd="-3dp"
+        android:baselineAligned="false"
+        app:elevation="2dp"
+        app:layout_anchor="@id/tableView"
+        app:layout_anchorGravity="bottom" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

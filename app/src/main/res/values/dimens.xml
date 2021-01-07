@@ -5,4 +5,5 @@
 
     <dimen name="column_height">35dp</dimen>
     <dimen name="row_height">40dp</dimen>
+    <dimen name="padding_in_card_views">8dp</dimen>
 </resources>

@@ -2,41 +2,44 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/transparent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/colorTransparent"
     android:orientation="vertical">
 
     <include layout="@layout/toolbar_pref" />
 
-    <include layout="@layout/width_seek_bar_layout" />
     <TextView
-        android:background="@color/cent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="8dp"
-        android:paddingTop="16dp"
-        android:paddingEnd="8dp"
-        android:paddingBottom="4dp"
-        android:textSize="16sp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:textSize="14sp"
         android:text="@string/setting_image_in_cell"
-        android:textColor="@color/gray_1" />
+        android:textColor="@color/colorTitle" />
     <RadioGroup
+        android:background="@color/colorBackground"
         android:id="@+id/imageViewSettingInCellRG"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:background="@color/cent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <RadioButton
+            android:checked="true"
+            android:textSize="16sp"
+            app:fontFamily="@font/roboto_light"
             android:id="@+id/putImageRB"
-            android:textColor="@color/light_gray"
+            android:textColor="@color/textColorPrimary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/put_in_cell" />
 
         <RadioButton
+            android:textSize="16sp"
+            app:fontFamily="@font/roboto_light"
             android:id="@+id/cutImageRB"
-            android:textColor="@color/light_gray"
+            android:textColor="@color/textColorPrimary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/cut_image" />

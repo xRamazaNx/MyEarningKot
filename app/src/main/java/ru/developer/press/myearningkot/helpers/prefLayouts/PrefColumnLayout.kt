@@ -34,7 +34,7 @@ fun Context.getPrefColumnLayout(
     prefColumnChangedCallback: PrefColumnChangedCallback
 ): View {
 
-    val columnLayout: PrefColumnLayout? = when (columnType) {
+    val columnLayout: PrefColumnLayout = when (columnType) {
         ColumnType.NUMERATION -> PrefNumerationColumnLayout(
             columns,
             prefColumnChangedCallback
@@ -82,9 +82,7 @@ fun Context.getPrefColumnLayout(
 
 // интерфейс для обратной связи когда надо показать изменения столбца в вью
 interface PrefColumnChangedCallback {
-    fun widthChanged()
     fun prefChanged()
-    fun widthProgress()
     fun recreateView() //  для колоны переключателя
     fun getNumberColumns(): MutableList<NumberColumn>
 }
@@ -96,28 +94,28 @@ abstract class PrefColumnLayout(
     abstract fun initBasicPref(view: View)
 
     protected fun initSeekBarAndToolbarButtons(view: View) {
-        val widthColumnSeekBar = view.widthColumnSeekBar
-        val column = columnList[0]
-        widthColumnSeekBar.progress = column.width
-        widthColumnSeekBar.setOnSeekBarChangeListener(object :
-            SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
-                val progress = p0!!.progress
-                if (progress > 30) {
-                    columnList.forEach {
-                        it.width = progress
-                    }
-                    prefColumnChangedCallback.widthProgress()
-                }
-            }
-
-            override fun onStartTrackingTouch(p0: SeekBar?) {
-            }
-
-            override fun onStopTrackingTouch(p0: SeekBar?) {
-                prefColumnChangedCallback.widthChanged()
-            }
-        })
+//        val widthColumnSeekBar = view.widthColumnSeekBar
+//        val column = columnList[0]
+//        widthColumnSeekBar.progress = column.width
+//        widthColumnSeekBar.setOnSeekBarChangeListener(object :
+//            SeekBar.OnSeekBarChangeListener {
+//            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+//                val progress = p0!!.progress
+//                if (progress > 30) {
+//                    columnList.forEach {
+//                        it.width = progress
+//                    }
+//                    prefColumnChangedCallback.widthProgress()
+//                }
+//            }
+//
+//            override fun onStartTrackingTouch(p0: SeekBar?) {
+//            }
+//
+//            override fun onStopTrackingTouch(p0: SeekBar?) {
+//                prefColumnChangedCallback.widthChanged()
+//            }
+//        })
 
         view.defaultPref.setOnClickListener {
             columnList.forEach {
@@ -226,13 +224,11 @@ class PrefNumberColumnLayout(
         val manualInput = view.manualInput
         val formulaInput = view.formula
         fun select(textView: TextView) {
-            textView.backgroundResource = R.drawable.shape_new_zapis
-            textView.textColor = Color.YELLOW
+            textView.textColorResource = R.color.colorAccent
         }
 
         fun unSelect(textView: TextView) {
-            textView.backgroundColor = Color.TRANSPARENT
-            textView.textColorResource = R.color.light_gray
+            textView.textColorResource = R.color.textColorPrimary
         }
         if (numberColumn.inputType == InputTypeNumberColumn.MANUAL) {
             select(manualInput)
@@ -475,7 +471,7 @@ class PrefSwitchColumnLayout(
                 container.foreground = ColorDrawable(Color.TRANSPARENT)
             } else {
                 container.foreground =
-                    ColorDrawable(context.getColorFromRes(R.color.cent_opacity))
+                    ColorDrawable(context.getColorFromRes(R.color.colorBackground_transparent))
             }
 
             enableTextSwitch.isChecked = switchMode
@@ -699,7 +695,6 @@ class PrefNumerationColumnLayout(
         textPrefButtonsInit(view, getPrefForTextViewList()) {
             prefColumnChangedCallback.prefChanged()
         }
-        // дальнеие настройки
     }
 }
 

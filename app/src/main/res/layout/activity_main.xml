@@ -2,16 +2,16 @@
 
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".activity.MainActivity"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.MainActivity">
 
     <ProgressBar
         android:id="@+id/progressBar"
-        android:layout_gravity="center"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
 
     </ProgressBar>
 
@@ -41,13 +41,12 @@
 
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@id/addPageButton"
-                android:background="@color/transparent"
+                android:background="@color/colorTransparent"
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp"
                 app:tabGravity="fill"
-                app:tabIndicatorColor="@color/color_activated"
-                app:tabMode="scrollable"
-                />
+                app:tabIndicatorColor="@color/colorOnPrimary"
+                app:tabMode="scrollable" />
 
             <ImageButton
                 android:id="@+id/addPageButton"
@@ -57,7 +56,7 @@
                 android:layout_marginEnd="4dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:src="@drawable/ic_add"
-                android:tint="@color/light_gray" />
+                android:tint="@color/colorOnPrimary" />
         </RelativeLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -77,8 +76,8 @@
         android:id="@+id/fbMain"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:buttonBackgroundColour="@color/accent"
-        app:buttonIcon="@drawable/ic_add_not_ring"
+        app:buttonBackgroundColour="@color/colorAccent"
+        app:buttonIcon="@drawable/ic_add_not_ring_white"
         app:fabSize="normal" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

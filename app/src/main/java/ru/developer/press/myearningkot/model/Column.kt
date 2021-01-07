@@ -8,6 +8,7 @@ import ru.developer.press.myearningkot.adapters.ParamModel
 import ru.developer.press.myearningkot.helpers.*
 import java.lang.Exception
 import java.lang.StringBuilder
+import java.math.BigDecimal
 import java.util.*
 import kotlin.random.Random
 
@@ -15,10 +16,25 @@ abstract class Column(var name: String) {
     @SerializedName(column_cast_gson)
     var className = javaClass.name
 
-
     val id: Long = Date().time + Random.nextLong(99999)
+
     @SerializedName("tp")
-    val titlePref: PrefForTextView = PrefForTextView()
+    val titlePref: PrefForTextView = PrefForTextView().apply {
+        isBold = true
+        App.instance?.apply {
+            color = getColorFromRes(R.color.textColorTabsTitleNormal)
+        }
+    }
+
+    fun resetTitlePref() {
+        titlePref.apply {
+            isBold = true
+            App.instance?.apply {
+                color = getColorFromRes(R.color.textColorTabsTitleNormal)
+            }
+        }
+    }
+
     var width: Int = 350
 
     @Transient
@@ -27,6 +43,7 @@ abstract class Column(var name: String) {
     fun createCellView(context: Context): View {
         return columnTypeControl.createCellView(context)
     }
+
     protected fun getProvideProperty(provideCardPropertyForCell: ProvideCardPropertyForCell): ProvideValueProperty {
 
         return object : ProvideValueProperty {
@@ -67,8 +84,19 @@ class NumerationColumn(name: String) : Column(name) {
             }
     }
 
+    init {
+        setDefaultPref()
+    }
+
     override fun setDefaultPref() {
         typePref.resetPref()
+        typePref.apply {
+            prefForTextView.isItalic = true
+            prefForTextView.textSize = 14
+            App.instance?.apply {
+                prefForTextView.color = getColorFromRes(R.color.textColorSecondary)
+            }
+        }
     }
 
 }
@@ -126,11 +154,11 @@ class NumberColumn(name: String) : Column(name) {
                     } else {
 
                         val numberColumn = card.columns[index] as NumberColumn
-                        val value =
+                        val value: String =
                             // проверяем колона работает по формуле или ручной ввод
                             if (numberColumn.inputType == InputTypeNumberColumn.FORMULA) {
                                 numberColumn.calcFormula(rowIndex, card)
-                            } else{
+                            } else {
                                 val cell = card.rows[rowIndex].cellList[index]
                                 cell.updateTypeValue(numberColumn.typePref)
                                 cell.displayValue
@@ -140,9 +168,10 @@ class NumberColumn(name: String) : Column(name) {
                 } else
                     string.append(it.value)
             }
-            Calc.evaluate(string.toString()).toString()
+            val value: Double? = Calc.evaluate(string.toString())
+            value?.let { BigDecimal(it).toPlainString() }?: ""
         } catch (exception: Exception) {
-            "Error formula"
+            "Error formula cell"
         }
     }
 }

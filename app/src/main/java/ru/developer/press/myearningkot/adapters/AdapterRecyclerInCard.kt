@@ -15,6 +15,7 @@ import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeAdapter
 import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.helpers.animateColor
+import ru.developer.press.myearningkot.helpers.getColorFromRes
 import ru.developer.press.myearningkot.model.Column
 import ru.developer.press.myearningkot.model.NumerationColumn
 import ru.developer.press.myearningkot.model.Row
@@ -104,6 +105,17 @@ class AdapterRecyclerInCard(
             holder.itemView.layoutParams = FrameLayout.LayoutParams(matchParent, totalView.height)
             return
         }
+
+        val itemView = holder.itemView
+        val context = itemView.context
+        val dip = context.dip(8)
+        val dip2 = context.dip(2)
+        if (position == itemCount-1) {
+//            itemView.setPadding(dip, 0, dip, dip2)
+        } else{
+//            itemView.setPadding(dip, dip2, dip, 0)
+
+        }
         holder.bind(provideDataRows.sortedRows[position], provideDataRows.getColumns())
     }
 
@@ -111,11 +123,13 @@ class AdapterRecyclerInCard(
 
 val animationDelete: Animation =
     AnimationUtils.loadAnimation(App.instance?.baseContext, R.anim.anim_delete)
-val animationAdd: Animation = AnimationUtils.loadAnimation(App.instance?.baseContext, R.anim. anim_add)
+val animationAdd: Animation =
+    AnimationUtils.loadAnimation(App.instance?.baseContext, R.anim.anim_add)
 
 class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataListener {
     var viewList = mutableListOf<View>()
     var rowNumber: TextView? = null
+    var rowLayout: LinearLayout? = null
     private var positionRow = 0
 
     fun bind(
@@ -137,16 +151,15 @@ class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataList
                 }
                 // ячейка выделена - обвести
                 cell.isSelect -> {
-                    cellView.backgroundResource = R.drawable.shape_cell_select
+                    cellView.backgroundResource = R.drawable.cell_selected_background
                 }
                 else ->
-                    cellView.backgroundResource = R.drawable.shape
+                    cellView.backgroundResource = R.drawable.cell_default_background
 
             }
         }
 
         rowNumber?.text = (layoutPosition + 1).toString()
-        rowNumber?.setTextColor((columns[0] as NumerationColumn).typePref.prefForTextView.color)
 
         when (row.status) {
             Row.Status.SELECT -> {
@@ -154,14 +167,14 @@ class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataList
                 rowNumber?.setTextColor(
                     ContextCompat.getColor(
                         itemView.context,
-                        R.color.shape_select_border
+                        R.color.colorSecondary
                     )
                 )
-                itemView.backgroundColorResource = R.color.shape_select_back
+                itemView.backgroundColorResource = R.color.colorAccent
             }
             Row.Status.ADDED -> {
                 itemView.startAnimation(animationAdd)
-                itemView.animateColor(Color.GREEN, Color.TRANSPARENT, 500)
+                itemView.animateColor(itemView.context.getColorFromRes(R.color.colorSecondaryLight), Color.TRANSPARENT, 500)
                 row.status = Row.Status.NONE
                 bind(row, columns)
             }
@@ -177,9 +190,8 @@ class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataList
                         val behavior = column.typePref.behavior
                         val frameLayout = itemView as FrameLayout
                         if (behavior.crossOut && cell.sourceValue.toBoolean()) {
-                            frameLayout.foreground =
-                                itemView.context.getDrawable(R.drawable.cross_line)
-                            itemView.backgroundColorResource = R.color.light_gray_opacity
+                            frameLayout.foreground = itemView.context.getDrawable(R.drawable.cross_line)
+                            itemView.backgroundColorResource = R.color.textColorSecondary
                         } else {
                             frameLayout.foreground = ColorDrawable(Color.TRANSPARENT)
                         }
@@ -188,8 +200,8 @@ class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataList
                 itemView.backgroundColor = Color.TRANSPARENT
             }
         }
-
     }
+
 
     override fun scrollRowNumber(x: Float) {
         rowNumber?.translationX = x

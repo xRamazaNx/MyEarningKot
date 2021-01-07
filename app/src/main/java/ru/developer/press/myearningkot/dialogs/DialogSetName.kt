@@ -10,6 +10,8 @@ import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.set_name_layout.view.*
 import org.jetbrains.anko.layoutInflater
 import ru.developer.press.myearningkot.R
+import ru.developer.press.myearningkot.helpers.getColorFromRes
+import ru.developer.press.myearningkot.helpers.setAlertButtonColors
 
 class DialogSetName(val setName: (String) -> Unit) : DialogFragment() {
 
@@ -20,10 +22,10 @@ class DialogSetName(val setName: (String) -> Unit) : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = AlertDialog.Builder(context).apply {
+        val dialog: AlertDialog.Builder = AlertDialog.Builder(context).apply {
             val view = context.layoutInflater.inflate(R.layout.set_name_layout, null)
 
-            val editTextCardName = view.editTextName
+            val editTextCardName = view.editTextSetName
             editTextCardName.setText(name)
             editTextCardName.showKeyboard()
             //
@@ -37,9 +39,10 @@ class DialogSetName(val setName: (String) -> Unit) : DialogFragment() {
 
         }
 
-        return dialog.create()
+        val alertDialog = dialog.create()
+        alertDialog.setAlertButtonColors(R.color.colorAccent, R.color.colorAccent)
+        return alertDialog
     }
-
 
     override fun onResume() {
         super.onResume()
@@ -48,7 +51,7 @@ class DialogSetName(val setName: (String) -> Unit) : DialogFragment() {
                 ColorDrawable(
                     ContextCompat.getColor(
                         it,
-                        R.color.cent
+                        R.color.colorSurface
                     )
                 )
             )

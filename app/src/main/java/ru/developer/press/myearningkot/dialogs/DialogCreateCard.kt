@@ -22,6 +22,7 @@ import ru.developer.press.myearningkot.activity.*
 import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.helpers.PrefCardInfo
 import ru.developer.press.myearningkot.helpers.SampleHelper
+import ru.developer.press.myearningkot.helpers.setAlertButtonColors
 import ru.developer.press.myearningkot.helpers.showItemChangeDialog
 import ru.developer.press.myearningkot.prefSampleLastChanged
 
@@ -112,7 +113,9 @@ class DialogCreateCard(private val createCard: (Card) -> Unit) : DialogFragment(
 
         }
 
-        return dialog.create()
+        val alertDialog = dialog.create()
+        alertDialog.setAlertButtonColors(R.color.colorAccent, R.color.colorAccent)
+        return alertDialog
     }
 
 
@@ -141,7 +144,7 @@ class DialogCreateCard(private val createCard: (Card) -> Unit) : DialogFragment(
                 ColorDrawable(
                     ContextCompat.getColor(
                         it,
-                        R.color.cent
+                        R.color.colorSurface
                     )
                 )
             )

@@ -12,7 +12,7 @@ class FrameForRow(context: Context) : FrameLayout(context){
         isAntiAlias = true
         style = Paint.Style.STROKE
         pathEffect = DashPathEffect(floatArrayOf(7f, 7f), 15f)
-        color = context.getColorFromRes(R.color.cent_opacity)
+        color = context.getColorFromRes(R.color.textColorSecondary)
         strokeWidth = 3f
     }
     override fun onDraw(canvas: Canvas?) {

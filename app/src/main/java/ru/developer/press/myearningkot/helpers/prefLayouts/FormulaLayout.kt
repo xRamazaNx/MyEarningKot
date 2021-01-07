@@ -127,7 +127,7 @@ class FormulaLayout(
 
     private fun TextView.initParamTextView() {
         padding = context.dpsToPixels(16)
-        textColor = Color.WHITE
+        textColor = context.getColorFromRes(R.color.textColorPrimary)
         layoutParams = LinearLayout.LayoutParams(wrapContent, matchParent)
     }
 
@@ -199,7 +199,7 @@ class FormulaLayout(
     }
 
     fun errorFormula() {
-        displayTextView.textColor = Color.RED
+        displayTextView.textColor = displayTextView.context.getColorFromRes(R.color.colorRed)
     }
 }
 
@@ -228,7 +228,7 @@ fun formulaDialogShow(
             padding = context.dpsToPixels(18)
             textSize = 18F
             text = "Введите формулу"
-            textColor = Color.WHITE
+            textColor = context.getColorFromRes(R.color.textColorPrimary)
         })
         setView(inflate)
         setPositiveButton("OK", null)
@@ -238,7 +238,7 @@ fun formulaDialogShow(
     }
     dialog.show()
     dialog.getButton(AlertDialog.BUTTON_POSITIVE).apply {
-        textColor = Color.WHITE
+        textColor = context.getColorFromRes(R.color.accent)
         setOnClickListener {
             formulaLayout.getFormula()?.let {
                 positiveClick(it)
@@ -248,9 +248,9 @@ fun formulaDialogShow(
 
     }
     dialog.getButton(AlertDialog.BUTTON_NEGATIVE).apply {
-        textColor = Color.WHITE
+        textColor = context.getColorFromRes(R.color.accent)
     }
-    dialog.window?.setBackgroundDrawable(ColorDrawable(context.getColorFromRes(R.color.cent)))
+    dialog.window?.setBackgroundDrawable(ColorDrawable(context.getColorFromRes(R.color.colorPrimary)))
 }
 fun initClickOperation(view: View, callBack : (String) -> Unit) {
     val add = view.add

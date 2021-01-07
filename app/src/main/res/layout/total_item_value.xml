@@ -10,16 +10,16 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center"
-        android:padding="4dp"
+        android:padding="8dp"
         android:text="TextView"
-        android:textColor="@color/white" />
+        android:textColor="@color/textColorPrimary" />
 
     <FrameLayout
         android:id="@+id/_verLine"
         android:layout_width="1px"
         android:layout_height="match_parent"
         android:layout_marginBottom="4dp"
-        android:background="@color/color_polosa_razdelitel">
+        android:background="@color/colorDivider">
 
     </FrameLayout>
 

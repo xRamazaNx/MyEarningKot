@@ -513,7 +513,7 @@ open class CardViewModel(var card: Card) : ViewModel(),
 class ViewModelMainFactory(private val pageList: MutableList<Page>) :
     ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return PageViewModelController(pageList) as T
+        return MainViewModel(pageList) as T
     }
 }
 

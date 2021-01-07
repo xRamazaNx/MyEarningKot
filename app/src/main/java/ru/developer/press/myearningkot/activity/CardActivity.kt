@@ -14,6 +14,7 @@ import android.view.View.GONE
 import android.view.animation.Animation
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView.ItemAnimator.ItemAnimatorFinishedListener
 import com.google.android.material.appbar.AppBarLayout
@@ -115,83 +116,82 @@ open class CardActivity : BasicCardActivity() {
                     } else
                         menu.findItem(R.id.pasteCell).setIcon(R.drawable.ic_paste_white_disabled)
 
-                    val speedAdapter = object : SpeedDialMenuAdapter() {
-
-                        private val list = mutableListOf<SpeedDialMenuItem>().apply {
-                            add(
-                                SpeedDialMenuItem(
-                                    this@CardActivity,
-                                    if (viewModel!!.isEqualTypeCellAndCopyCell())
-                                        getDrawable(R.drawable.ic_paste_white)!!
-                                    else
-                                        getDrawable(R.drawable.ic_paste_white_disabled)!!,
-//                                    getString(R.string.PASTE)
-                                    ""
-                                )
-                            )
-                            add(
-                                SpeedDialMenuItem(
-                                    this@CardActivity,
-                                    getDrawable(R.drawable.ic_copy_white)!!,
-//                                    getString(R.string.COPY)
-                                    ""
-                                )
-                            )
-                            add(
-                                SpeedDialMenuItem(
-                                    this@CardActivity,
-                                    getDrawable(R.drawable.ic_cut_white)!!,
-                                    ""
-//                                    getString(R.string.cut)
-                                )
-                            )
-                            add(
-                                SpeedDialMenuItem(
-                                    this@CardActivity,
-                                    getDrawable(R.drawable.ic_edit_white)!!,
-//                                    getString(R.string.DELETE)
-                                    ""
-                                )
-                            )
-                        }
-
-                        override fun getCount(): Int = list.size
-
-                        override fun onMenuItemClick(position: Int): Boolean {
-                            fbAddRow.closeSpeedDialMenu()
-                            fbAddRow.postDelayed(100) {
-
-                                when (position) {
-                                    0 -> {
-                                        pasteCell()
-                                    }
-                                    1 -> {
-                                        copySelectedCell()
-                                    }
-                                    2 -> {
-                                        cutSelectedCell()
-                                    }
-                                    3 -> {
-                                        editCell()
-                                    }
-                                }
-                            }
-                            return true
-                        }
-
-                        override fun getMenuItem(
-                            context: Context,
-                            position: Int
-                        ): SpeedDialMenuItem = list[position]
-
-                        override fun getBackgroundColour(position: Int): Int {
-                            return getColorFromRes(R.color.red_fb_button)
-                        }
-                    }
-                    fbAddRow.speedDialMenuAdapter = speedAdapter
-                    // при открытии меню проверка одного ли типа ячейки чтоб работала кнопка вставки или нет
-                    fbAddRow.setButtonIconResource(R.drawable.ic_menu_3_line)
-                    fbAddRow.setButtonBackgroundColour(getColorFromRes(R.color.red_fb_button))
+//                    val speedAdapter = object : SpeedDialMenuAdapter() {
+//
+//                        private val list = mutableListOf<SpeedDialMenuItem>().apply {
+//                            add(
+//                                SpeedDialMenuItem(
+//                                    this@CardActivity,
+//                                    if (viewModel!!.isEqualTypeCellAndCopyCell())
+//                                        getDrawable(R.drawable.ic_paste_white)!!
+//                                    else
+//                                        getDrawable(R.drawable.ic_paste_white_disabled)!!,
+////                                    getString(R.string.PASTE)
+//                                    ""
+//                                )
+//                            )
+//                            add(
+//                                SpeedDialMenuItem(
+//                                    this@CardActivity,
+//                                    getDrawable(R.drawable.ic_copy_white)!!,
+////                                    getString(R.string.COPY)
+//                                    ""
+//                                )
+//                            )
+//                            add(
+//                                SpeedDialMenuItem(
+//                                    this@CardActivity,
+//                                    getDrawable(R.drawable.ic_cut_white)!!,
+//                                    ""
+////                                    getString(R.string.cut)
+//                                )
+//                            )
+//                            add(
+//                                SpeedDialMenuItem(
+//                                    this@CardActivity,
+//                                    getDrawable(R.drawable.ic_edit_white)!!,
+////                                    getString(R.string.DELETE)
+//                                    ""
+//                                )
+//                            )
+//                        }
+//
+//                        override fun getCount(): Int = list.size
+//
+//                        override fun onMenuItemClick(position: Int): Boolean {
+//                            fbAddRow.closeSpeedDialMenu()
+//                            fbAddRow.postDelayed(100) {
+//
+//                                when (position) {
+//                                    0 -> {
+//                                        pasteCell()
+//                                    }
+//                                    1 -> {
+//                                        copySelectedCell()
+//                                    }
+//                                    2 -> {
+//                                        cutSelectedCell()
+//                                    }
+//                                    3 -> {
+//                                        editCell()
+//                                    }
+//                                }
+//                            }
+//                            return true
+//                        }
+//
+//                        override fun getMenuItem(
+//                            context: Context,
+//                            position: Int
+//                        ): SpeedDialMenuItem = list[position]
+//
+//                        override fun getBackgroundColour(position: Int): Int {
+//                            return getColorFromRes(R.color.red_fb_button)
+//                        }
+//                    }
+//                    fbAddRow.speedDialMenuAdapter = speedAdapter
+//                    fbAddRow.setButtonIconResource(R.drawable.ic_menu_3_line)
+//                    fbAddRow.setButtonBackgroundColour(getColorFromRes(R.color.red_fb_button))
                     supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_check)
                 }
 
@@ -266,18 +266,18 @@ open class CardActivity : BasicCardActivity() {
                         ): SpeedDialMenuItem = list[position]
 
                         override fun getBackgroundColour(position: Int): Int {
-                            return getColorFromRes(R.color.shape_select_border)
+                            return getColorFromRes(R.color.colorAccent)
                         }
                     }
                     fbAddRow.setButtonIconResource(R.drawable.ic_menu_3_line)
-                    fbAddRow.setButtonBackgroundColour(getColorFromRes(R.color.shape_select_border))
+                    fbAddRow.setButtonBackgroundColour(getColorFromRes(R.color.colorAccent))
                     supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_check)
                 }
                 else -> {
                     menuInflater.inflate(R.menu.card_main_menu, menu)
                     fbAddRow.speedDialMenuAdapter = null
-                    fbAddRow.setButtonIconResource(R.drawable.ic_add_not_ring)
-                    fbAddRow.setButtonBackgroundColour(getColorFromRes(R.color.greenButton))
+                    fbAddRow.setButtonIconResource(R.drawable.ic_add_not_ring_white)
+                    fbAddRow.setButtonBackgroundColour(getColorFromRes(R.color.colorSecondaryDark))
                     // тут именно это пусть будет
                     Handler().post { waitForAnimationsToFinish() }
                     if (fbAddRow.isShown) {
@@ -292,14 +292,11 @@ open class CardActivity : BasicCardActivity() {
     }
 
     private fun createViewModel(card: Card) {
-        viewModel =
-            ViewModelProviders.of(
-                this@CardActivity,
-                ViewModelCardFactory(
-                    card
-                )
+        viewModel = ViewModelProvider(
+            this, ViewModelCardFactory(
+                card
             )
-                .get(CardViewModel::class.java)
+        ).get(CardViewModel::class.java)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

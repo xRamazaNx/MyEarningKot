@@ -3,9 +3,9 @@
        android:thickness="0dp"
     >
     <gradient
-        android:startColor="@color/cent"
-        android:centerColor="@color/white"
-        android:endColor="@color/cent"
+        android:startColor="@color/colorTransparent"
+        android:centerColor="@color/colorDivider"
+        android:endColor="@color/colorTransparent"
         android:angle="0"
         android:type="linear"
         />

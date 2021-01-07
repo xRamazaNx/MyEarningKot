@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/transparent"
+    android:background="@color/colorTransparent"
     android:orientation="vertical">
 
     <include layout="@layout/toolbar_pref" />
@@ -15,9 +15,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
-
-            <include layout="@layout/width_seek_bar_layout" />
 
             <include layout="@layout/prefs_text_view" />
 

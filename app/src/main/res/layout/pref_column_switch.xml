@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/transparent"
+    android:background="@color/colorTransparent"
     android:orientation="vertical">
 
     <include layout="@layout/toolbar_pref" />
@@ -17,33 +18,35 @@
             android:orientation="vertical">
 
 
-            <include layout="@layout/width_seek_bar_layout" />
-
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/cent"
+                android:background="@color/colorBackground"
                 android:orientation="vertical">
 
                 <Switch
                     android:id="@+id/enableTextSwitch"
+                    style="@style/switch_style"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
+                    android:fontFamily="@font/roboto_light"
                     android:padding="16dp"
                     android:text="@string/useTextSwitch"
-                    android:textColor="@color/light_gray" />
+                    android:textColor="@color/textColorPrimary"
+                    android:textSize="16sp"
+                    app:fontFamily="@font/roboto_light" />
 
                 <FrameLayout
                     android:id="@+id/switchTextSettingContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:foreground="@color/cent_opacity">
+                    android:foreground="@color/colorBackground_transparent">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:baselineAligned="false"
                         android:orientation="horizontal">
 
 
@@ -64,20 +67,21 @@
                                 android:layout_alignParentStart="true"
                                 android:layout_alignParentTop="true"
                                 android:text="@string/switchTextEnable"
-                                android:textColor="@color/gray_1"
-                                android:textSize="12sp" />
+                                android:textColor="@color/colorTitle"
+                                android:textSize="14sp"
+                                app:fontFamily="@font/roboto_medium" />
 
                             <EditText
-                                android:layout_toStartOf="@id/enabledTextSetting"
-                                android:textSize="14sp"
                                 android:id="@+id/enableEditText"
                                 android:layout_width="match_parent"
                                 android:layout_height="40dp"
                                 android:layout_below="@id/enableInfo"
+                                android:layout_toStartOf="@id/enabledTextSetting"
                                 android:importantForAutofill="no"
                                 android:inputType="text"
                                 android:maxLines="1"
-                                android:textColor="@color/light_gray" />
+                                android:textColor="@color/textColorPrimary"
+                                android:textSize="16sp" />
 
 
                             <ImageButton
@@ -87,7 +91,7 @@
                                 android:layout_alignTop="@id/enableEditText"
                                 android:layout_alignBottom="@id/enableEditText"
                                 android:layout_alignParentEnd="true"
-                                android:background="@color/cent"
+                                android:background="@color/colorTransparent"
                                 android:elevation="1dp"
                                 android:src="@drawable/ic_font_setting" />
                         </RelativeLayout>
@@ -109,20 +113,21 @@
                                 android:layout_alignParentStart="true"
                                 android:layout_alignParentTop="true"
                                 android:text="@string/switchTextDisable"
-                                android:textColor="@color/gray_1"
-                                android:textSize="12sp" />
+                                android:textColor="@color/colorTitle"
+                                android:textSize="14sp"
+                                app:fontFamily="@font/roboto_medium" />
 
                             <EditText
-                                android:layout_toStartOf="@id/disableTextSetting"
-                                android:textSize="14sp"
                                 android:id="@+id/disableEditText"
                                 android:layout_width="match_parent"
                                 android:layout_height="40dp"
                                 android:layout_below="@id/disableInfo"
+                                android:layout_toStartOf="@id/disableTextSetting"
                                 android:importantForAutofill="no"
                                 android:inputType="text"
                                 android:maxLines="1"
-                                android:textColor="@color/light_gray" />
+                                android:textColor="@color/textColorPrimary"
+                                android:textSize="14sp" />
 
 
                             <ImageButton
@@ -132,9 +137,9 @@
                                 android:layout_alignTop="@id/disableEditText"
                                 android:layout_alignBottom="@id/disableEditText"
                                 android:layout_alignParentEnd="true"
-                                android:background="@color/transparent"
+                                android:background="@color/colorTransparent"
                                 android:elevation="1dp"
-                                    android:src="@drawable/ic_font_setting" />
+                                android:src="@drawable/ic_font_setting" />
                         </RelativeLayout>
 
                     </LinearLayout>
@@ -149,17 +154,22 @@
                     android:paddingTop="16dp"
                     android:paddingEnd="16dp"
                     android:text="@string/behavior_switch_setting"
-                    android:textColor="@color/gray_1"
-                    android:textSize="16sp" />
+                    android:textColor="@color/colorTitle"
+                    android:textSize="14sp"
+                    app:fontFamily="@font/roboto_medium" />
 
                 <Switch
                     android:id="@+id/crossRow"
+                    style="@style/switch_style"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
+                    android:fontFamily="@font/roboto_light"
                     android:padding="16dp"
                     android:text="@string/cross_row"
-                    android:textColor="@color/light_gray" />
+                    android:textColor="@color/textColorPrimary"
+                    android:textSize="16sp"
+                    app:fontFamily="@font/roboto_light" />
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -167,16 +177,31 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
                     android:alpha="0.5"
-                    android:background="@color/color_normal" />
+                    android:background="@color/colorDivider" />
 
                 <Switch
-                    android:id="@+id/acceptRow"
+                    style="@style/switch_style"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
+                    android:fontFamily="@font/roboto_light"
                     android:padding="16dp"
+                    android:textSize="16sp"
+                    app:fontFamily="@font/roboto_light"
+                    android:id="@+id/acceptRow"
                     android:text="@string/acceptRow"
-                    android:textColor="@color/light_gray" />
+                    android:textColor="@color/textColorPrimary" />
+                <TextView
+                    android:textSize="14sp"
+                    android:background="@color/colorDark"
+                    android:textColor="@color/colorControlNormal"
+                    android:text="При включении данной опции данные в записи будут учитываться в итоговой формуле только при включении флажка"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
             </LinearLayout>
 
@@ -185,7 +210,7 @@
             <!--        android:layout_height="wrap_content"-->
             <!--        android:textColor="@color/light_gray"-->
             <!--        android:padding="16dp"-->
-            <!--        android:background="@color/cent"-->
+            <!--        android:background="@color/colorPrimary"-->
             <!--        android:text="@string/color_frame_type"-->
             <!--        android:drawablePadding="16dp"-->
             <!--        android:drawableEnd="@drawable/ic_setting"-->

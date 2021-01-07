@@ -31,6 +31,7 @@ import ru.developer.press.myearningkot.dpsToPixels
 import ru.developer.press.myearningkot.model.Column
 import ru.developer.press.myearningkot.model.ImageTypeValue
 import ru.developer.press.myearningkot.helpers.filesFolder
+import ru.developer.press.myearningkot.helpers.setAlertButtonColors
 import java.io.File
 
 
@@ -48,12 +49,14 @@ class DialogEditImageCell(
     }
 
     private fun getImageDialog(): AlertDialog {
-        return getAlertDialog().apply {
+        val alertDialog = getAlertDialog().apply {
             activity?.apply {
                 val imageViewer = getImageViewer()
                 setView(imageViewer)
             }
         }.create()
+        alertDialog.setAlertButtonColors(R.color.colorAccent, R.color.colorAccent)
+        return alertDialog
     }
 
     private fun initImageViewer(imageViewer: View) {
@@ -230,7 +233,7 @@ class DialogEditImageCell(
                     ColorDrawable(
                         ContextCompat.getColor(
                             it,
-                            R.color.cent
+                            R.color.colorSurface
                         )
                     )
                 )

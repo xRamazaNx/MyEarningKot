@@ -45,7 +45,7 @@ class AdapterRecyclerInPage(
     }
 
     private fun animate(view: View) {
-        val color = ContextCompat.getColor(view.context, R.color.cent)
+        val color = ContextCompat.getColor(view.context, R.color.colorPrimary)
         view.animateColor(page.background, color, 500)
     }
 

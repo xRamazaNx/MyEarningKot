@@ -3,6 +3,8 @@ package ru.developer.press.myearningkot.activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.ColorFilter
+import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Gravity
@@ -16,12 +18,14 @@ import android.widget.TableLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
-import androidx.viewpager2.widget.CompositePageTransformer
+import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.MarginPageTransformer
 import co.zsmb.materialdrawerkt.builders.accountHeader
 import co.zsmb.materialdrawerkt.builders.drawer
@@ -39,19 +43,22 @@ import com.mikepenz.materialdrawer.Drawer
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.coroutines.*
-import org.jetbrains.anko.collections.forEachByIndex
+import org.jetbrains.anko.collections.forEachReversedByIndex
+import org.jetbrains.anko.collections.forEachReversedWithIndex
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.textColor
+import org.jetbrains.anko.textColorResource
 import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.adapters.AdapterViewPagerMain
 import ru.developer.press.myearningkot.dialogs.DialogCreateCard
 import ru.developer.press.myearningkot.dialogs.DialogSetName
-import ru.developer.press.myearningkot.helpers.Page
 import ru.developer.press.myearningkot.helpers.getColorFromRes
+import ru.developer.press.myearningkot.helpers.setFont
 import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.DataController
-import ru.developer.press.myearningkot.viewmodels.PageViewModelController
+import ru.developer.press.myearningkot.viewmodels.MainViewModel
 import ru.developer.press.myearningkot.viewmodels.ViewModelMainFactory
+
 
 // GITHUB
 const val ID_UPDATE_CARD = "id_card"
@@ -65,13 +72,15 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
         val pageList = withContext(Dispatchers.IO) {
             DataController().getPageList()
         }
-        viewModel =
-            ViewModelProviders.of(
-                this@MainActivity,
-                ViewModelMainFactory(
-                    pageList
-                )
-            ).get(PageViewModelController::class.java)
+        viewModel = ViewModelProvider(this@MainActivity, ViewModelMainFactory(pageList)).get(
+            MainViewModel::class.java
+        )
+//            ViewModelProviders.of(
+//                this@MainActivity,
+//                ViewModelMainFactory(
+//                    pageList
+//                )
+//            ).get(PageViewModelController::class.java)
 
         progressBar.visibility = GONE
         initObserver.value = {
@@ -80,7 +89,7 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
         }
     }
 
-    private lateinit var viewModel: PageViewModelController
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,7 +97,7 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
         setSupportActionBar(toolbar)
         // он должен быть тут первым а то статусбар внизу оказывается из за поздей инициализации
         initDrawer()
-        toolbar.setTitleTextColor(Color.WHITE)
+        toolbar.setTitleTextColor(getColorFromRes(R.color.colorOnPrimary))
 
         initializerViewModel.start()
         initObserver.observe(this, Observer {
@@ -160,11 +169,17 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
                 }
             }.show(supportFragmentManager, "setName")
         }
-        viewModel.getPages().forEachIndexed { index, it ->
+        val pages = viewModel.getPages()
+        pages.forEachReversedWithIndex { index, it ->
             it.observe(this@MainActivity, Observer {
                 tabs.getTabAt(index)?.select()
             })
         }
+//        pages.forEachIndexed { index, it ->
+//            it.observe(this@MainActivity, Observer {
+//                tabs.getTabAt(index)?.select()
+//            })
+//        }
     }
 
     private fun initTabAndViewPager() {
@@ -180,28 +195,32 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
     }
 
     private fun initDrawer() {
-        val lightGray = R.color.centDark
+        val textColor = R.color.textColorPrimary
+
         drawer = drawer {
             selectedItem = -1
             toolbar = this@MainActivity.toolbar
             closeOnClick = false
-//            sliderBackgroundColorRes = R.color.white
+            sliderBackgroundColorRes = R.color.colorPrimary
             actionBarDrawerToggleAnimated = true
 //            headerViewRes = R.layout.card_view
 //            footerDivider = true
             headerDivider = true
 
             accountHeader {
+
+                this.emailTypeface =
+                    ResourcesCompat.getFont(this@MainActivity, R.font.roboto_light)!!
                 selectionListEnabledForSingleProfile = false
                 currentHidden = true
 //                selectionSecondLine = "This is not an email!" // вместо него показан маил
                 threeSmallProfileImages = false
-                textColorRes = R.color.gray
+                textColorRes = textColor
 //                background = ContextCompat.getColor(this@MainActivity, R.color.centDark)
-                backgroundDrawable = ColorDrawable(getColorFromRes(R.color.centDark))
+                backgroundDrawable = ColorDrawable(getColorFromRes(R.color.colorBackground))
 
                 profile("Profile 1", "user1@gmail.com") {
-                    textColorRes = R.color.white
+                    textColorRes = R.color.textColorTertiary
                 }
 
                 onProfileChanged { _, profile, _ ->
@@ -217,19 +236,30 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
             expandableItem {
                 nameRes = R.string.sort
                 selectable = false
-                textColorRes = lightGray
-                arrowColorRes = lightGray
-                iconDrawable = getDrawable(R.drawable.ic_sort_dark)!!
+                textColorRes = textColor
+                arrowColorRes = textColor
+                iconDrawable = getDrawable(R.drawable.ic_sort)!!
                 arrowRotationAngle = Pair(90, 0)
 
-
                 primaryItem(getString(R.string.to_date_create)) {
-                    textColorRes = lightGray
+                    onClick { view, position, drawerItem ->
+                        true
+                    }
+                    selectedColorRes = R.color.colorTransparent
+                    selectedTextColorRes = R.color.colorAccent
+                    textColorRes = textColor
                     level = 2
+                    selectedIconDrawable = getDrawable(R.drawable.ic_create_selected)!!
                     iconDrawable = getDrawable(R.drawable.ic_create)!!
                 }
                 primaryItem(getString(R.string.to_date_modify)) {
-                    textColorRes = lightGray
+                    onClick { view, position, drawerItem ->
+                        true
+                    }
+                    selectedColorRes = R.color.colorTransparent
+                    selectedTextColorRes = R.color.colorAccent
+                    textColorRes = textColor
+                    selectedIconDrawable = getDrawable(R.drawable.ic_edit_selected)!!
                     iconDrawable = getDrawable(R.drawable.ic_edit)!!
                     level = 2
                 }
@@ -237,8 +267,8 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
             }
             secondaryItem(getString(R.string.settings_label)) {
                 selectable = false
-                textColorRes = lightGray
-                iconDrawable = getDrawable(R.drawable.ic_setting_table)!!
+                textColorRes = textColor
+                iconDrawable = getDrawable(R.drawable.ic_setting)!!
                 onClick { _ ->
                     drawer.closeDrawer()
                     true
@@ -251,19 +281,19 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
 //                }
             }
             // нижний отдельный бар
-            footer {
-                // о программе
-                primaryItem(getString(R.string.info_programm)) {
-                    selectable = false
-                    textColorRes = lightGray
-                    iconDrawable = getDrawable(R.drawable.ic_info)!!
-                    iconColorRes = lightGray
-                    onClick { _ ->
-                        true
-                    }
-                }
-            }
+//            footer {
+//                // о программе
+//                primaryItem(getString(R.string.info_programm)) {
+//                    textColorRes = textColor
+//                    iconDrawable = getDrawable(R.drawable.ic_info)!!
+//                    onClick { _ ->
+//                        true
+//                    }
+//                }
+//            }
         }
+        drawer.actionBarDrawerToggle.drawerArrowDrawable.color =
+            getColorFromRes(R.color.colorOnPrimary)
     }
 
     override fun getCard(position: Int): Card {
@@ -284,13 +314,17 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
             val instance = App.instance
             val id = instance?.getUpdateCardId()
             if (id != null && id > -1) {
-                // после того как зашли в карточку изменили что то и выходим назад в списку карточек идет обновление карточки из табицы так как внутри мы ее сохраняли и надо вытащить и обновить ее и в списке
-                val position = viewModel.updateCardInPage(
-                    id,
-                    tabs.selectedTabPosition
-                )
-                viewPager.post {
-                    adapterViewPagerMain.notifyCardInPage(tabs.selectedTabPosition, position)
+                // после того как зашли в карточку изменили что то и выходим назад
+                // в списке карточек идет обновление карточки из табицы так как внутри мы ее сохраняли и надо вытащить и обновить ее и в списке
+                val selectedTabPosition = tabs.selectedTabPosition
+                if (selectedTabPosition > -1) {
+                    val position = viewModel.updateCardInPage(
+                        id,
+                        selectedTabPosition
+                    )
+                    viewPager.post {
+                        adapterViewPagerMain.notifyCardInPage(selectedTabPosition, position)
+                    }
                 }
                 instance.setUpdateCardId(-1)
             }
@@ -305,42 +339,33 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.page_bacground_color -> {
-                val tabs = tabs
-                val position = tabs.selectedTabPosition
-                ColorPickerDialog.newBuilder()
-                    .setColor(viewModel.getPages()[position].value!!.background)
-                    .create().apply {
-                        setColorPickerDialogListener(object : ColorPickerDialogListener {
-                            override fun onColorSelected(dialogId: Int, color: Int) {
-//                                tabs.getTabAt(tabs.selectedTabPosition)?.select()
-                                viewModel.pageColorChanged(color, position)
-
-                            }
-
-                            override fun onDialogDismissed(dialogId: Int) {
-
-                            }
-                        })
-                    }.show(supportFragmentManager, "pageBackgroundColorDialog")
-            }
+//            R.id.page_bacground_color -> {
+//                val tabs = tabs
+//                val position = tabs.selectedTabPosition
+//                ColorPickerDialog.newBuilder()
+//                    .setColor(viewModel.getPages()[position].value!!.background)
+//                    .create().apply {
+//                        setColorPickerDialogListener(object : ColorPickerDialogListener {
+//                            override fun onColorSelected(dialogId: Int, color: Int) {
+////                                tabs.getTabAt(tabs.selectedTabPosition)?.select()
+//                                viewModel.pageColorChanged(color, position)
+//
+//                            }
+//
+//                            override fun onDialogDismissed(dialogId: Int) {
+//
+//                            }
+//                        })
+//                    }.show(supportFragmentManager, "pageBackgroundColorDialog")
+//            }
         }
         return true
     }
 
     private fun TabLayout.Tab.tabSelected() {
         val textView = customView as TextView
-        textView.textColor = Color.WHITE
-        val background = viewModel.getPages()[position].value!!.background
-        parent?.apply {
-            setSelectedTabIndicatorColor(background)
-            setSelectedTabIndicatorHeight(dip(2))
-        }
-        badge?.colorFilter =
-            BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
-                background,
-                BlendModeCompat.DST_ATOP
-            )
+        textView.textColorResource = R.color.textColorTabsTitleSelected
+        parent?.setSelectedTabIndicatorColor(getColorFromRes(R.color.textColorTabsTitleSelected))
     }
 
     private fun linkViewPagerAndTabs() {
@@ -352,14 +377,16 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
         val context = tabs.context
         TabLayoutMediator(tabs, viewPager) { tab, position ->
             val tabTextView = TextView(context).apply {
+                textSize = 16f
                 isSingleLine = true
                 layoutParams = TableLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT).apply {
                     weight = 0f
                 }
                 gravity = Gravity.CENTER
                 text = nameList[position]
-                val background = viewModel.getPages()[position].value!!.background
-                textColor = background
+
+                setFont(R.font.roboto_medium)
+                textColorResource = R.color.textColorTabsTitleNormal
             }
             tab.customView = tabTextView
             tab.view.apply {
@@ -383,8 +410,7 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
                 val textView = tab?.customView as TextView
-                val background = viewModel.getPages()[tab.position].value!!.background
-                textView.textColor = background
+                textView.textColorResource = R.color.textColorTabsTitleNormal
             }
 
             override fun onTabSelected(tab: TabLayout.Tab?) {

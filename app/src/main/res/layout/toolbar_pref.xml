@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/colorTransparent"
     android:orientation="vertical">
 
     <FrameLayout
@@ -14,7 +15,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/centDark"
+        android:background="@color/colorPrimary"
         android:orientation="horizontal">
 
         <TextView
@@ -27,8 +28,8 @@
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:text="@string/selected_element_pref"
-            android:textColor="@color/gray_1"
-            android:textSize="16sp" />
+            android:textColor="@color/textColorPrimary"
+            android:textSize="20sp" />
 
 <!--        <ImageButton-->
 <!--            android:id="@+id/deleteColumn"-->
@@ -60,7 +61,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="?android:attr/selectableItemBackground"
-            android:tint="@color/blue"
+            android:tint="@color/colorRed"
             app:srcCompat="@drawable/ic_scale_default" />
 
     </LinearLayout>

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/transparent"
+    android:background="@color/colorTransparent"
     android:orientation="vertical">
 
     <include layout="@layout/toolbar_pref" />
@@ -16,15 +17,12 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <include layout="@layout/width_seek_bar_layout" />
-
-
             <include layout="@layout/prefs_text_view" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/cent"
+                android:background="@color/colorBackground"
                 android:orientation="vertical">
 
                 <FrameLayout
@@ -33,7 +31,7 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
                     android:alpha="0.5"
-                    android:background="@color/color_normal" />
+                    android:background="@color/colorDivider" />
 
 
                 <LinearLayout
@@ -52,7 +50,9 @@
                         android:padding="16dp"
                         android:singleLine="true"
                         android:text="@string/digits_count"
-                        android:textColor="@color/light_gray" />
+                        android:textColor="@color/textColorPrimary"
+                        android:textSize="16sp"
+                        app:fontFamily="@font/roboto_light" />
 
                     <ImageButton
 
@@ -70,7 +70,9 @@
                         android:layout_height="wrap_content"
                         android:padding="8dp"
                         android:text="size"
-                        android:textColor="@color/light_gray" />
+                        android:textColor="@color/colorTitle"
+                        android:textSize="16sp"
+                        app:fontFamily="@font/roboto_medium" />
 
                     <ImageButton
 
@@ -91,42 +93,46 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
                     android:alpha="0.5"
-                    android:background="@color/color_normal" />
+                    android:background="@color/textColorSecondary" />
 
                 <Switch
                     android:id="@+id/groupNumberSwitch"
+                    android:text="@string/group_number"
+                    style="@style/switch_style"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
+                    android:fontFamily="@font/roboto_light"
                     android:padding="16dp"
-                    android:text="@string/group_number"
-                    android:textColor="@color/light_gray" />
+                    android:textColor="@color/textColorPrimary"
+                    android:textSize="16sp"
+                    app:fontFamily="@font/roboto_light" />
 
                 <FrameLayout
-                    android:layout_marginBottom="8dp"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp"
                     android:alpha="0.5"
-                    android:background="@color/color_normal" />
+                    android:background="@color/colorDivider" />
 
                 <TextView
-                    android:textAllCaps="true"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/cent"
+                    android:background="@color/colorBackground"
                     android:paddingStart="12dp"
                     android:paddingTop="8dp"
                     android:paddingEnd="16dp"
                     android:text="@string/input_type"
-                    android:textColor="@color/color_activated"
-                    android:textSize="14sp" />
+                    android:textColor="@color/colorTitle"
+                    android:textSize="14sp"
+                    app:fontFamily="@font/roboto_medium" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/cent"
+                    android:background="@color/colorBackground"
                     android:orientation="horizontal"
                     android:padding="12dp"
                     android:paddingStart="8dp"
@@ -139,30 +145,33 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
                         android:layout_weight="1"
-                        android:background="@drawable/shape_new_zapis"
                         android:ellipsize="end"
                         android:gravity="center"
                         android:maxLines="1"
                         android:padding="8dp"
                         android:singleLine="true"
                         android:text="@string/manual_input"
-                        android:textColor="@color/blue" />
+                        android:textColor="@color/textColorPrimary"
+                        android:textSize="16sp"
+                        app:fontFamily="@font/roboto" />
 
                     <TextView
-                        android:background="?android:attr/selectableItemBackground"
                         android:id="@+id/formula"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
                         android:layout_weight="1"
+                        android:background="?android:attr/selectableItemBackground"
                         android:ellipsize="end"
                         android:gravity="center"
                         android:maxLines="1"
                         android:padding="8dp"
                         android:singleLine="true"
                         android:text="@string/formula"
-                        android:textColor="@color/light_gray" />
+                        android:textColor="@color/textColorPrimary"
+                        android:textSize="16sp"
+                        app:fontFamily="@font/roboto" />
 
                 </LinearLayout>
 

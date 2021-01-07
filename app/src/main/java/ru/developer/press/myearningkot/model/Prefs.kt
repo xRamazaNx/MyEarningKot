@@ -1,8 +1,14 @@
 package ru.developer.press.myearningkot.model
 
+import android.graphics.Color
 import android.graphics.Typeface
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
+import ru.developer.press.myearningkot.App
+import ru.developer.press.myearningkot.R
+import ru.developer.press.myearningkot.helpers.getColorFromRes
 import ru.developer.press.myearningkot.helpers.getColorFromText
+import ru.developer.press.myearningkot.helpers.setFont
 
 class SortPref(
     var isSave: Boolean = false,
@@ -14,13 +20,13 @@ class SortPref(
 abstract class Prefs : ResetPreferences
 
 class PrefForTextView(
-    var textSize: Int = 14,
+    var textSize: Int = 16,
     var isBold: Boolean = false,
     var isItalic: Boolean = false,
     var color: Int = getColorFromText(),
     var align: Int = TextView.TEXT_ALIGNMENT_CENTER // 0 - left, 1 - center, 2 right
 ) : ResetPreferences {
-    fun customize(textView: TextView?) {
+    fun customize(textView: TextView?, fontRes:Int = R.font.roboto) {
         textView?.also {
             it.textSize = this.textSize.toFloat()
             it.setTextColor(color)
@@ -34,7 +40,8 @@ class PrefForTextView(
                     Typeface.ITALIC
                 else
                     Typeface.NORMAL
-            it.setTypeface(null, style)
+
+            it.setFont(fontRes, style)
             it.textAlignment = align
         }
     }
@@ -50,7 +57,9 @@ class PrefForTextView(
 }
 
 open class TextTypePref(
-    var prefForTextView: PrefForTextView = PrefForTextView()
+    var prefForTextView: PrefForTextView = PrefForTextView().apply {
+        textSize = 14
+    }
 ) : Prefs() {
     override fun resetPref() {
         prefForTextView.resetPref()
@@ -81,10 +90,14 @@ class DateTypePref(
     var type: Int = 1,
     var enableTime: Boolean = true
 ) : TextTypePref() {
+    init {
+        resetPref()
+    }
     override fun resetPref() {
         super.resetPref()
         type = 0
         enableTime = true
+        prefForTextView.textSize = 12
     }
 }
 
@@ -93,8 +106,12 @@ class NumberTypePref(
     var isGrouping: Boolean = true,
     var groupSize: Int = 3
 ) : TextTypePref() {
+    init {
+        prefForTextView.textSize = 16
+    }
     override fun resetPref() {
         super.resetPref()
+        prefForTextView.textSize = 16
         digitsCount = 2
         isGrouping = true
         groupSize = 3
@@ -143,6 +160,10 @@ class ImageTypePref : Prefs() {
 }
 
 class ListTypePref : TextTypePref() {
+
+    init {
+        prefForTextView.isItalic = true
+    }
     var listTypeIndex = -1
     override fun resetPref() {
         super.resetPref()

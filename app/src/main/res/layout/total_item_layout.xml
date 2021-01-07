@@ -5,16 +5,19 @@
     android:orientation="vertical">
 
     <LinearLayout
+        android:paddingTop="8dp"
         android:id="@+id/totalTitleContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:orientation="horizontal"></LinearLayout>
+        android:orientation="horizontal">
+
+    </LinearLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="@color/color_polosa_razdelitel">
+        android:background="@color/colorDivider">
 
     </FrameLayout>
 

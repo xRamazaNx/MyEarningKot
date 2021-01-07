@@ -1,6 +1,7 @@
 package ru.developer.press.myearningkot.helpers
 
 import android.graphics.Color
+import android.provider.CalendarContract
 import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 import androidx.room.Database
@@ -32,7 +33,7 @@ class Page {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0L
     var pageName = ""
-    var background = Color.WHITE
+    var background = Color.parseColor("#161719")
 
     @Ignore val cards = mutableListOf<MutableLiveData<Card>>()
 }

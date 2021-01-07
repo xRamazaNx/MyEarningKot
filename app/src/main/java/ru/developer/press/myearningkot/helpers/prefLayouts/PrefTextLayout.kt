@@ -26,7 +26,6 @@ import ru.developer.press.myearningkot.helpers.getColorFromRes
 import ru.developer.press.myearningkot.helpers.getDate
 import ru.developer.press.myearningkot.helpers.getDateTypeList
 import ru.developer.press.myearningkot.helpers.showItemChangeDialog
-import splitties.alertdialog.appcompat.alertDialog
 
 fun Context.getPrefTextLayout(
     prefForTextView: MutableList<PrefForTextView>,
@@ -46,7 +45,6 @@ fun Context.getPrefTextLayout(
     view.defaultPref.setOnClickListener {
         prefForTextView.forEach {
             it.resetPref()
-            it.color = Color.LTGRAY
         }
         callback?.prefChanged()
         init()
@@ -64,28 +62,28 @@ fun Context.getPrefTotalLayout(
     val view = layoutInflater.inflate(R.layout.prefs_total, null)
     val firstTotal = totals[0]
 
-    val widthColumnSeekBar = view.widthColumnSeekBar
-
-    widthColumnSeekBar.progress = firstTotal.width
-    widthColumnSeekBar.setOnSeekBarChangeListener(object :
-        SeekBar.OnSeekBarChangeListener {
-        override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
-            val progress = p0!!.progress
-            if (progress > 30) {
-                totals.forEach {
-                    it.width = progress
-                }
-                callback.widthProgress()
-            }
-        }
-
-        override fun onStartTrackingTouch(p0: SeekBar?) {
-        }
-
-        override fun onStopTrackingTouch(p0: SeekBar?) {
-            callback.widthChanged()
-        }
-    })
+//    val widthColumnSeekBar = view.widthColumnSeekBar
+//
+//    widthColumnSeekBar.progress = firstTotal.width
+//    widthColumnSeekBar.setOnSeekBarChangeListener(object :
+//        SeekBar.OnSeekBarChangeListener {
+//        override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+//            val progress = p0!!.progress
+//            if (progress > 30) {
+//                totals.forEach {
+//                    it.width = progress
+//                }
+//                callback.widthProgress()
+//            }
+//        }
+//
+//        override fun onStartTrackingTouch(p0: SeekBar?) {
+//        }
+//
+//        override fun onStopTrackingTouch(p0: SeekBar?) {
+//            callback.widthChanged()
+//        }
+//    })
 
 
     val prefList = mutableListOf<PrefForTextView>().apply {
@@ -100,7 +98,6 @@ fun Context.getPrefTotalLayout(
     val digitsSizeTextView = view.digitsSize
     val grouping = view.groupNumberSwitch
     val ignoreSwitchWork = view.ignoreSwitchColumnWorkSwitch
-    val ignoreInfo = view.ignoreSwitchWorkInfo
 
     digitsSizeTextView.text = typePref.digitsCount.toString()
     grouping.isChecked = typePref.isGrouping
@@ -117,25 +114,6 @@ fun Context.getPrefTotalLayout(
             it.isIgnoreSwitchWork = b
         }
         callback.prefChanged()
-    }
-
-    ignoreInfo.setOnClickListener {
-        val text: String =
-            "Если в карточке есть колона типа \"Переключатель\" данная функия будет игнорировать работу переключателя с включенной опцией \"Управлять учетом в итовой панели\""
-        val alertDialog = alertDialog {
-
-            val textView = TextView(this@getPrefTotalLayout).apply {
-                setText(text)
-                padding = 24
-            }
-            setView(textView)
-            setPositiveButton(
-                R.string.OK
-            ) { p0, _ ->
-                p0.dismiss()
-            }
-        }
-        alertDialog.show()
     }
 
 
@@ -167,7 +145,6 @@ fun Context.getPrefTotalLayout(
     view.defaultPref.setOnClickListener {
         totals.forEach {
             it.totalPref.resetPref()
-            it.totalPref.prefForTextView.color = Color.LTGRAY
         }
         callback.prefChanged()
         init()
@@ -298,7 +275,7 @@ fun textPrefButtonsInit(
     val alignRight = view.alignRightButton
 
     val initAlign = {
-        val colorFromRes = view.context.getColorFromRes(R.color.light_gray)
+        val colorFromRes = view.context.getColorFromRes(R.color.textColorPrimary)
         alignLeft.image?.setTint(colorFromRes)
         alignCenter.image?.setTint(colorFromRes)
         alignRight.image?.setTint(colorFromRes)
@@ -322,11 +299,11 @@ fun textPrefButtonsInit(
         }
     }
     if (!isWorkAlignPanel) {
-        val colorFromRes = view.context.getColorFromRes(R.color.color_normal)
+        val colorFromRes = view.context.getColorFromRes(R.color.textColorSecondary)
         fun disable(imageButton: ImageButton) {
-            imageButton.image?.setTint(colorFromRes)
-            imageButton.isClickable = false
             setDefaultBackground(imageButton)
+            imageButton.setColorFilter(colorFromRes)
+            imageButton.isClickable = false
 
 
         }
@@ -446,8 +423,11 @@ fun textPrefButtonsInit(
     }
 }
 
-private fun setPressedBackground(boldButton: ImageButton) {
-    boldButton.backgroundResource = R.drawable.button_pressed
+private fun setPressedBackground(imageButton: ImageButton) {
+    imageButton.setColorFilter(imageButton.context.getColorFromRes(R.color.accent))
+    imageButton.scaleX = 1.1F
+    imageButton.scaleY = 1.1F
+//    imageButton.backgroundResource = R.drawable.shape_selected
 }
 
 interface PrefTextChangedCallback : PrefChangedCallBack {
@@ -462,8 +442,6 @@ interface PrefTotalChangedCallBack : PrefChangedCallBack {
     fun calcFormula()
     fun getNumberColumns(): MutableList<NumberColumn>
     fun getTotals(): List<TotalItem>
-    fun widthProgress()
-    fun widthChanged()
 }
 /*
 класс который помогает выделять и убирать вылеление
@@ -478,12 +456,16 @@ interface PrefTotalChangedCallBack : PrefChangedCallBack {
         обычные текстовые
  */
 
-fun setDefaultBackground(view: View) {
+fun setDefaultBackground(imageButton: ImageButton) {
     val outValue = TypedValue()
-    view.context.theme.resolveAttribute(
+    imageButton.context.theme.resolveAttribute(
         android.R.attr.selectableItemBackground,
         outValue,
         true
     )
-    view.setBackgroundResource(outValue.resourceId)
+
+    imageButton.scaleX = 1f
+    imageButton.scaleY = 1f
+    imageButton.setColorFilter(imageButton.context.getColorFromRes(R.color.textColorPrimary))
+//    view.setBackgroundResource(outValue.resourceId)
 }

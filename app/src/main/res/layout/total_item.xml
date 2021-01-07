@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/cent">
+    android:background="@color/colorBackground">
 
     <TextView
         android:id="@+id/totalTitle"
@@ -14,19 +14,19 @@
         android:gravity="center"
         android:padding="4dp"
         android:text="TextView"
-        android:textColor="@color/white" />
+        android:textColor="@color/textColorTabsTitleNormal" />
 
     <FrameLayout
         android:id="@+id/_horLine"
         android:layout_width="match_parent"
         android:layout_height="1px"
         android:layout_below="@id/totalTitle"
-        android:background="@color/color_polosa_razdelitel">
+        android:background="@color/textColorSecondary">
 
     </FrameLayout>
 
     <TextView
-        android:textColor="@color/white"
+        android:textColor="@color/textColorPrimary"
         android:id="@+id/totalValue"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -43,7 +43,7 @@
         android:layout_width="1px"
         android:layout_height="wrap_content"
         android:layout_below="@id/totalTitle"
-        android:background="@color/color_polosa_razdelitel">
+        android:background="@color/textColorSecondary">
 
     </FrameLayout>
 

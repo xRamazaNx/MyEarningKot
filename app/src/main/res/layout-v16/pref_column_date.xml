@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="wrap_content"
-    android:background="@color/transparent"
+    android:background="@color/colorTransparent"
     android:orientation="vertical">
 
     <include layout="@layout/toolbar_pref" />
 
     <ScrollView
+        android:background="@color/colorBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -17,26 +19,26 @@
             android:orientation="vertical">
 
 
-            <include layout="@layout/width_seek_bar_layout" />
-
             <include layout="@layout/prefs_text_view" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/cent"
                 android:orientation="vertical">
 
                 <FrameLayout
+                    android:background="@color/colorDivider"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
                     android:alpha="0.5"
-                    android:background="@color/color_normal" />
+                    />
 
 
                 <TextView
+                    app:fontFamily="@font/roboto_light"
+                    android:textSize="16sp"
                     android:id="@+id/dateTypeTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -50,23 +52,29 @@
                     android:paddingBottom="16dp"
                     android:singleLine="true"
                     android:text="@string/date_type"
-                    android:textColor="@color/light_gray" />
+                    />
 
                 <FrameLayout
+                    android:background="@color/colorDivider"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
                     android:alpha="0.5"
-                    android:background="@color/color_normal" />
+                    />
 
                 <Switch
+                    android:fontFamily="@font/roboto_light"
+                    app:fontFamily="@font/roboto_light"
+                    android:textSize="16sp"
+                    style="@style/switch_style"
+                    android:textColor="@color/textColorPrimary"
                     android:id="@+id/enableTime"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
                     android:text="@string/show_time"
-                    android:textColor="@color/light_gray" />
+                    />
 
             </LinearLayout>
         </LinearLayout>

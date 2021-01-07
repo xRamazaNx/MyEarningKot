@@ -2,18 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/transparent"
+    android:background="@color/colorTransparent"
     android:orientation="vertical">
 
     <include layout="@layout/toolbar_pref" />
-    <include layout="@layout/width_seek_bar_layout"/>
 
 <!--    <TextView-->
 <!--        android:layout_width="match_parent"-->
 <!--        android:layout_height="wrap_content"-->
 <!--        android:textColor="@color/light_gray"-->
 <!--        android:padding="16dp"-->
-<!--        android:background="@color/cent"-->
+<!--        android:background="@color/colorPrimary"-->
 <!--        android:text="@string/color_frame_type"-->
 <!--        android:drawablePadding="16dp"-->
 <!--        android:drawableEnd="@drawable/ic_setting"-->

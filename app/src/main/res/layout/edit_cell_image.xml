@@ -4,13 +4,13 @@
     android:id="@+id/imageViewerContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/cent"
+    android:background="@color/colorBackground"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/centDark"
+        android:background="@color/colorSurface"
         android:orientation="horizontal">
 
         <TextView
@@ -24,8 +24,8 @@
             android:paddingEnd="24dp"
             android:paddingBottom="16dp"
             android:text="@string/change_images"
-            android:textColor="@color/gray_1"
-            android:textSize="18sp" />
+            android:textColor="@color/colorOnPrimary"
+            android:textSize="20sp" />
 
         <ImageButton
 
@@ -36,8 +36,9 @@
             android:background="?android:attr/selectableItemBackground"
             android:contentDescription="@string/DELETE"
             android:padding="16dp"
-            android:src="@drawable/ic_delete_forever_button"
-            android:tint="@color/material_red_400" />
+            android:src="@drawable/ic_delete"
+            android:tint="@color/colorRed"
+            />
     </LinearLayout>
 
     <androidx.viewpager2.widget.ViewPager2
@@ -51,15 +52,17 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:alpha="0.5"
-        android:background="@color/color_normal" />
+        android:background="@color/colorDark" />
 
     <LinearLayout
+        android:background="@color/colorSurface"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <ImageButton
 
+            android:tint="@color/textColorPrimary"
             android:id="@+id/imagePickButton"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -78,16 +81,16 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:alpha="0.5"
-            android:background="@color/color_normal" />
+            android:background="@color/colorDark" />
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/imagesTabs"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:background="@color/cent"
+            android:background="@color/colorPrimary"
             android:padding="6dp"
             app:tabGravity="fill"
-            app:tabIndicatorColor="@color/color_activated"
+            app:tabIndicatorColor="@color/textColorTabsTitleSelected"
             app:tabMode="scrollable" />
 
     </LinearLayout>
@@ -96,6 +99,6 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:alpha="0.5"
-        android:background="@color/color_normal" />
+        android:background="@color/colorDark" />
 
 </LinearLayout>

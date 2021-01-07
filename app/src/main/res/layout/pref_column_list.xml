@@ -2,12 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/transparent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/colorTransparent"
     android:orientation="vertical">
 
     <include layout="@layout/toolbar_pref" />
 
     <ScrollView
+        android:background="@color/colorBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -17,14 +19,12 @@
             android:orientation="vertical">
 
 
-            <include layout="@layout/width_seek_bar_layout" />
 
             <include layout="@layout/prefs_text_view" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/cent"
                 android:orientation="vertical">
 
                 <FrameLayout
@@ -33,7 +33,7 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
                     android:alpha="0.5"
-                    android:background="@color/color_normal" />
+                    android:background="@color/colorDivider" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -41,6 +41,8 @@
                     android:orientation="horizontal">
 
                     <TextView
+                        app:fontFamily="@font/roboto_light"
+                        android:textSize="16sp"
                         android:id="@+id/list_change"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -50,7 +52,7 @@
                         android:gravity="center_vertical"
                         android:padding="16dp"
                         android:text="@string/list"
-                        android:textColor="@color/light_gray" />
+                        android:textColor="@color/textColorPrimary" />
 
                     <FrameLayout
                         android:layout_width="1dp"
@@ -58,7 +60,7 @@
                         android:layout_marginTop="12dp"
                         android:layout_marginBottom="12dp"
                         android:alpha="0.5"
-                        android:background="@color/color_normal" />
+                        android:background="@color/colorDivider" />
 
                     <ImageButton
                         android:id="@+id/edit_list"
@@ -69,7 +71,7 @@
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp"
                         android:src="@drawable/ic_edit_name"
-                        android:tint="@color/white" />
+                        android:tint="@color/colorAccent" />
                 </LinearLayout>
 
             </LinearLayout>

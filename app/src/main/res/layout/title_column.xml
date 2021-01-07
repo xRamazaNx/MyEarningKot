@@ -9,5 +9,5 @@
     android:singleLine="true"
     android:text="@string/NUMBER"
     android:textAllCaps="false"
-    android:textColor="@color/color_title_column"
+    android:textColor="@color/textColorTabsTitleNormal"
     android:textSize="16sp" />

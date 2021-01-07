@@ -1,5 +1,6 @@
 package ru.developer.press.myearningkot.helpers.prefLayouts
 
+
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.DashPathEffect
@@ -16,7 +17,7 @@ class WidthLineDrawer(context: Context, attributeSet: AttributeSet) : View(conte
         isAntiAlias = true
         style = Paint.Style.STROKE
         pathEffect = DashPathEffect(floatArrayOf(7f, 7f), 15f)
-        color = context.getColorFromRes(R.color.cent)
+        color = context.getColorFromRes(R.color.textColorSecondary)
         strokeWidth = 3f
     }
 

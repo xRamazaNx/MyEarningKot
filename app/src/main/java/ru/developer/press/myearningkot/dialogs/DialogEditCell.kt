@@ -8,7 +8,6 @@ import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -22,10 +21,12 @@ import kotlinx.android.synthetic.main.edit_cell_phone.view.*
 import kotlinx.android.synthetic.main.edit_cell_text.view.*
 import org.jetbrains.anko.layoutInflater
 import ru.developer.press.myearningkot.R
+import ru.developer.press.myearningkot.helpers.getColorFromRes
 import ru.developer.press.myearningkot.model.Column
 import ru.developer.press.myearningkot.model.ColumnType
 import ru.developer.press.myearningkot.model.PhoneTypeValue
 import ru.developer.press.myearningkot.helpers.prefLayouts.initClickOperation
+import ru.developer.press.myearningkot.helpers.setAlertButtonColors
 import java.lang.Exception
 import java.util.*
 
@@ -41,7 +42,7 @@ class DialogEditCell(
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        return when (column.getType()) {
+        val alertDialog: AlertDialog = when (column.getType()) {
             ColumnType.TEXT -> getTextDialog()
             ColumnType.NUMBER -> getNumberDialog()
             ColumnType.PHONE -> getPhoneDialog()
@@ -50,6 +51,8 @@ class DialogEditCell(
 
             else -> AlertDialog.Builder(context).create()
         }
+        alertDialog.setAlertButtonColors(R.color.colorAccent, R.color.colorAccent)
+        return alertDialog
     }
 
     private fun getDateDialog(): AlertDialog {
@@ -73,7 +76,7 @@ class DialogEditCell(
             //            datePicker.backgroundColor = Color.WHITE
             datePicker.post {
 
-                window?.setBackgroundDrawable(ColorDrawable(Color.WHITE))
+                window?.setBackgroundDrawable(ColorDrawable(context.getColorFromRes(R.color.colorSurface)))
             }
         }
     }
@@ -189,7 +192,7 @@ class DialogEditCell(
                     ColorDrawable(
                         ContextCompat.getColor(
                             it,
-                            R.color.cent
+                            R.color.colorSurface
                         )
                     )
                 )

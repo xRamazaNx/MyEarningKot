@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/transparent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/colorTransparent"
     android:orientation="vertical">
 
     <include layout="@layout/toolbar_pref" />
@@ -17,14 +18,12 @@
             android:orientation="vertical">
 
 
-            <include layout="@layout/width_seek_bar_layout" />
-
             <include layout="@layout/prefs_text_view" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/cent"
+                android:background="@color/colorBackground"
                 android:orientation="vertical">
 
                 <FrameLayout
@@ -33,18 +32,18 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
                     android:alpha="0.5"
-                    android:background="@color/color_normal" />
+                    android:background="@color/textColorSecondary" />
 
                 <TextView
+                    app:fontFamily="@font/roboto_medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="8dp"
+                    android:paddingStart="12dp"
                     android:paddingTop="16dp"
-                    android:paddingEnd="8dp"
-                    android:paddingBottom="4dp"
-                    android:textSize="16sp"
+                    android:paddingEnd="12dp"
+                    android:textSize="14sp"
                     android:text="@string/setting_view_phone_data"
-                    android:textColor="@color/gray_1" />
+                    android:textColor="@color/colorTitle" />
 
                 <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
                     android:id="@+id/phoneParamRecycler"
@@ -52,6 +51,7 @@
                     android:layout_height="match_parent"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
+                    android:paddingTop="8dp"
                     android:paddingBottom="16dp" />
             </LinearLayout>
         </LinearLayout>

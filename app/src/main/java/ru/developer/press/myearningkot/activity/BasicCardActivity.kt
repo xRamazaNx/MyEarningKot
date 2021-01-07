@@ -25,6 +25,7 @@ import ru.developer.press.myearningkot.adapters.AdapterRecyclerInCard
 import ru.developer.press.myearningkot.model.createViewInPlate
 import ru.developer.press.myearningkot.model.updateTotalAmount
 import ru.developer.press.myearningkot.helpers.bindTitleOfColumn
+import ru.developer.press.myearningkot.helpers.getColorFromRes
 
 @SuppressLint("Registered")
 abstract class BasicCardActivity : AppCompatActivity() {
@@ -47,7 +48,7 @@ abstract class BasicCardActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.setTitleTextColor(Color.WHITE)
+        toolbar.setTitleTextColor(getColorFromRes(R.color.colorOnPrimary))
 
         // для того что бы тоталвью не пропускал сквозь себя клики на ресайклер с записями
         totalAmountView.setOnClickListener { }

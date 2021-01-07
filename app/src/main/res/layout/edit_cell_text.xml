@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/cent"
+    android:background="@color/colorBackground"
     android:orientation="vertical">
 
     <TextView
@@ -10,14 +10,14 @@
         android:id="@+id/titleTextEdit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/centDark"
+        android:background="@color/colorPrimary"
         android:paddingStart="24dp"
         android:paddingEnd="24dp"
         android:paddingTop="16dp"
         android:paddingBottom="16dp"
         android:text="@string/input_of_data"
-        android:textColor="@color/gray_1"
-        android:textSize="18sp" />
+        android:textColor="@color/textColorPrimary"
+        android:textSize="20sp" />
 
     <EditText
         android:id="@+id/editCellText"
@@ -32,7 +32,7 @@
         android:layout_marginBottom="16dp"
         android:paddingBottom="12dp"
         android:paddingTop="16dp"
-        android:textColor="@color/light_gray"
-        android:textColorHint="@color/color_normal" />
+        android:textColor="@color/textColorPrimary"
+        android:textColorHint="@color/textColorSecondary" />
 
 </LinearLayout>

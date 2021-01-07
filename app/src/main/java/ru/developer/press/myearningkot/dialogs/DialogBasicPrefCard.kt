@@ -16,6 +16,7 @@ import org.jetbrains.anko.layoutInflater
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.helpers.getValutaTypeList
+import ru.developer.press.myearningkot.helpers.setAlertButtonColors
 import ru.developer.press.myearningkot.helpers.showItemChangeDialog
 
 class DialogBasicPrefCard(
@@ -39,7 +40,7 @@ class DialogBasicPrefCard(
             val textViewValutaType = view.textViewValutaType
             val listValutaType = getValutaTypeList()
             textViewValutaType.text =
-                "${getString(R.string.change_valuta)} (${listValutaType[card.valuta]})"
+                "${getString(R.string.valuta)} (${listValutaType[card.valuta]})"
             textViewValutaType.setOnClickListener {
                 context.showItemChangeDialog(
                     "Выберите валюту",
@@ -49,7 +50,7 @@ class DialogBasicPrefCard(
                     fun(selected) {
                         card.valuta = selected
                         textViewValutaType.text =
-                            "${getString(R.string.change_valuta)} (${listValutaType[selected]})"
+                            "${getString(R.string.valuta)} (${listValutaType[selected]})"
                         updateCard()
                     })
             }
@@ -122,7 +123,9 @@ class DialogBasicPrefCard(
             }
         }
 
-        return dialog.create()
+        val alertDialog = dialog.create()
+        alertDialog.setAlertButtonColors(R.color.colorAccent, R.color.colorAccent)
+        return alertDialog
     }
 
     private fun updateCard() {
@@ -140,7 +143,7 @@ class DialogBasicPrefCard(
                 ColorDrawable(
                     ContextCompat.getColor(
                         it,
-                        R.color.cent
+                        R.color.colorSurface
                     )
                 )
             )

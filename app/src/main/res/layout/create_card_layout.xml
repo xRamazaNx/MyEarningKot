@@ -4,12 +4,39 @@
     android:id="@+id/create_card_1_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/cent"
+    android:background="@color/colorSurface"
     android:orientation="vertical"
     android:visibility="visible">
 
-    <include layout="@layout/set_name_layout" />
+    <TextView
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:text="@string/create_sample_of_card"
+        android:textColor="@color/colorOnPrimary"
+        android:textSize="20sp" />
 
+    <EditText
+        android:hint="@string/set_name"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:textSize="16sp"
+        android:id="@+id/editTextName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="text"
+        android:textColor="@color/textColorPrimary"
+        android:textColorHint="@color/textColorSecondary"
+        android:importantForAutofill="no" />
+    <FrameLayout
+        android:layout_margin="8dp"
+        android:background="@color/colorDark"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,8 +44,9 @@
         android:paddingStart="24dp"
         android:paddingEnd="24dp"
         android:text="@string/sample_of_card"
-        android:textColor="@color/gray"
-        android:textSize="12sp" />
+        android:textColor="@color/colorTitle"
+        android:textSize="14sp" />
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -36,16 +64,16 @@
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:drawableStart="@drawable/ic_sample"
-            android:drawableEnd="@drawable/ic_drop_down"
             android:drawablePadding="16dp"
             android:focusable="true"
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
             android:text="@string/sample_of_card"
-            android:textColor="@color/white"
+            android:textColor="@color/textColorPrimary"
             android:textSize="16sp" />
 
         <ImageButton
+            android:tint="@color/textColorPrimary"
             android:id="@+id/editSampleButton"
             android:layout_width="40dp"
             android:layout_height="match_parent"

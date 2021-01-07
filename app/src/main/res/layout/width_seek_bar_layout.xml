@@ -4,21 +4,19 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:background="@color/cent"
-    android:padding="16dp"
+    android:orientation="vertical"
+    android:background="@color/colorBackground"
     >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:text="@string/width"
-        android:textColor="@color/light_gray" />
-
+<!--    <FrameLayout-->
+<!--        android:background="@color/colorControlNormal"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="1dp"/>-->
     <SeekBar
+        android:padding="16dp"
         android:id="@+id/widthColumnSeekBar"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_weight="1"
         android:max="1000" />
 </LinearLayout>

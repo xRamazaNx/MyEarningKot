@@ -35,7 +35,7 @@ open class TypeControlImpl(
 ) {
     var weight = 1f
     protected fun View.getLayoutParamOfCell(): ViewGroup.LayoutParams {
-        backgroundResource = R.drawable.shape
+        backgroundResource = R.drawable.cell_default_background
         padding = 8
         return LayoutParams(
             provideValueProperty.getWidthColumn(),
@@ -88,6 +88,14 @@ class NumerationTypeControl(
         weight = 0F
         return super.createCellView(context)
     }
+
+    override fun display(view: View, value: String) {
+
+        val textView = view as TextView
+        val typePref = provideValueProperty.typePref as TextTypePref
+        typePref.prefForTextView.customize(textView, R.font.roboto_light)
+        textView.text = value
+    }
 }
 
 
@@ -139,7 +147,7 @@ class SwitchTypeControl(
             }
         else
             FrameLayout(context).apply {
-                backgroundResource = R.drawable.shape
+                backgroundResource = R.drawable.cell_default_background
                 padding = 8
                 layoutParams = LayoutParams(
                     provideValueProperty.getWidthColumn(),
@@ -196,9 +204,9 @@ class SwitchTypeControl(
             val frame = view as FrameLayout
             val image = frame.getChildAt(0) as ImageView
             if (toBoolean) {
-                image.setColorFilter(Color.BLACK)
+                image.setColorFilter(frame.context.getColorFromRes(R.color.colorControlEnabled))
             } else
-                image.setColorFilter(Color.LTGRAY)
+                image.setColorFilter(frame.context.getColorFromRes(R.color.colorControlNormal))
         }
     }
 }

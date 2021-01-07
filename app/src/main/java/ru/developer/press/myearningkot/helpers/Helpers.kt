@@ -176,13 +176,13 @@ fun Context.showItemChangeDialog(
                     marginEnd = dpsToPixels(8)
                 }
                 text = name
-                textColorResource = R.color.centDarkTemnee2
+                textColorResource = R.color.textColorPrimary
 
                 setPadding(dpsToPixels, dpsToPixels, dpsToPixels, dpsToPixels)
                 setOnClickListener {
                     itemClickEvent(index)
                     postDelayed({
-                        backgroundColorResource = R.color.gray
+                        backgroundColorResource = R.color.textColorSecondary
                         builder.dismiss()
                     }, 150)
                 }
@@ -191,7 +191,7 @@ fun Context.showItemChangeDialog(
             }
 
             if (index == _selectItem) {
-                itemTextView.backgroundColorResource = R.color.gray
+                itemTextView.backgroundColorResource = R.color.textColorSecondary
             }
             itemListContainer.addView(itemTextView)
         }
@@ -202,7 +202,7 @@ fun Context.showItemChangeDialog(
 
 fun Context.getColorFromRes(res: Int): Int = ContextCompat.getColor(this, res)
 
-fun getColorFromText(): Int = Color.parseColor("#141414")
+fun getColorFromText(): Int = Color.parseColor("#f1f1f1")
 
 
 inline fun <reified T> clone(source: T): T {

@@ -1,37 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/cent"
+    android:background="@color/colorTransparent"
     android:orientation="vertical">
 
     <TextView
-        android:textColor="@color/accent_primary"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
-        android:paddingTop="24dp"
-        android:paddingBottom="8dp"
-        android:textSize="16sp"
-        android:text="@string/general_setting"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:paddingStart="24dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="24dp"
+        android:text="@string/general_setting"
+        android:textColor="@color/colorOnPrimary"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+
     <TextView
+        android:fontFamily="@font/roboto_medium"
+        app:fontFamily="@font/roboto_medium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="12dp"
+        android:paddingTop="24dp"
+        android:paddingEnd="12dp"
+        android:text="@string/general_setting_card"
+        android:textColor="@color/colorTitle"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+    <TextView
+        android:fontFamily="@font/roboto"
+        app:fontFamily="@font/roboto"
         android:id="@+id/textViewValutaType"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
         android:drawableStart="@drawable/ic_valuta"
-        android:drawableEnd="@drawable/ic_drop_down"
         android:drawablePadding="16dp"
         android:focusable="true"
         android:padding="16dp"
         android:singleLine="true"
-        android:text="@string/change_valuta"
-        android:textColor="@color/light_gray"
-        android:textSize="14sp" />
+        android:text="@string/valuta"
+        android:textColor="@color/textColorPrimary"
+        android:textSize="16sp" />
 
 
     <FrameLayout
@@ -39,64 +54,66 @@
         android:layout_height="1px"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@color/color_background_info_card"
+        android:background="@color/colorDivider"
         android:visibility="visible">
 
     </FrameLayout>
 
 
-    <Switch
-        android:drawableStart="@drawable/ic_horizontal_scroll"
-        android:drawablePadding="16dp"
+    <ru.developer.press.myearningkot.helpers.prefLayouts.MySwitch
+        android:fontFamily="@font/roboto"
         android:id="@+id/switchEnableHorizontalScrollItems"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?android:attr/selectableItemBackground"
         android:checked="false"
-        android:padding="16dp"
         android:clickable="true"
+        android:drawableStart="@drawable/ic_horizontal_scroll"
+        android:drawablePadding="16dp"
         android:focusable="true"
+        android:padding="16dp"
         android:showText="false"
         android:text="@string/enable_horizontal_scroll_items"
         android:textAllCaps="false"
-        android:textColor="@color/light_gray"
+        android:textColor="@color/textColorPrimary"
         android:textIsSelectable="false"
-        android:textSize="14sp" />
+        android:textSize="16sp" />
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="1px"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@color/color_background_info_card"
+        android:background="@color/colorDivider"
         android:visibility="visible">
 
     </FrameLayout>
 
 
-        <Switch
-            android:id="@+id/switchEnableSomeStroke"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableStart="@drawable/ic_some_stroke"
-            android:drawablePadding="16dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:checked="true"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="16dp"
-            android:gravity="center_vertical"
-            android:text="@string/enable_some_stroke"
-            android:textColor="@color/light_gray"
-            android:textIsSelectable="false"
-            android:textSize="14sp" />
+    <ru.developer.press.myearningkot.helpers.prefLayouts.MySwitch
+        android:fontFamily="@font/roboto"
+        android:id="@+id/switchEnableSomeStroke"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:checked="true"
+        android:clickable="true"
+        android:drawableStart="@drawable/ic_some_stroke"
+        android:drawablePadding="16dp"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:text="@string/enable_some_stroke"
+        android:textColor="@color/textColorPrimary"
+        android:textIsSelectable="false"
+        android:textSize="16sp" />
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="1px"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@color/color_background_info_card"
+        android:background="@color/colorDivider"
         android:visibility="visible">
 
     </FrameLayout>
@@ -104,66 +121,73 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        >
+        android:orientation="horizontal">
 
         <TextView
 
-            android:padding="16dp"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:drawableStart="@drawable/ic_height"
             android:drawablePadding="16dp"
+            android:fontFamily="@font/roboto"
+            app:fontFamily="@font/roboto"
             android:gravity="center_vertical"
+            android:padding="16dp"
             android:text="@string/cell_height"
-            android:textColor="@color/light_gray" />
+            android:textColor="@color/textColorPrimary"
+            android:textSize="16sp" />
 
         <ImageButton
+            android:tint="@color/colorSecondary"
             android:id="@+id/heightSizeDown"
             android:layout_width="40dp"
             android:layout_height="match_parent"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:background="?android:attr/selectableItemBackground"
-            android:src="@drawable/ic_down"
-            android:contentDescription="@string/down_size" />
+            android:contentDescription="@string/down_size"
+            android:src="@drawable/ic_down" />
 
         <TextView
+            android:textSize="16sp"
             android:id="@+id/heightSize"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:text="size"
-            android:textColor="@color/light_gray" />
+            android:textColor="@color/textColorTertiary" />
 
         <ImageButton
 
             android:id="@+id/heightSizeUp"
-
+            android:tint="@color/colorSecondary"
             android:layout_width="40dp"
             android:layout_height="match_parent"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="@string/up_size"
             android:rotation="180"
-            android:src="@drawable/ic_down"
-            android:contentDescription="@string/up_size" />
+            android:src="@drawable/ic_down" />
 
     </LinearLayout>
 
     <TextView
-        android:textColor="@color/accent_primary"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
-        android:paddingTop="24dp"
-        android:paddingBottom="8dp"
-        android:textSize="16sp"
-        android:text="@string/general_setting_totals"
+        android:fontFamily="@font/roboto_medium"
+        app:fontFamily="@font/roboto_medium"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:paddingStart="12dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="12dp"
+        android:text="@string/general_setting_totals"
+        android:textColor="@color/colorTitle"
+        android:textSize="14sp" />
 
-    <Switch
+    <ru.developer.press.myearningkot.helpers.prefLayouts.MySwitch
+        android:fontFamily="@font/roboto"
+        app:fontFamily="@font/roboto"
         android:id="@+id/switchEnableDatePeriod"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -176,9 +200,9 @@
         android:gravity="center_vertical"
         android:padding="16dp"
         android:text="@string/show_date_period"
-        android:textColor="@color/light_gray"
+        android:textColor="@color/textColorPrimary"
         android:textIsSelectable="false"
-        android:textSize="14sp"
+        android:textSize="16sp"
         tools:ignore="RtlSymmetry" />
 
     <FrameLayout
@@ -186,14 +210,15 @@
         android:layout_height="1px"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@color/color_background_info_card"
+        android:background="@color/colorDivider"
         android:visibility="visible">
 
     </FrameLayout>
 
 
-    <Switch
+    <ru.developer.press.myearningkot.helpers.prefLayouts.MySwitch
 
+        android:fontFamily="@font/roboto"
         android:id="@+id/switchEnableHorizontalScrollTotals"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -203,13 +228,13 @@
         android:drawableStart="@drawable/ic_horizontal_scroll"
         android:drawablePadding="16dp"
         android:focusable="true"
+        android:padding="16dp"
         android:showText="false"
         android:text="@string/enable_horizontal_scroll_totals"
         android:textAllCaps="false"
-        android:textColor="@color/light_gray"
+        android:textColor="@color/textColorPrimary"
         android:textIsSelectable="false"
-        android:padding="16dp"
-        android:textSize="14sp" />
+        android:textSize="16sp" />
 
 
     <FrameLayout
@@ -217,13 +242,14 @@
         android:layout_height="1px"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@color/color_background_info_card"
+        android:background="@color/colorDivider"
         android:visibility="visible">
 
     </FrameLayout>
 
 
-    <Switch
+    <ru.developer.press.myearningkot.helpers.prefLayouts.MySwitch
+        android:fontFamily="@font/roboto"
         android:id="@+id/switchShowTotalInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -236,10 +262,9 @@
         android:gravity="center_vertical"
         android:padding="16dp"
         android:text="@string/show_total_info"
-        android:textColor="@color/light_gray"
+        android:textColor="@color/textColorPrimary"
         android:textIsSelectable="false"
-        android:textSize="14sp" />
-
+        android:textSize="16sp" />
 
 
 </LinearLayout>
