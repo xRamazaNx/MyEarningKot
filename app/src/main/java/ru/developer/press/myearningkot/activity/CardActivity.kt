@@ -7,12 +7,11 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.view.View.GONE
 import android.view.animation.Animation
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView.ItemAnimator.ItemAnimatorFinishedListener
 import com.google.android.material.appbar.AppBarLayout
@@ -43,7 +42,6 @@ import kotlin.concurrent.thread
 
 open class CardActivity : BasicCardActivity() {
     override var viewModel: CardViewModel? = null
-    private var cellClickTime: Long = 0
     private var isLongClick = false
     private val launch = CoroutineScope(Dispatchers.Main).launch {
         val id = intent.getLongExtra(CARD_ID, 0)
@@ -55,7 +53,7 @@ open class CardActivity : BasicCardActivity() {
         progressBar.visibility = GONE
         doStart()
         viewModel?.apply {
-            titleLiveData.observe(this@CardActivity, Observer {
+            titleLiveData.observe(this@CardActivity, {
                 title = it
             })
         }
@@ -280,7 +278,7 @@ open class CardActivity : BasicCardActivity() {
                     fbAddRow.setButtonIconResource(R.drawable.ic_add_not_ring_white)
                     fbAddRow.setButtonBackgroundColour(getColorFromRes(R.color.colorSecondaryDark))
                     // тут именно это пусть будет
-                    Handler().post { waitForAnimationsToFinish() }
+                    Handler(Looper.getMainLooper()).post { waitForAnimationsToFinish() }
                     if (fbAddRow.isShown) {
                         if (!appBar.isShown)
                             fbAddRow.hide()
@@ -448,7 +446,7 @@ open class CardActivity : BasicCardActivity() {
     // выполняем что ни будь и рекуклер обновляется после конца анимации
     private fun recyclerRunEvent(runEventRecycler: () -> Unit) { // ...
         runEventRecycler()
-        Handler().post(waitForAnimationsToFinishRunnable)
+        Handler(Looper.getMainLooper()).post(waitForAnimationsToFinishRunnable)
     }
 
     private val waitForAnimationsToFinishRunnable =
@@ -474,7 +472,7 @@ open class CardActivity : BasicCardActivity() {
             // but there might still be more items that will be animated after this method returns.
             // Post a message to the message queue for checking if there are any more
             // animations running.
-            Handler().post(waitForAnimationsToFinishRunnable)
+            Handler(Looper.getMainLooper()).post(waitForAnimationsToFinishRunnable)
         }
 //
 //
@@ -654,7 +652,7 @@ open class CardActivity : BasicCardActivity() {
                     updateTypeControlColumn(it)
                 }
             }
-            adapter.notifyDataSetChanged()
+            adapter.notifyItemChanged(rowSelectPosition)
             updateCardInDB()
 
         }.editCell()

@@ -2,6 +2,7 @@ package ru.developer.press.myearningkot
 
 import android.content.Context
 import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
@@ -23,7 +24,7 @@ class ScrollContainer(
         value = false
     }
 
-    private val hand = Handler()
+    private val hand = Handler(Looper.getMainLooper())
     private var mLongPressed = Runnable {
         isLong.value = true
         clickEvent(MotionEvent.obtain(motionEventFromActionDown).apply {

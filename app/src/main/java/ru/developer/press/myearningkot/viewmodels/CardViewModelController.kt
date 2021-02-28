@@ -7,7 +7,6 @@ import android.widget.LinearLayout
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import org.jetbrains.anko.collections.forEachByIndex
 import ru.developer.press.myearningkot.ProvideDataRows
 import ru.developer.press.myearningkot.helpers.Page
 import ru.developer.press.myearningkot.model.*

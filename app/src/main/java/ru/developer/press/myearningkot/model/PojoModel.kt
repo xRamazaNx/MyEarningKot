@@ -545,8 +545,8 @@ data class Cell(
         }
     }
 
-    fun displayCellView(view: View) {
-        cellTypeControl.display(view, displayValue)
+    fun displayCellView() {
+        cellTypeControl.display(elementView, displayValue)
     }
 
     fun copy(): Cell {
@@ -674,13 +674,13 @@ open class Backgrounder {
     @Transient
     var currentBackground: Int = -1
     @Transient
-    var elementView:View? = null
+    lateinit var elementView:View
 
     fun setBackground(backgroundRes: Int) {
         currentBackground = backgroundRes
         val drawable =
-            elementView?.let { ContextCompat.getDrawable(it.context,currentBackground) }
-        elementView?.background = drawable
+            elementView.let { ContextCompat.getDrawable(it.context,currentBackground) }
+        elementView.background = drawable
     }
 }
 
@@ -688,7 +688,7 @@ class Row : Backgrounder() {
     fun crossOut(itemView: View, isCrossOut: Boolean) {
         val frameLayout = itemView as FrameLayout
         if (isCrossOut) {
-            val drawable = itemView.context.getDrawable(R.drawable.cross_line)
+            val drawable = ContextCompat.getDrawable(itemView.context,R.drawable.cross_line)
             frameLayout.foreground = drawable
             itemView.backgroundColorResource = R.color.textColorSecondary
         } else {

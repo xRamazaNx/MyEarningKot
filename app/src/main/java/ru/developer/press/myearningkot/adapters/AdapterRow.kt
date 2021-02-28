@@ -94,20 +94,25 @@ class AdapterRecyclerInCard(
         }
 
         val sortedRows = provideDataRows.sortedRows
-        val previousRow = if (position > 0) sortedRows[position - 1] else null
-        val secondRow = if (position < sortedRows.lastIndex) sortedRows[position + 1] else null
         val row = sortedRows[position]
 
-        holder.bind(
-            row,
-            provideDataRows.getColumns(),
-            previousRow,
-            secondRow
-        )
         // выделение ячейки без обновления холдера а то мигает мерзко
         holder.viewList.forEachIndexed { columnIndex, view ->
             val cell = row.cellList[columnIndex]
             cell.elementView = view
+            cell.displayCellView()
+            when {
+                // колона выделена- обвести
+                cell.isPrefColumnSelect -> {
+                    setSelectBackground(cell.elementView)
+                }
+                // ячейка выделена - обвести
+                cell.isSelect -> {
+                    cell.setBackground(R.drawable.cell_selected_background)
+                }
+                else ->
+                    cell.setBackground( R.drawable.cell_default_background)
+            }
 
             if (cellClickPrefFunction != null) {
                 view.setOnClickListener {
@@ -116,7 +121,7 @@ class AdapterRecyclerInCard(
             } else {
                 if (columnIndex > 0) {
                     rowClickListener?.let {
-                        view.setOnClickListener { view ->
+                        view.setOnClickListener { _ ->
                             // индексы (ряд и колона) предыдущего выделеного элемента (ячейки)
                             val selectCellPairIndexes = provideDataRows.getSelectCellPairIndexes()
                             selectCellPairIndexes?.let {
@@ -136,6 +141,15 @@ class AdapterRecyclerInCard(
 
             }
         }
+
+        val previousRow = if (position > 0) sortedRows[position - 1] else null
+        val secondRow = if (position < sortedRows.lastIndex) sortedRows[position + 1] else null
+        holder.bind(
+            row,
+            provideDataRows.getColumns(),
+            previousRow,
+            secondRow
+        )
     }
 
 }
@@ -146,7 +160,6 @@ lateinit var animationAdd: Animation
 class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataListener {
     var viewList = mutableListOf<View>()
     var rowNumber: TextView? = null
-    var rowLayout: LinearLayout? = null
     private var positionRow = 0
 
     fun bind(
@@ -162,23 +175,6 @@ class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataList
         val context = itemView.context
 
         positionRow = adapterPosition
-        row.cellList.forEachIndexed { index, cell ->
-            val cellView: View = viewList[index]
-            cell.displayCellView(cellView)
-
-            when {
-                // колона выделена- обвести
-                cell.isPrefColumnSelect -> {
-                    setSelectBackground(cellView)
-                }
-                // ячейка выделена - обвести
-                cell.isSelect -> {
-                    cell.setBackground(R.drawable.cell_selected_background)
-                }
-                else ->
-                    cell.setBackground( R.drawable.cell_default_background)
-            }
-        }
 
         rowNumber?.text = (layoutPosition + 1).toString()
 
@@ -227,7 +223,6 @@ class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataList
                         row.crossOut(itemView, behavior.crossOut && cell.sourceValue.toBoolean())
                     }
                 }
-
                 row.setBackground(R.color.colorBackgroundCard)
             }
         }
@@ -235,9 +230,6 @@ class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataList
 
     override fun scrollRowNumber(x: Float) {
         rowNumber?.translationX = x
-
-//        if (rowNumber!!.x < 0)
-//            rowNumber?.translationX = 0f
     }
 
     override fun getItemHeight(): Int {
