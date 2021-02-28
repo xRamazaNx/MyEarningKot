@@ -143,10 +143,12 @@ class MainViewModel(context: Context, list: MutableList<Page>) : ViewModel(),
         pageList.forEach { liveData ->
             val find = liveData.value?.cards?.find { it.value?.id == openedCardId }
             find?.let {
-                val card = it.value!!
-                card.isUpdating = true
-                it.postValue(card)
-                openedCardId = -1
+                thread {
+                    val card = dataController.getCard(openedCardId)
+                    card.isUpdating = true
+                    it.postValue(card)
+                    openedCardId = -1
+                }
                 return@forEach
             }
         }

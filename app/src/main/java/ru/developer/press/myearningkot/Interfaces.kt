@@ -5,10 +5,7 @@ import android.content.Context
 import android.view.View
 import androidx.lifecycle.MutableLiveData
 import ru.developer.press.myearningkot.helpers.Page
-import ru.developer.press.myearningkot.model.Card
-import ru.developer.press.myearningkot.model.Column
-import ru.developer.press.myearningkot.model.Prefs
-import ru.developer.press.myearningkot.model.Row
+import ru.developer.press.myearningkot.model.*
 
 // для viewPage обратная связь реализатор PageViewModel
 interface AdapterPageInterface {
@@ -39,6 +36,7 @@ interface ProvideDataRows{
     fun isEnableHorizontalScroll(): Boolean
     fun isEnableSomeStroke(): Boolean
     fun getRowHeight(): Int
+    fun getSelectCellPairIndexes(): Pair<Int, Int>?
 
 }
 
@@ -55,7 +53,7 @@ interface CardClickListener {
 }
 
 interface RowClickListener {
-    fun cellClick(view: View, rowPosition: Int, cellPosition: Int)
+    fun cellClick(rowPosition: Int, cellPosition: Int)
 }
 
 interface NotifyCallback {

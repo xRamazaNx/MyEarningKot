@@ -561,7 +561,7 @@ open class CardActivity : BasicCardActivity() {
     }
 
     private val rowClickListener = object : RowClickListener {
-        override fun cellClick(view: View, rowPosition: Int, cellPosition: Int) {
+        override fun cellClick(rowPosition: Int, cellPosition: Int) {
             if (isLongClick) {
                 viewModel?.rowClicked(rowPosition) {
                     notifyAdapter()
@@ -570,24 +570,19 @@ open class CardActivity : BasicCardActivity() {
             } else {
                 if (viewModel!!.selectMode.value == SelectMode.ROW) {
                     isLongClick = true
-                    cellClick(view, rowPosition, cellPosition)
+                    cellClick(rowPosition, cellPosition)
                     return
                 }
                 viewModel?.cellClicked(
                     rowPosition,
                     cellPosition
-                ) { oldRowPosition, isDoubleTap ->
+                ) {isDoubleTap ->
                     if (isDoubleTap) {
                         editCell()
-                    } else {
-                        adapter.notifyItemChanged(oldRowPosition)
-                        adapter.notifyItemChanged(rowPosition)
                     }
                 }
-
             }
         }
-
     }
 
     private fun editCell() {

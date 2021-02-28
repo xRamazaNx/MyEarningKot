@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import org.jetbrains.anko.collections.forEachByIndex
 import ru.developer.press.myearningkot.ProvideDataRows
 import ru.developer.press.myearningkot.helpers.Page
 import ru.developer.press.myearningkot.model.*
@@ -78,6 +79,18 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     }
 
     override fun getRowHeight(): Int = card.heightCells
+    override fun getSelectCellPairIndexes(): Pair<Int, Int>? {
+        var pair: Pair<Int, Int>?
+        sortedRows.forEachIndexed { indexRow, row ->
+            row.cellList.forEachIndexed { indexCell, cell ->
+                if (cell.isSelect){
+                    pair = Pair(indexRow, indexCell)
+                    return pair
+                }
+            }
+        }
+        return null
+    }
 
     fun updateCard(card: Card = this.card) {
         this.card = card
@@ -90,6 +103,7 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
         updateTypeControl()
         updateCardLD()
     }
+
     fun addColumnSample(columnType: ColumnType, name: String) {
         card.addColumnSample(columnType, name)
 //        updateTypeControl()
@@ -304,7 +318,7 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     fun cellClicked(
         rowPosition: Int,
         cellPosition: Int,
-        function: (Int, Boolean) -> Unit
+        function: (Boolean) -> Unit
     ) {
 
         this.rowSelectPosition = rowPosition
@@ -312,7 +326,6 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
 
         val cell = sortList()[rowPosition].cellList[cellPosition]
         val isDoubleTap = cell.isSelect
-        val oldSelectPosition: Int = card.unSelectCell()
         cell.isSelect = true
 
         // присваиваем cell только если не было выделено
@@ -323,7 +336,7 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
         }
         selectMode.value =
             SelectMode.CELL
-        function(if (oldSelectPosition > -1) oldSelectPosition else rowPosition, isDoubleTap)
+        function(isDoubleTap)
     }
 
     fun rowClicked(rowPosition: Int = card.rows.size - 1, function: (Int) -> Unit) {
@@ -360,7 +373,7 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
         updateTypeControlColumn(card.columns[columnPosition])
     }
 
-    fun copySelectedCell(isCut: Boolean) :Cell?{
+    fun copySelectedCell(isCut: Boolean): Cell? {
         card.rows.forEach {
             it.cellList.forEachIndexed { index, cell ->
                 if (cell.isSelect) {
@@ -518,9 +531,10 @@ class ViewModelMainFactory(private val context: Context, private val pageList: M
     }
 }
 
-class ViewModelCardFactory(private val context: Context,private val card: Card) : ViewModelProvider.NewInstanceFactory() {
+class ViewModelCardFactory(private val context: Context, private val card: Card) :
+    ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return CardViewModel(context , card) as T
+        return CardViewModel(context, card) as T
     }
 }
 //

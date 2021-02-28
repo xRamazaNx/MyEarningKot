@@ -74,24 +74,7 @@ class AdapterRecyclerInCard(
         }
 
         // нажатие для настройки колоны
-        return rowHolder.apply {
-            viewList.forEachIndexed { columnIndex, view ->
-                if (cellClickPrefFunction != null) {
-                    view.setOnClickListener {
-                        cellClickPrefFunction!!.invoke(columnIndex)
-                    }
-                } else {
-                    if (columnIndex > 0) {
-                        rowClickListener?.let {
-                            view.setOnClickListener { view ->
-                                it.cellClick(view, adapterPosition, columnIndex)
-                            }
-                        }
-                    }
-
-                }
-            }
-        }
+        return rowHolder
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -110,25 +93,49 @@ class AdapterRecyclerInCard(
             return
         }
 
-        val itemView = holder.itemView
-        val context = itemView.context
-        val dip = context.dip(8)
-        val dip2 = context.dip(2)
-        if (position == itemCount - 1) {
-//            itemView.setPadding(dip, 0, dip, dip2)
-        } else {
-//            itemView.setPadding(dip, dip2, dip, 0)
-
-        }
         val sortedRows = provideDataRows.sortedRows
         val previousRow = if (position > 0) sortedRows[position - 1] else null
         val secondRow = if (position < sortedRows.lastIndex) sortedRows[position + 1] else null
+        val row = sortedRows[position]
+
         holder.bind(
-            sortedRows[position],
+            row,
             provideDataRows.getColumns(),
             previousRow,
             secondRow
         )
+        // выделение ячейки без обновления холдера а то мигает мерзко
+        holder.viewList.forEachIndexed { columnIndex, view ->
+            val cell = row.cellList[columnIndex]
+            cell.elementView = view
+
+            if (cellClickPrefFunction != null) {
+                view.setOnClickListener {
+                    cellClickPrefFunction!!.invoke(columnIndex)
+                }
+            } else {
+                if (columnIndex > 0) {
+                    rowClickListener?.let {
+                        view.setOnClickListener { view ->
+                            // индексы (ряд и колона) предыдущего выделеного элемента (ячейки)
+                            val selectCellPairIndexes = provideDataRows.getSelectCellPairIndexes()
+                            selectCellPairIndexes?.let {
+                                val selectedCell = sortedRows[it.first].cellList[it.second]
+                                // если ячейка на которую кликнули не равна той что была кликнута
+                                // то надо убирается выделение из предыдущего элемента
+                                if (selectedCell !== cell) {
+                                    selectedCell.isSelect = false
+                                    selectedCell.setBackground(R.drawable.cell_default_background)
+                                }
+                            }
+                            cell.setBackground(R.drawable.cell_selected_background)
+                            it.cellClick(position, columnIndex)
+                        }
+                    }
+                }
+
+            }
+        }
     }
 
 }
@@ -151,6 +158,7 @@ class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataList
         if (itemViewType == -1) {
             return
         }
+        row.elementView = itemView
         val context = itemView.context
 
         positionRow = adapterPosition
@@ -165,10 +173,10 @@ class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataList
                 }
                 // ячейка выделена - обвести
                 cell.isSelect -> {
-                    cell.setBackground(cellView, R.drawable.cell_selected_background)
+                    cell.setBackground(R.drawable.cell_selected_background)
                 }
                 else ->
-                    cell.setBackground(cellView, R.drawable.cell_default_background)
+                    cell.setBackground( R.drawable.cell_default_background)
             }
         }
 
@@ -187,13 +195,13 @@ class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataList
                 val isPrevSelect = previousRow?.status == Row.Status.SELECT
                 val isSecondSelect = secondRow?.status == Row.Status.SELECT
                 if (isPrevSelect && isSecondSelect)
-                    row.setBackground(itemView, R.drawable.row_selected_background_border)
+                    row.setBackground(R.drawable.row_selected_background_border)
                 else if (isPrevSelect) {
-                    row.setBackground(itemView, R.drawable.row_selected_background_bottom)
+                    row.setBackground(R.drawable.row_selected_background_bottom)
                 } else if (isSecondSelect) {
-                    row.setBackground(itemView, R.drawable.row_selected_background_top)
+                    row.setBackground( R.drawable.row_selected_background_top)
                 } else {
-                    row.setBackground(itemView, R.drawable.row_selected_background)
+                    row.setBackground( R.drawable.row_selected_background)
                 }
             }
             Row.Status.ADDED -> {
@@ -220,7 +228,7 @@ class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataList
                     }
                 }
 
-                row.setBackground(itemView, R.color.colorBackgroundCard)
+                row.setBackground(R.color.colorBackgroundCard)
             }
         }
     }

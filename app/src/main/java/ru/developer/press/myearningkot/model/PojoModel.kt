@@ -10,6 +10,7 @@ import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.widget.FrameLayout
+import androidx.core.content.ContextCompat
 import androidx.core.text.toSpannable
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
@@ -672,13 +673,14 @@ class TotalItem {
 open class Backgrounder {
     @Transient
     var currentBackground: Int = -1
+    @Transient
+    var elementView:View? = null
 
-    fun setBackground(view: View, backgroundRes: Int) {
-//        if (currentBackground != backgroundRes) {
+    fun setBackground(backgroundRes: Int) {
         currentBackground = backgroundRes
-        val drawable = view.context.getDrawable(currentBackground)
-        view.background = drawable
-//        }
+        val drawable =
+            elementView?.let { ContextCompat.getDrawable(it.context,currentBackground) }
+        elementView?.background = drawable
     }
 }
 
