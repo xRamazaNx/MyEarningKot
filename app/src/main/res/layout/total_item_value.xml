@@ -10,7 +10,8 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center"
-        android:padding="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp"
         android:text="TextView"
         android:textColor="@color/textColorPrimary" />
 

@@ -14,10 +14,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.layoutInflater
 import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.helpers.getValutaTypeList
 import ru.developer.press.myearningkot.helpers.setAlertButtonColors
 import ru.developer.press.myearningkot.helpers.showItemChangeDialog
+import ru.developer.press.myearningkot.model.Card
 
 class DialogBasicPrefCard(
     val card: Card,
@@ -38,7 +38,7 @@ class DialogBasicPrefCard(
 
             // выбор валюты
             val textViewValutaType = view.textViewValutaType
-            val listValutaType = getValutaTypeList()
+            val listValutaType = getValutaTypeList(context)
             textViewValutaType.text =
                 "${getString(R.string.valuta)} (${listValutaType[card.valuta]})"
             textViewValutaType.setOnClickListener {
@@ -143,7 +143,7 @@ class DialogBasicPrefCard(
                 ColorDrawable(
                     ContextCompat.getColor(
                         it,
-                        R.color.colorSurface
+                        R.color.colorDialogBackground
                     )
                 )
             )

@@ -3,22 +3,22 @@
       xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         app:showAsAction="always"
-        android:icon="@drawable/ic_edit_white"
+        android:icon="@drawable/ic_rename"
         android:id="@+id/editCell"
         android:title="@string/PASTE"/>
     <item
         app:showAsAction="always"
-        android:icon="@drawable/ic_cut_white"
+        android:icon="@drawable/ic_cut"
         android:id="@+id/cutCell"
         android:title="@string/cut"/>
     <item
         app:showAsAction="always"
-        android:icon="@drawable/ic_copy_white"
+        android:icon="@drawable/ic_copy"
         android:id="@+id/copyCell"
         android:title="@string/COPY"/>
     <item
         app:showAsAction="always"
-        android:icon="@drawable/ic_paste_white"
+        android:icon="@drawable/ic_paste"
         android:id="@+id/pasteCell"
         android:title="@string/PASTE"/>
 

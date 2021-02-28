@@ -8,6 +8,7 @@
 
 
     <include layout="@layout/toolbar_pref" />
+    <include layout="@layout/width_seek_bar_layout"/>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -94,7 +95,7 @@
                 android:alpha="0.5"
                 android:background="@color/colorDivider" />
 
-            <Switch
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/groupNumberSwitch"
                 style="@style/switch_style"
                 android:layout_width="match_parent"
@@ -116,7 +117,7 @@
                 android:background="@color/colorDivider" />
 
 
-            <Switch
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/ignoreSwitchColumnWorkSwitch"
                 style="@style/switch_style"
                 android:layout_width="match_parent"
@@ -132,7 +133,7 @@
                 app:fontFamily="@font/roboto_light" />
             <TextView
                 android:textSize="14sp"
-                android:background="@color/colorDark"
+                android:background="@color/colorPrimaryDark"
                 android:textColor="@color/colorControlNormal"
                 android:text="Данные в итоге будут считываться в формуле игнорируя настройки переключателя в записях"
                 android:paddingStart="16dp"

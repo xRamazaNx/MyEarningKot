@@ -8,10 +8,8 @@ import android.view.MotionEvent
 import android.view.ViewConfiguration
 import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
-import androidx.core.util.rangeTo
 import androidx.lifecycle.MutableLiveData
 import kotlinx.android.synthetic.main.activity_card.view.*
-import ru.developer.press.myearningkot.activity.toast
 
 
 class ScrollContainer(

@@ -1,16 +1,16 @@
 package ru.developer.press.myearningkot
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -21,20 +21,18 @@ import com.bumptech.glide.request.target.Target
 import com.stfalcon.imageviewer.StfalconImageViewer
 import kotlinx.android.synthetic.main.main_cards_layout.*
 import org.jetbrains.anko.backgroundColor
+import org.jetbrains.anko.dip
 import org.jetbrains.anko.matchParent
 import ru.developer.press.myearningkot.activity.MainActivity
-import ru.developer.press.myearningkot.adapters.AdapterRecyclerInPage
+import ru.developer.press.myearningkot.adapters.AdapterCard
 import ru.developer.press.myearningkot.helpers.Page
-import ru.developer.press.myearningkot.model.Card
 
 
 class PageFragment : Fragment() {
     lateinit var page: MutableLiveData<Page>
-    private lateinit var cardClickListener: CardClickListener
-    private var adapterRecyclerInPage: AdapterRecyclerInPage? = null
+    private var adapterCard: AdapterCard? = null
     private var recycler: RecyclerView? = null
 
-    @SuppressLint("InflateParams")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -43,17 +41,12 @@ class PageFragment : Fragment() {
         return inflater.inflate(R.layout.main_cards_layout, null)
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        cardClickListener = context as MainActivity
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         recycler = recyclerCards
         recycler?.layoutManager = LinearLayoutManager(context)
-        adapterRecyclerInPage = AdapterRecyclerInPage(page.value!!, cardClickListener)
+        adapterCard = AdapterCard(page.value!!, activity as MainActivity)
 
-        page.observe(activity!!, Observer {
+        page.observe(activity!!, {
             view.backgroundColor = it.background
         })
         updateRecycler()
@@ -62,12 +55,12 @@ class PageFragment : Fragment() {
 
     private fun updateRecycler() {
 
-        recycler?.adapter = adapterRecyclerInPage
+        recycler?.adapter = adapterCard
 
     }
+
     fun scrollToPosition(cardPosition: Int) {
-        recycler?.smoothScrollToPosition(cardPosition)
-        adapterRecyclerInPage?.animateCardUpdated(cardPosition)
+       recycler?.scrollToPosition(cardPosition)
     }
 
     fun notifyCardInRecycler(positionCard: Int) {
@@ -81,7 +74,6 @@ class PageFragment : Fragment() {
 //
 //
 class ImageFragment : Fragment() {
-
     var isErrorImage = false
     var imagePath: String? = null
     override fun onCreateView(
@@ -95,7 +87,7 @@ class ImageFragment : Fragment() {
                     gravity = Gravity.CENTER
                 }
                 addView(ImageView(ctx).apply {
-                    val dpsToPixels = context.dpsToPixels(300)
+                    val dpsToPixels = context.dip(300)
                     layoutParams = FrameLayout.LayoutParams(dpsToPixels, matchParent).apply {
                         gravity = Gravity.CENTER
                     }
@@ -105,7 +97,6 @@ class ImageFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        toast(imageUri.toString())
         val frame = view as FrameLayout
         val imageView = frame.getChildAt(0) as ImageView
 

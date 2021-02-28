@@ -2,7 +2,6 @@ package ru.developer.press.myearningkot.helpers
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.text.TextUtils
 import android.view.Gravity.CENTER
@@ -13,17 +12,16 @@ import android.widget.ImageView
 import android.widget.LinearLayout.LayoutParams
 import android.widget.LinearLayout.LayoutParams.MATCH_PARENT
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import jp.wasabeef.glide.transformations.CropTransformation
 import org.jetbrains.anko.backgroundResource
+import org.jetbrains.anko.dip
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.padding
 import ru.developer.press.myearningkot.ColumnTypeControl
 import ru.developer.press.myearningkot.ProvideValueProperty
 import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.dpsToPixels
 import ru.developer.press.myearningkot.model.ImageTypePref
 import ru.developer.press.myearningkot.model.SwitchTypePref
 import ru.developer.press.myearningkot.model.TextTypePref
@@ -125,10 +123,10 @@ class ListTypeControl(
             setCompoundDrawablesWithIntrinsicBounds(
                 null,
                 null,
-                ContextCompat.getDrawable(context, R.drawable.ic_drop_down_dark),
+                context.getDrawableRes(R.drawable.ic_drop_down),
                 null
             )
-            compoundDrawablePadding = context.dpsToPixels(2)
+            compoundDrawablePadding = context.dip(2)
         }
 
     }
@@ -155,8 +153,8 @@ class SwitchTypeControl(
                 ).apply {
                     weight = 1f
                 }
-                val dpsToPixels = context.dpsToPixels(8)
-                setPadding(dpsToPixels, paddingTop, dpsToPixels, paddingBottom)
+                val dip = context.dip(8)
+                setPadding(dip, paddingTop, dip, paddingBottom)
 
 //                addView(
 //                    Switch(context).apply {
@@ -179,8 +177,8 @@ class SwitchTypeControl(
                         }
                         setImageResource(R.drawable.ic_check)
                         this.adjustViewBounds = true
-                        this.maxHeight = context.dpsToPixels(48)
-                        this.maxWidth = context.dpsToPixels(48)
+                        this.maxHeight = context.dip(48)
+                        this.maxWidth = context.dip(48)
                     }
                 )
             }
@@ -233,18 +231,18 @@ class ImageTypeControl(
 
 
         val imageView = (view as FrameLayout).getChildAt(0) as ImageView
-        // через пост чтобы использовать размеры изображения для управления качеством в ячейке
         Glide
             .with(view)
             .load("")
             .into(imageView)
+        // через пост чтобы использовать размеры изображения для управления качеством в ячейке
         imageView.post {
-            // если нет фото то просто как игнор
+            // если нет фото то игнор
             if (value.isNotEmpty()) {
                 val glide = Glide
                     .with(view)
                     .load(value)
-                    // если ошщибка вдруг в полуении изображений
+                    // если ошщибка в полуении изображений
                     .error(R.drawable.ic_image_error)
                 if (imageTypePref.imageViewMode == 0) {
                     // если выбрано "поместить" то этого хватает
@@ -280,7 +278,7 @@ class ColorTypeControl(
             layoutParams = getLayoutParamOfCell()
 
             addView(FrameLayout(context).apply {
-                padding = context.dpsToPixels(4)
+                padding = context.dip(4)
                 layoutParams = FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT

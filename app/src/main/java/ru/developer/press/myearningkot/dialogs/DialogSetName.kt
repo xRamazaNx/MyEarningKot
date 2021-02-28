@@ -10,14 +10,23 @@ import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.set_name_layout.view.*
 import org.jetbrains.anko.layoutInflater
 import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.helpers.getColorFromRes
 import ru.developer.press.myearningkot.helpers.setAlertButtonColors
 
-class DialogSetName(val setName: (String) -> Unit) : DialogFragment() {
+class DialogSetName : DialogFragment() {
 
+    private var positiveClick: ((String) -> Unit)? = null
     private var name = ""
-    fun setFirstName(name: String): DialogSetName {
+    private var title = ""
+    fun setName(name: String): DialogSetName {
         this.name = name
+        return this
+    }
+    fun setTitle(title: String): DialogSetName {
+        this.title = title
+        return this
+    }
+    fun setPositiveListener(click:((String) -> Unit)? = null): DialogSetName {
+        positiveClick = click
         return this
     }
 
@@ -25,13 +34,14 @@ class DialogSetName(val setName: (String) -> Unit) : DialogFragment() {
         val dialog: AlertDialog.Builder = AlertDialog.Builder(context).apply {
             val view = context.layoutInflater.inflate(R.layout.set_name_layout, null)
 
+            view.title.setText(title)
             val editTextCardName = view.editTextSetName
             editTextCardName.setText(name)
             editTextCardName.showKeyboard()
             //
             setView(view)
             setPositiveButton(R.string.OK) { _: DialogInterface, _: Int ->
-                setName(editTextCardName.text.toString())
+                positiveClick?.invoke(editTextCardName.text.toString())
             }
             setNegativeButton(R.string.CANCEL) { dialogInterface: DialogInterface, i: Int ->
                 dialogInterface.dismiss()
@@ -51,7 +61,7 @@ class DialogSetName(val setName: (String) -> Unit) : DialogFragment() {
                 ColorDrawable(
                     ContextCompat.getColor(
                         it,
-                        R.color.colorSurface
+                        R.color.colorDialogBackground
                     )
                 )
             )

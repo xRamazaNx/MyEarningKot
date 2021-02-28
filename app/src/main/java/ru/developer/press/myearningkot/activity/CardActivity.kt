@@ -12,10 +12,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.View.GONE
 import android.view.animation.Animation
-import androidx.core.view.postDelayed
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView.ItemAnimator.ItemAnimatorFinishedListener
 import com.google.android.material.appbar.AppBarLayout
 import kotlinx.android.synthetic.main.activity_card.*
@@ -24,20 +22,23 @@ import kotlinx.android.synthetic.main.card.*
 import kotlinx.android.synthetic.main.card.view.*
 import kotlinx.coroutines.*
 import ru.developer.press.myearningkot.*
-import ru.developer.press.myearningkot.viewmodels.CardViewModel.SelectMode
+import ru.developer.press.myearningkot.App.Companion.app
 import ru.developer.press.myearningkot.adapters.animationAdd
 import ru.developer.press.myearningkot.adapters.animationDelete
 import ru.developer.press.myearningkot.dialogs.PICK_IMAGE_MULTIPLE
 import ru.developer.press.myearningkot.dialogs.editCellTag
-import ru.developer.press.myearningkot.dialogs.startPrefActivity
-import ru.developer.press.myearningkot.model.*
 import ru.developer.press.myearningkot.helpers.EditCellControl
+import ru.developer.press.myearningkot.helpers.PrefCardInfo
 import ru.developer.press.myearningkot.helpers.getColorFromRes
+import ru.developer.press.myearningkot.helpers.getDrawableRes
+import ru.developer.press.myearningkot.model.*
 import ru.developer.press.myearningkot.viewmodels.CardViewModel
+import ru.developer.press.myearningkot.viewmodels.CardViewModel.SelectMode
 import ru.developer.press.myearningkot.viewmodels.ViewModelCardFactory
 import uk.co.markormesher.android_fab.SpeedDialMenuAdapter
 import uk.co.markormesher.android_fab.SpeedDialMenuItem
 import java.lang.Runnable
+import kotlin.concurrent.thread
 
 
 open class CardActivity : BasicCardActivity() {
@@ -47,7 +48,7 @@ open class CardActivity : BasicCardActivity() {
     private val launch = CoroutineScope(Dispatchers.Main).launch {
         val id = intent.getLongExtra(CARD_ID, 0)
         val card = withContext(Dispatchers.IO) {
-            DataController().getCard(id)
+            DataController(this@CardActivity).getCard(id)
         }
         createViewModel(card)
 
@@ -64,7 +65,7 @@ open class CardActivity : BasicCardActivity() {
         super.onCreate(savedInstanceState)
         // внести все нужные события ид, подписки и т.д.
         launch.start()
-        tableView.isLong.observe(this, Observer {
+        tableView.isLong.observe(this, {
             isLongClick = it
         })
         fbAddRow.setContentCoverColour(Color.TRANSPARENT)
@@ -105,16 +106,16 @@ open class CardActivity : BasicCardActivity() {
 
     private fun selectedModeObserve() {
         val menu = toolbar.menu
-        viewModel?.selectMode?.observe(this, Observer { selectMode ->
+        viewModel?.selectMode?.observe(this, { selectMode ->
             menu.clear()
             when (selectMode) {
                 SelectMode.CELL -> {
                     menuInflater.inflate(R.menu.cell_menu, menu)
                     // ставим иконку вставить в зависимости доступности вставки
-                    if (viewModel!!.isEqualTypeCellAndCopyCell()) {
-                        menu.findItem(R.id.pasteCell).setIcon(R.drawable.ic_paste_white)
+                    if (viewModel!!.isEqualTypeCellAndCopyCell(app().copyCell)) {
+                        menu.findItem(R.id.pasteCell).setIcon(R.drawable.ic_paste)
                     } else
-                        menu.findItem(R.id.pasteCell).setIcon(R.drawable.ic_paste_white_disabled)
+                        menu.findItem(R.id.pasteCell).setIcon(R.drawable.ic_paste_disabled)
 
 //                    val speedAdapter = object : SpeedDialMenuAdapter() {
 //
@@ -198,18 +199,18 @@ open class CardActivity : BasicCardActivity() {
                 SelectMode.ROW -> {
                     menuInflater.inflate(R.menu.row_menu, menu)
                     if (viewModel!!.isCapabilityPaste()) {
-                        menu.findItem(R.id.pasteRow).setIcon(R.drawable.ic_paste_white)
+                        menu.findItem(R.id.pasteRow).setIcon(R.drawable.ic_paste)
                     } else
-                        menu.findItem(R.id.pasteRow).setIcon(R.drawable.ic_paste_white_disabled)
+                        menu.findItem(R.id.pasteRow).setIcon(R.drawable.ic_paste_disabled)
                     fbAddRow.speedDialMenuAdapter = object : SpeedDialMenuAdapter() {
                         private val list = mutableListOf<SpeedDialMenuItem>().apply {
                             add(
                                 SpeedDialMenuItem(
                                     this@CardActivity,
                                     if (viewModel!!.isCapabilityPaste())
-                                        getDrawable(R.drawable.ic_paste_white)!!
+                                        getDrawableRes(R.drawable.ic_paste)!!
                                     else
-                                        getDrawable(R.drawable.ic_paste_white_disabled)!!,
+                                        getDrawableRes(R.drawable.ic_paste_disabled)!!,
 //                                    getString(R.string.PASTE)
                                     ""
                                 )
@@ -217,7 +218,7 @@ open class CardActivity : BasicCardActivity() {
                             add(
                                 SpeedDialMenuItem(
                                     this@CardActivity,
-                                    getDrawable(R.drawable.ic_copy_white)!!,
+                                    getDrawableRes(R.drawable.ic_copy)!!,
 //                                    getString(R.string.COPY)
                                     ""
                                 )
@@ -225,7 +226,7 @@ open class CardActivity : BasicCardActivity() {
                             add(
                                 SpeedDialMenuItem(
                                     this@CardActivity,
-                                    getDrawable(R.drawable.ic_cut_white)!!,
+                                    getDrawableRes(R.drawable.ic_cut)!!,
                                     ""
 //                                    getString(R.string.cut)
                                 )
@@ -233,7 +234,7 @@ open class CardActivity : BasicCardActivity() {
                             add(
                                 SpeedDialMenuItem(
                                     this@CardActivity,
-                                    getDrawable(R.drawable.ic_delete_white)!!,
+                                    getDrawableRes(R.drawable.ic_delete)!!,
 //                                    getString(R.string.DELETE)
                                     ""
                                 )
@@ -269,7 +270,7 @@ open class CardActivity : BasicCardActivity() {
                             return getColorFromRes(R.color.colorAccent)
                         }
                     }
-                    fbAddRow.setButtonIconResource(R.drawable.ic_menu_3_line)
+                    fbAddRow.setButtonIconResource(R.drawable.ic_more_setting)
                     fbAddRow.setButtonBackgroundColour(getColorFromRes(R.color.colorAccent))
                     supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_check)
                 }
@@ -284,9 +285,11 @@ open class CardActivity : BasicCardActivity() {
                         if (!appBar.isShown)
                             fbAddRow.hide()
                     }
-                    supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_back_white)
+                    supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_home)
                 }
             }
+            if (selectMode != SelectMode.NONE)
+                fbAddRow.hide()
         })
 
     }
@@ -294,6 +297,7 @@ open class CardActivity : BasicCardActivity() {
     private fun createViewModel(card: Card) {
         viewModel = ViewModelProvider(
             this, ViewModelCardFactory(
+                this,
                 card
             )
         ).get(CardViewModel::class.java)
@@ -315,7 +319,7 @@ open class CardActivity : BasicCardActivity() {
                             recreate()
                         } else {
                             CoroutineScope(Dispatchers.IO).launch {
-                                val card = DataController().getCard(id)
+                                val card = DataController(this@CardActivity).getCard(id)
                                 withContext(Dispatchers.Main) {
                                     viewModel!!.updateCard(card)
                                     createTitles()
@@ -348,6 +352,7 @@ open class CardActivity : BasicCardActivity() {
             }
             R.id.setting -> {
                 startPrefActivity(
+                    PrefCardInfo.CardCategory.CARD,
                     activity = this,
                     card = viewModel!!.card,
                     title = getString(R.string.setting)
@@ -425,7 +430,7 @@ open class CardActivity : BasicCardActivity() {
 
     private fun pasteCell() {
         // на вход принимается функция которая должна обновить строку после вставки
-        viewModel?.pasteCell {
+        viewModel?.pasteCell(app().copyCell) {
             // обновление строки после вставки данных
             adapter.notifyItemChanged(it)
         }
@@ -520,6 +525,8 @@ open class CardActivity : BasicCardActivity() {
         totalAmountView.animate().setListener(animListener)
         appBar.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
 
+            if (viewModel?.selectMode?.value != SelectMode.NONE)
+                return@OnOffsetChangedListener
             val heightToolbar = appBarLayout.toolbar.height
 
             val isHide = -verticalOffset == heightToolbar
@@ -653,20 +660,17 @@ open class CardActivity : BasicCardActivity() {
                 }
             }
             adapter.notifyDataSetChanged()
-            updateCardInDB().invokeOnCompletion {
-                updateTotals()
-            }
+            updateCardInDB()
 
         }.editCell()
     }
 
-    private fun updateCardInDB() =
-        CoroutineScope(Dispatchers.Main).launch {
-            withContext(Dispatchers.IO) {
-                viewModel?.card?.let {
-                    DataController().updateCard(it)
-                }
-            }
+    private fun updateCardInDB() = thread {
+        viewModel?.updateCardIntoDB()
+        runOnUiThread {
+            updateTotals()
         }
+    }
+
 
 }

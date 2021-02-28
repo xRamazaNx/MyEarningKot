@@ -5,7 +5,6 @@ import android.app.DatePickerDialog
 import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
@@ -22,12 +21,11 @@ import kotlinx.android.synthetic.main.edit_cell_text.view.*
 import org.jetbrains.anko.layoutInflater
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.helpers.getColorFromRes
+import ru.developer.press.myearningkot.helpers.prefLayouts.initClickOperation
+import ru.developer.press.myearningkot.helpers.setAlertButtonColors
 import ru.developer.press.myearningkot.model.Column
 import ru.developer.press.myearningkot.model.ColumnType
 import ru.developer.press.myearningkot.model.PhoneTypeValue
-import ru.developer.press.myearningkot.helpers.prefLayouts.initClickOperation
-import ru.developer.press.myearningkot.helpers.setAlertButtonColors
-import java.lang.Exception
 import java.util.*
 
 
@@ -76,7 +74,7 @@ class DialogEditCell(
             //            datePicker.backgroundColor = Color.WHITE
             datePicker.post {
 
-                window?.setBackgroundDrawable(ColorDrawable(context.getColorFromRes(R.color.colorSurface)))
+                window?.setBackgroundDrawable(ColorDrawable(context.getColorFromRes(R.color.colorDialogBackground)))
             }
         }
     }
@@ -192,7 +190,7 @@ class DialogEditCell(
                     ColorDrawable(
                         ContextCompat.getColor(
                             it,
-                            R.color.colorSurface
+                            R.color.colorDialogBackground
                         )
                     )
                 )

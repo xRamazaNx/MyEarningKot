@@ -1,7 +1,6 @@
 package ru.developer.press.myearningkot.helpers.prefLayouts
 
 import android.content.Context
-import android.graphics.Color
 import android.util.TypedValue
 import android.view.View
 import android.widget.ImageButton
@@ -12,20 +11,16 @@ import com.jaredrummler.android.colorpicker.ColorPickerDialogListener
 import kotlinx.android.synthetic.main.pref_column_date.view.*
 import kotlinx.android.synthetic.main.prefs_text_view.view.*
 import kotlinx.android.synthetic.main.prefs_total.view.*
-import kotlinx.android.synthetic.main.prefs_total.view.digitsCountDown
-import kotlinx.android.synthetic.main.prefs_total.view.digitsCountUp
-import kotlinx.android.synthetic.main.prefs_total.view.digitsSize
-import kotlinx.android.synthetic.main.prefs_total.view.groupNumberSwitch
 import kotlinx.android.synthetic.main.toolbar_pref.view.*
 import kotlinx.android.synthetic.main.width_seek_bar_layout.view.*
 import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.activity.BasicCardActivity
-import ru.developer.press.myearningkot.model.*
 import ru.developer.press.myearningkot.helpers.getColorFromRes
 import ru.developer.press.myearningkot.helpers.getDate
 import ru.developer.press.myearningkot.helpers.getDateTypeList
 import ru.developer.press.myearningkot.helpers.showItemChangeDialog
+import ru.developer.press.myearningkot.model.*
 
 fun Context.getPrefTextLayout(
     prefForTextView: MutableList<PrefForTextView>,
@@ -62,28 +57,28 @@ fun Context.getPrefTotalLayout(
     val view = layoutInflater.inflate(R.layout.prefs_total, null)
     val firstTotal = totals[0]
 
-//    val widthColumnSeekBar = view.widthColumnSeekBar
-//
-//    widthColumnSeekBar.progress = firstTotal.width
-//    widthColumnSeekBar.setOnSeekBarChangeListener(object :
-//        SeekBar.OnSeekBarChangeListener {
-//        override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
-//            val progress = p0!!.progress
-//            if (progress > 30) {
-//                totals.forEach {
-//                    it.width = progress
-//                }
-//                callback.widthProgress()
-//            }
-//        }
-//
-//        override fun onStartTrackingTouch(p0: SeekBar?) {
-//        }
-//
-//        override fun onStopTrackingTouch(p0: SeekBar?) {
-//            callback.widthChanged()
-//        }
-//    })
+    val widthColumnSeekBar = view.widthColumnSeekBar
+
+    widthColumnSeekBar.progress = firstTotal.width
+    widthColumnSeekBar.setOnSeekBarChangeListener(object :
+        SeekBar.OnSeekBarChangeListener {
+        override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+            val progress = p0!!.progress
+            if (progress > 30) {
+                totals.forEach {
+                    it.width = progress
+                }
+                callback.widthProgress()
+            }
+        }
+
+        override fun onStartTrackingTouch(p0: SeekBar?) {
+        }
+
+        override fun onStopTrackingTouch(p0: SeekBar?) {
+            callback.widthChanged()
+        }
+    })
 
 
     val prefList = mutableListOf<PrefForTextView>().apply {
@@ -442,6 +437,8 @@ interface PrefTotalChangedCallBack : PrefChangedCallBack {
     fun calcFormula()
     fun getNumberColumns(): MutableList<NumberColumn>
     fun getTotals(): List<TotalItem>
+    fun widthProgress()
+    fun widthChanged()
 }
 /*
 класс который помогает выделять и убирать вылеление

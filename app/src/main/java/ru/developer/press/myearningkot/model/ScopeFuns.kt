@@ -1,23 +1,18 @@
 package ru.developer.press.myearningkot.model
 
-import android.graphics.Color
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.View
 import android.view.View.GONE
-import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.card.view.*
-import kotlinx.android.synthetic.main.total_item.view.*
 import kotlinx.android.synthetic.main.total_item_layout.view.*
+import kotlinx.android.synthetic.main.total_item_value.view.*
 import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.activity.CardActivity
-import ru.developer.press.myearningkot.helpers.setFont
+import kotlinx.android.synthetic.main.total_item_layout.view.totalValueContainer as totalValueContainer1
 
 fun Card.createViewInPlate(plateView: View) {
     val context = plateView.context
@@ -50,29 +45,18 @@ fun Card.createViewInPlate(plateView: View) {
     totalContainerDisableScroll.removeAllViews()
     totalContainerScroll.removeAllViews()
 
-    val addTotalImageButton = ImageButton(context).apply {
-        layoutParams = LinearLayout.LayoutParams(dip(40), dip(40)).apply {
-            gravity = Gravity.CENTER_VERTICAL
-        }
-        setImageResource(R.drawable.ic_add_not_ring)
-        padding = dip(16)
-//        backgroundColor = Color.TRANSPARENT
-        backgroundResource = R.drawable.add_total_backgraund
-        setColorFilter(ContextCompat.getColor(context, R.color.colorAccent))
-        //FIXME добавить анимацию нажатия и увеличить делей чтоб анимацию показать нормально
-    }
     // добавляем в главный лейаут для тоталов
     if (enableHorizontalScrollTotal) {
         totalContainerScroll.addView(totalContainer)
-        totalContainerScroll.addView(addTotalImageButton)
+//        totalContainerScroll.addView(addTotalImageButton)
         totalContainerDisableScroll.visibility = GONE
     } else {
         totalContainerDisableScroll.addView(totalContainer)
-        totalContainerDisableScroll.addView(addTotalImageButton)
+//        totalContainerDisableScroll.addView(addTotalImageButton)
         totalContainerScroll.visibility = GONE
     }
     // контейнер для всех значений
-    val totalValueLayout = totalContainer.totalValueContainer
+    val totalValueLayout = totalContainer.totalValueContainer1
     // кнтейнер для всех заголовков
     val totalTitleLayout = totalContainer.totalTitleContainer
 
@@ -113,7 +97,7 @@ fun Card.createViewInPlate(plateView: View) {
 }
 
 fun Card.updateTotalAmount(plateView: View) {
-    val totalValueLayout = plateView.totalValueContainer
+    val totalValueLayout = plateView.totalValueContainer1
     totals.forEachIndexed { index, totalItem ->
         // лайот где валуе и линия
         val valueLayout = totalValueLayout.getChildAt(index)
@@ -125,9 +109,9 @@ fun Card.updateTotalAmount(plateView: View) {
 
 fun View.hideAddTotalButton(card: Card) {
 
-    if (card.enableHorizontalScrollTotal)
-        totalContainerScroll.getChildAt(1).visibility = GONE
-    else
-        totalContainerDisableScroll.getChildAt(1).visibility = GONE
+//    if (card.enableHorizontalScrollTotal)
+//        totalContainerScroll.getChildAt(1).visibility = GONE
+//    else
+//        totalContainerDisableScroll.getChildAt(1).visibility = GONE
 
 }

@@ -1,20 +1,21 @@
 package ru.developer.press.myearningkot.viewmodels
 
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ru.developer.press.myearningkot.AdapterPageInterface
-import ru.developer.press.myearningkot.CardClickListener
 import ru.developer.press.myearningkot.helpers.Page
 import ru.developer.press.myearningkot.helpers.SingleLiveEvent
 import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.DataController
 import ru.developer.press.myearningkot.model.NumberColumn
+import kotlin.concurrent.thread
 
 // этот класс создается (ViewModelProviders.of(this).get(Class::class.java))
 // и существует пока существует активити до уничтожения он только обновляет данные представления
-class MainViewModel(list: MutableList<Page>) : ViewModel(),
-    AdapterPageInterface,
-    CardClickListener {
+class MainViewModel(context: Context, list: MutableList<Page>) : ViewModel(),
+    AdapterPageInterface {
+    private var openedCardId: Long = -1
     private val pageList: MutableList<MutableLiveData<Page>> = mutableListOf()
 
     init {
@@ -24,8 +25,9 @@ class MainViewModel(list: MutableList<Page>) : ViewModel(),
     }
 
     // нажали на карточку
-    override fun cardClick(idCard: Long) {
+    fun cardClick(idCard: Long) {
         openCardEvent.call(idCard)
+        openedCardId = idCard
     }
 
     val openCardEvent = SingleLiveEvent<Long>()
@@ -56,28 +58,32 @@ class MainViewModel(list: MutableList<Page>) : ViewModel(),
         return cardsInPage.size
     }
 
-    private val dataController = DataController()
+    private val dataController = DataController(context)
 
-    fun addCard(
+    fun createCard(
         indexPage: Int,
-        card: Card,
+        sampleID: Long,
+        name: String,
         updateView: (position: Int) -> Unit
     ) {
-
-        // для того что бы удвлить времянки
-        card.rows.clear()
-        // добавляем в базу данных новую Card присовение ид очень важно
-        val mutableLiveData = pageList[indexPage]
-        val page = mutableLiveData.value!!
-        card.idPage = page.id
-        // добавляем в базу
-        dataController.addCard(card)
-        // узнать позицию для добавления во вкладку и для ее обновления во вью... а ее надо узнавать смотря какая сортировка
-        val position = getPositionCardInPage(indexPage, card)
-        // добавляем во вкладку
-        page.cards.add(position, MutableLiveData<Card>().apply { postValue(card) })
-        mutableLiveData.postValue(page)
-        updateView(position)
+        thread {
+            val card: Card = dataController.getSampleCard(sampleID)!!
+            // для того что бы удвлить времянки
+            card.rows.clear()
+            // добавляем в базу данных новую Card присовение ид очень важно
+            val mutableLiveData = pageList[indexPage]
+            val page = mutableLiveData.value!!
+            card.idPage = page.id
+            card.name = name
+            // добавляем в базу
+            dataController.addCard(card)
+            // узнать позицию для добавления во вкладку и для ее обновления во вью... а ее надо узнавать смотря какая сортировка
+            val position = getPositionCardInPage(indexPage, card)
+            // добавляем во вкладку
+            page.cards.add(position, MutableLiveData<Card>().apply { postValue(card) })
+            mutableLiveData.postValue(page)
+            updateView(position)
+        }
 
     }
 
@@ -106,13 +112,14 @@ class MainViewModel(list: MutableList<Page>) : ViewModel(),
         return pageList[selectedTabPosition].value!!.cards[position].value!!
     }
 
-    private fun calcCard (card: Card){
+    private fun calcCard(card: Card) {
         card.apply {
             columns.filterIsInstance<NumberColumn>().forEach { column ->
                 updateTypeControlColumn(column)
             }
         }
     }
+
     fun calcAllCards() {
         pageList.forEach { page ->
             page.value!!.cards.forEach { card ->
@@ -130,6 +137,30 @@ class MainViewModel(list: MutableList<Page>) : ViewModel(),
         page.background = color
         mutableLiveData.postValue(page)
 
+    }
+
+    fun checkUpdatedCard() {
+        pageList.forEach { liveData ->
+            val find = liveData.value?.cards?.find { it.value?.id == openedCardId }
+            find?.let {
+                val card = it.value!!
+                card.isUpdating = true
+                it.postValue(card)
+                openedCardId = -1
+                return@forEach
+            }
+        }
+//
+//        pageList.forEach { liveData ->
+//            liveData.value?.cards?.forEach {
+//                val value = it.value
+//                if (value?.id == openedCardId) {
+//                    value.isUpdating = true
+//                    it.postValue(value)
+//                }
+//                return
+//            }
+//        }
     }
 
 //    fun deletePage(position: Int, deleteEvent: (Boolean) -> Unit) {

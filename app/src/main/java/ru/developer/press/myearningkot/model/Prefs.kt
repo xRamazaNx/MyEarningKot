@@ -1,12 +1,8 @@
 package ru.developer.press.myearningkot.model
 
-import android.graphics.Color
 import android.graphics.Typeface
 import android.widget.TextView
-import androidx.core.content.res.ResourcesCompat
-import ru.developer.press.myearningkot.App
 import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.helpers.getColorFromRes
 import ru.developer.press.myearningkot.helpers.getColorFromText
 import ru.developer.press.myearningkot.helpers.setFont
 

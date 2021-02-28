@@ -7,6 +7,7 @@
     android:orientation="vertical">
 
     <include layout="@layout/toolbar_pref" />
+    <include layout="@layout/width_seek_bar_layout"/>
 
     <ScrollView
         android:background="@color/colorBackground"
@@ -70,7 +71,7 @@
                         android:background="?android:attr/selectableItemBackground"
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp"
-                        android:src="@drawable/ic_edit_name"
+                        android:src="@drawable/ic_edit"
                         android:tint="@color/colorAccent" />
                 </LinearLayout>
 

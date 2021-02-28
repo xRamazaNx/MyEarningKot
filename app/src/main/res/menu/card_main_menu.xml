@@ -2,9 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!--tools:context="com.a4165816.press.zarplata.com.a4165816.press.earnings.ZarplataActivity"-->
-
-
     <item
         android:id="@+id/search"
         android:icon="@drawable/ic_search"

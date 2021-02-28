@@ -24,14 +24,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jetbrains.anko.dip
 import org.jetbrains.anko.support.v4.toast
 import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.adapters.AdapterViewPagerImageCell
-import ru.developer.press.myearningkot.dpsToPixels
-import ru.developer.press.myearningkot.model.Column
-import ru.developer.press.myearningkot.model.ImageTypeValue
+import ru.developer.press.myearningkot.adapters.AdapterViewPagerFromImageCell
 import ru.developer.press.myearningkot.helpers.filesFolder
 import ru.developer.press.myearningkot.helpers.setAlertButtonColors
+import ru.developer.press.myearningkot.model.Column
+import ru.developer.press.myearningkot.model.ImageTypeValue
 import java.io.File
 
 
@@ -65,38 +65,37 @@ class DialogEditImageCell(
         val tabs = imageViewer.imagesTabs
 
         val activity = activity!!
-        val adapter = AdapterViewPagerImageCell(
+        val adapter = AdapterViewPagerFromImageCell(
             fragmentManager = activity.supportFragmentManager,
             lifecycle = lifecycle,
             imageUriList = imageValue.imagePathList
         )
         viewPager.adapter = adapter
-        val dpsToPixels = activity.dpsToPixels(48)
-        TabLayoutMediator(tabs, viewPager,
-            TabLayoutMediator.TabConfigurationStrategy { tab, position ->
-                val image = ImageView(activity).apply {
-                    layoutParams = TableLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT
-                    ).apply {
-                        weight = 0f
-                    }
+        val dpsToPixels = activity.dip(48)
+        TabLayoutMediator(tabs, viewPager) { tab, position ->
+            val image = ImageView(activity).apply {
+                layoutParams = TableLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                ).apply {
+                    weight = 0f
                 }
-                tab.customView = image
-                Glide
-                    .with(this)
-                    .load(imageValue.imagePathList[position])
-                    .error(R.drawable.ic_image_error)
-                    .fitCenter()
-                    .into(image)
-                tab.view.layoutParams =
-                    LinearLayout.LayoutParams(
-                        dpsToPixels,
-                        dpsToPixels
-                    ).apply {
-                        weight = 0f
-                    }
-            }).attach()
+            }
+            tab.customView = image
+            Glide
+                .with(this)
+                .load(imageValue.imagePathList[position])
+                .error(R.drawable.ic_image_error)
+                .fitCenter()
+                .into(image)
+            tab.view.layoutParams =
+                LinearLayout.LayoutParams(
+                    dpsToPixels,
+                    dpsToPixels
+                ).apply {
+                    weight = 0f
+                }
+        }.attach()
         viewPager.post {
             if (imageValue.imagePathList.isNotEmpty()
                 && changeImage > -1
@@ -233,7 +232,7 @@ class DialogEditImageCell(
                     ColorDrawable(
                         ContextCompat.getColor(
                             it,
-                            R.color.colorSurface
+                            R.color.colorDialogBackground
                         )
                     )
                 )

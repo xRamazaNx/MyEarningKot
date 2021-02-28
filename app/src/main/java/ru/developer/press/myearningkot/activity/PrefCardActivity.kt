@@ -18,11 +18,9 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_card.*
 import kotlinx.android.synthetic.main.card.*
-import kotlinx.android.synthetic.main.card.datePeriodCard
-import kotlinx.android.synthetic.main.card.nameCard
 import kotlinx.android.synthetic.main.card.view.*
-import kotlinx.android.synthetic.main.total_item.view.totalValue
 import kotlinx.android.synthetic.main.total_item_layout.view.*
+import kotlinx.android.synthetic.main.total_item_value.view.*
 import kotlinx.android.synthetic.main.width_seek_bar_layout.*
 import kotlinx.android.synthetic.main.width_seek_bar_layout.view.*
 import kotlinx.coroutines.CoroutineScope
@@ -33,20 +31,21 @@ import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import org.jetbrains.anko.backgroundColorResource
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.wrapContent
-import ru.developer.press.myearningkot.viewmodels.CardViewModel
 import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.viewmodels.ViewModelCardFactory
 import ru.developer.press.myearningkot.dialogs.DialogBasicPrefCard
 import ru.developer.press.myearningkot.dialogs.DialogSetName
-import ru.developer.press.myearningkot.model.*
 import ru.developer.press.myearningkot.helpers.PrefCardInfo
+import ru.developer.press.myearningkot.helpers.SampleHelper
 import ru.developer.press.myearningkot.helpers.prefLayouts.*
 import ru.developer.press.myearningkot.helpers.prefLayouts.ElementPrefType.*
-import ru.developer.press.myearningkot.helpers.SampleHelper
 import ru.developer.press.myearningkot.helpers.showItemChangeDialog
+import ru.developer.press.myearningkot.model.*
+import ru.developer.press.myearningkot.viewmodels.CardViewModel
+import ru.developer.press.myearningkot.viewmodels.ViewModelCardFactory
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.negativeButton
 import splitties.alertdialog.appcompat.positiveButton
+import kotlin.concurrent.thread
 
 
 val CARD_ID = "card_id"
@@ -55,7 +54,6 @@ val TITLE_PREF_ACTIVITY = "title_pref_activity"
 val CARD_EDIT_JSON_REQ_CODE = 0
 
 class PrefCardActivity : BasicCardActivity() {
-    private var seekBarWindow: PopupWindow? = null
     private val totalContainer: LinearLayout
         get() {
             return if (totalContainerDisableScroll.childCount > 0)
@@ -68,13 +66,13 @@ class PrefCardActivity : BasicCardActivity() {
     private val selectedControl = PrefSelectedControl()
     lateinit var prefWindow: PopupWindow
     override var viewModel: CardViewModel? = null
-    private val addTotalImageButton: ImageView
-        get() {
-            return if (totalContainerDisableScroll.childCount > 0)
-                totalContainerDisableScroll.getChildAt(1) as ImageView
-            else
-                totalContainerScroll.getChildAt(1) as ImageView
-        }
+//    private val addTotalImageButton: ImageView
+//        get() {
+//            return if (totalContainerDisableScroll.childCount > 0)
+//                totalContainerDisableScroll.getChildAt(1) as ImageView
+//            else
+//                totalContainerScroll.getChildAt(1) as ImageView
+//        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,31 +83,32 @@ class PrefCardActivity : BasicCardActivity() {
         visibleHideElements()
         disableBehavior()
 
-        CoroutineScope(Dispatchers.Main).launch {
+        thread {
 
-            val card: Card? = withContext(Dispatchers.IO) {
-                val prefCardJson = intent.getStringExtra(PREF_CARD_INFO_JSON)
-                prefCardInfo = Gson().fromJson(prefCardJson, PrefCardInfo::class.java)
+            val prefCardJson = intent.getStringExtra(PREF_CARD_INFO_JSON)
+            prefCardInfo = Gson().fromJson(prefCardJson, PrefCardInfo::class.java)
 
-                if (prefCardInfo.cardCategory == PrefCardInfo.CardCategory.CARD)
-                    DataController().getCard(prefCardInfo.idCard)
-                else {
-                    SampleHelper().getSample(prefCardInfo.idCard)
-                }
+            val card: Card? = if (prefCardInfo.cardCategory == PrefCardInfo.CardCategory.CARD) {
+                DataController(this).getCard(prefCardInfo.idCard)
+            } else {
+                SampleHelper(this).getSample(prefCardInfo.idCard)
             }
-            viewModel = ViewModelProvider(
-                this@PrefCardActivity, ViewModelCardFactory(
-                    card!!
+            runOnUiThread {
+                viewModel = ViewModelProvider(
+                    this@PrefCardActivity, ViewModelCardFactory(
+                        this,
+                        card!!
+                    )
+                ).get(
+                    CardViewModel::
+                    class.java
                 )
-            ).get(
-                CardViewModel::
-                class.java
-            )
-            initSelectCallback()
-            progressBar.visibility = GONE
-            doStart()
-            initElementClick()
+                initSelectCallback()
+                progressBar.visibility = GONE
+                doStart()
+                initClicksOfElements()
 
+            }
         }
 
         initPrefPopupWindow()
@@ -121,142 +120,6 @@ class PrefCardActivity : BasicCardActivity() {
 //            if (prefWindow.isShowing)
 //                prefWindow.update(matchParent, height)
         }
-
-        selectedControl.showWidthSeekBar = { selectedElementList ->
-
-            var isFirstChangeProgress = true
-            val columnList =
-                getColumnsFromSelectedElements(selectedElementList)
-
-            val listTotal = mutableListOf<TotalItem>().apply {
-                selectedElementList.filterIsInstance(
-                    SelectedElement.ElementTotal::class.java
-                )
-                    .forEach {
-                        add(viewModel!!.card.totals[it.index])
-                    }
-            }
-
-            fun widthChanged() {
-                if (selectedControl.selectPrefType == COLUMN) {
-
-                    createTitles()
-                    createRecyclerView()
-                    clickPrefToAdapter()
-                    initElementClick()
-
-                    widthDrawer.positionList.clear()
-                    widthDrawer.invalidate()
-                } else {
-                    updatePlate()
-                }
-                // фуакция на изменение ширины колоны
-            }
-
-            fun widthProgress(progress: Int) {
-                if (selectedControl.selectPrefType == COLUMN) {
-
-                    columnList.forEach { column ->
-                        column.width = progress
-                        val index = viewModel!!.card.columns.indexOf(column)
-                        columnContainer.getChildAt(index)
-                            .layoutParams.width =
-                            column.width
-                    }
-                    columnContainer.requestLayout()
-
-                    widthDrawer.positionList.clear()
-                    columnContainer.forEach {
-                        val title = it
-                        val rightPosition =
-                            title.x + it.width - horizontalScrollView.scrollX
-                        widthDrawer.positionList.add(rightPosition)
-                    }
-
-                    widthDrawer.invalidate()
-                } else {
-
-                    listTotal.forEach { total ->
-                        total.width = progress
-                        val index = viewModel!!.card.totals.indexOf(total)
-                        totalContainer.totalValueContainer.getChildAt(
-                            index
-                        )
-                            .layoutParams.width =
-                            total.width
-                        totalContainer.totalTitleContainer.getChildAt(
-                            index
-                        )
-                            .layoutParams.width =
-                            total.width
-                    }
-                    totalContainer.requestLayout()
-                }
-
-            }
-
-            if (seekBarWindow == null) {
-                seekBarWindow = PopupWindow(this).also { popupWindow ->
-                    popupWindow.contentView =
-                        layoutInflater.inflate(R.layout.width_seek_bar_layout, null)
-                    popupWindow.width = matchParent
-                }
-            }
-            val seekBar = seekBarWindow!!.contentView.widthColumnSeekBar
-            seekBar?.setOnSeekBarChangeListener(object :
-                SeekBar.OnSeekBarChangeListener {
-
-                override fun onProgressChanged(
-                    p0: SeekBar?,
-                    p1: Int,
-                    p2: Boolean
-                ) {
-                    if (isFirstChangeProgress) {
-                        isFirstChangeProgress = false
-                        return
-                    }
-                    val progress = p0!!.progress
-                    if (progress > 30) {
-
-                        widthProgress(progress)
-                    }
-                }
-
-                override fun onStartTrackingTouch(p0: SeekBar?) {
-                }
-
-                override fun onStopTrackingTouch(p0: SeekBar?) {
-                    widthChanged()
-                }
-            })
-
-            if (!seekBarWindow!!.isShowing) {
-                if (selectedControl.selectPrefType == COLUMN)
-                    seekBarWindow!!.showAsDropDown(columnContainer)
-                else{
-//                    seekbarLayout.animate().translationY(-(totalAmountView.height).toFloat())
-                    seekBarWindow!!.showAsDropDown(totalAmountView, 0, -totalAmountView.height*2)
-                }
-            }
-            var progress = 0
-            if (columnList.isNotEmpty()) {
-                var i = 0
-                columnList.forEach {
-                    i += it.width
-                }
-                progress = i / columnList.size
-            }
-            if (listTotal.isNotEmpty()) {
-                var i = 0
-                listTotal.forEach {
-                    i += it.width
-                }
-                progress = i / listTotal.size
-            }
-            seekBar?.progress = progress
-        }
-        selectedControl.hideWidthSeekBar =
-            { seekBarWindow?.dismiss() }
 
     }
 
@@ -270,20 +133,22 @@ class PrefCardActivity : BasicCardActivity() {
         prefWindow.isOutsideTouchable = true
         prefWindow.animationStyle = R.style.popup_window_animation
         prefWindow.setOnDismissListener {
+            root.animate().alpha(1f)
             totalAmountView.animate().translationY(0f)
             selectedControl.unSelectAll()
         }
     }
 
-    fun showPrefWindow(view: View) {
-//        if (y > 0) {
-//            view.post {
-//                totalAmountView.animate().translationY(-recycler.height.toFloat()+y)
-//            }
-//        }
+    fun showPrefWindow(view: View, y: Int) {
+        if (y > 0) {
+            view.post {
+                totalAmountView.animate().translationY(-view.height.toFloat())
+            }
+        }
         view.minimumHeight = (resources.displayMetrics.heightPixels / 3)
         prefWindow.contentView = view
         prefWindow.showAtLocation(totalAmountView, Gravity.BOTTOM, 0, 0)
+        root.animate().alpha(0.3f)
 
     }
 
@@ -305,7 +170,7 @@ class PrefCardActivity : BasicCardActivity() {
         )
     }
 
-    private fun initElementClick() {
+    private fun initClicksOfElements() {
         clickPrefToAdapter()
 
         val card = viewModel?.card
@@ -340,14 +205,6 @@ class PrefCardActivity : BasicCardActivity() {
         }
 
         initClickTotals(card)
-
-        addTotalImageButton.setOnClickListener {
-            viewModel?.addTotal()
-            viewModel?.updatePlateChanged()
-            initElementClick()
-            selectedControl.unSelectAll()
-            selectTotal(viewModel!!.card.totals.size - 1)
-        }
 
     }
 
@@ -406,7 +263,7 @@ class PrefCardActivity : BasicCardActivity() {
 
 
                             setShowTotalInfo(card.isShowTotalInfo)//
-                            initElementClick()
+                            initClicksOfElements()
                             if (card.isShowTotalInfo)
                                 selectedControl.updateSelected()
                             else
@@ -432,7 +289,7 @@ class PrefCardActivity : BasicCardActivity() {
                     createRecyclerView()
                     // после создания адаптера надо зановго заложить умение выделяться
                     clickPrefToAdapter()
-                    initElementClick()
+                    initClicksOfElements()
 
                     horizontalScrollView.post {
                         horizontalScrollView.fullScroll(ScrollView.FOCUS_RIGHT)
@@ -442,6 +299,13 @@ class PrefCardActivity : BasicCardActivity() {
                     selectColumn(index)
 
                 }
+            }
+            R.id.addTotal -> {
+                viewModel?.addTotal()
+                viewModel?.updatePlateChanged()
+                initClicksOfElements()
+                selectedControl.unSelectAll()
+                selectTotal(viewModel!!.card.totals.size - 1)
             }
             R.id.elementSetting -> {
                 selectedControl.showPref()
@@ -498,17 +362,17 @@ class PrefCardActivity : BasicCardActivity() {
     }
 
     private fun setCardOfResult() {
-        CoroutineScope(Dispatchers.Main).launch {
-            progressBar.visibility = VISIBLE
-            withContext(Dispatchers.IO) {
-                val card = viewModel?.card
-                if (prefCardInfo.cardCategory == PrefCardInfo.CardCategory.CARD)
-                    DataController().updateCard(card!!)
-                else
-                    SampleHelper().updateSample(card!!)
+        thread {
+            runOnUiThread {
+                progressBar.visibility = VISIBLE
             }
-            val data = Intent()
+            val card = viewModel?.card
+            if (prefCardInfo.cardCategory == PrefCardInfo.CardCategory.CARD)
+                DataController(this).updateCard(card!!)
+            else
+                SampleHelper(this).updateSample(card!!)
 
+            val data = Intent()
             data.putExtra(CARD_ID, prefCardInfo.idCard)
             setResult(Activity.RESULT_OK, data)
             finish()
@@ -617,6 +481,7 @@ class PrefCardActivity : BasicCardActivity() {
                 }
 
                 override fun showPref(elementPref: ElementPref) {
+                    var yOff = 0
                     val prefLayout =
                         when (elementPref.elementPrefType) {
                             TEXT_VIEW -> {
@@ -630,6 +495,9 @@ class PrefCardActivity : BasicCardActivity() {
                                         || elementType == ElementType.TOTAL_TITLE
                                     )
                                         isWorkAlignPanel = false
+                                }
+                                if (!isWorkAlignPanel) {
+                                    yOff = totalAmountView.height
                                 }
                                 val prefList = mutableListOf<PrefForTextView>()
 
@@ -674,8 +542,7 @@ class PrefCardActivity : BasicCardActivity() {
                                                     ElementType.TOTAL_TITLE -> {
                                                         val elementTotal =
                                                             it as SelectedElement.ElementTotal
-                                                        card.totals[elementTotal.index].title =
-                                                            text
+                                                        card.totals[elementTotal.index].title = text
                                                     }
                                                     else -> {
 
@@ -693,39 +560,54 @@ class PrefCardActivity : BasicCardActivity() {
                             }
 
                             TOTAL -> {
+                                yOff = totalAmountView.height
 
                                 val listTotal = mutableListOf<TotalItem>().apply {
-                                    elementPref.selectedElementList.filterIsInstance(
-                                        SelectedElement.ElementTotal::class.java
-                                    )
+                                    elementPref.selectedElementList.filterIsInstance(SelectedElement.ElementTotal::class.java)
                                         .forEach {
                                             add(card.totals[it.index])
                                         }
                                 }
-                                getPrefTotalLayout(
-                                    listTotal,
-                                    object : PrefTotalChangedCallBack {
-                                        override fun prefChanged() {
-                                            updatePlate()
-                                        }
+                                getPrefTotalLayout(listTotal, object : PrefTotalChangedCallBack {
+                                    override fun prefChanged() {
+                                        updatePlate()
+                                    }
 
-                                        override fun calcFormula() {
-                                            card.totals.forEach {
-                                                it.calcFormula(card)
-                                            }
-                                            prefChanged()
+                                    override fun calcFormula() {
+                                        card.totals.forEach {
+                                            it.calcFormula(card)
                                         }
+                                        prefChanged()
+                                    }
 
-                                        override fun getNumberColumns(): MutableList<NumberColumn> {
-                                            return card.columns.filterIsInstance<NumberColumn>()
-                                                .toMutableList()
+                                    override fun getNumberColumns(): MutableList<NumberColumn> {
+                                        return card.columns.filterIsInstance<NumberColumn>()
+                                            .toMutableList()
+                                    }
+
+                                    override fun getTotals(): List<TotalItem> = card.totals
+                                    override fun widthProgress() {
+                                        listTotal.forEach { total ->
+
+                                            val index = card.totals.indexOf(total)
+                                            totalContainer.totalValueContainer.getChildAt(index)
+                                                .layoutParams.width =
+                                                total.width
+                                            totalContainer.totalTitleContainer.getChildAt(index)
+                                                .layoutParams.width =
+                                                total.width
                                         }
+                                        totalContainer.requestLayout()
+                                    }
 
-                                        override fun getTotals(): List<TotalItem> = card.totals
-                                    })
+                                    override fun widthChanged() {
+                                        updatePlate()
+                                    }
+                                })
                             }
 
                             DATE_PERIOD -> {
+                                yOff = totalAmountView.height
                                 getPrefDatePeriod(card.cardPref.dateOfPeriodPref,
                                     object : PrefChangedCallBack {
                                         override fun prefChanged() {
@@ -739,6 +621,16 @@ class PrefCardActivity : BasicCardActivity() {
                                     getColumnsFromSelectedElements(elementPref.selectedElementList)
                                 getPrefColumnLayout(columnList, elementPref.columnType,
                                     object : PrefColumnChangedCallback {
+                                        override fun widthChanged() {
+                                            createTitles()
+                                            createRecyclerView()
+                                            clickPrefToAdapter()
+                                            initClicksOfElements()
+
+                                            widthDrawer.positionList.clear()
+                                            widthDrawer.invalidate()
+                                            // фуакция на изменение ширины колоны
+                                        }
 
                                         override fun prefChanged() {
                                             CoroutineScope(Dispatchers.Main).launch {
@@ -752,6 +644,26 @@ class PrefCardActivity : BasicCardActivity() {
                                             }
                                         }
 
+                                        override fun widthProgress() {
+                                            columnList.forEach { column ->
+
+                                                val index = card.columns.indexOf(column)
+                                                columnContainer.getChildAt(index)
+                                                    .layoutParams.width =
+                                                    column.width
+                                            }
+                                            columnContainer.requestLayout()
+
+                                            widthDrawer.positionList.clear()
+                                            columnContainer.forEach {
+                                                val title = it
+                                                val rightPosition =
+                                                    title.x + it.width - horizontalScrollView.scrollX
+                                                widthDrawer.positionList.add(rightPosition)
+                                            }
+
+                                            widthDrawer.invalidate()
+                                        }
 
                                         override fun recreateView() {
                                             CoroutineScope(Dispatchers.Main).launch {
@@ -777,7 +689,7 @@ class PrefCardActivity : BasicCardActivity() {
                     showPrefWindow(
                         prefLayout.apply {
                             backgroundColorResource = R.color.colorBackground
-                        }
+                        }, yOff
                     )
                 }
 
@@ -814,7 +726,7 @@ class PrefCardActivity : BasicCardActivity() {
                                 createTitles()
                                 createRecyclerView()
                                 clickPrefToAdapter()
-                                initElementClick()
+                                initClicksOfElements()
                                 reSelectAfterMove(columnList)
                             }
                         }
@@ -825,7 +737,7 @@ class PrefCardActivity : BasicCardActivity() {
                             if (!it)
                                 toast(getString(R.string.moving_not_available))
                             else {
-                                initElementClick()
+                                initClicksOfElements()
                                 reSelectAfterMove(totalList)
                             }
                         }
@@ -853,7 +765,7 @@ class PrefCardActivity : BasicCardActivity() {
                                 createTitles()
                                 createRecyclerView()
                                 clickPrefToAdapter()
-                                initElementClick()
+                                initClicksOfElements()
                                 reSelectAfterMove(columnList)
                             }
                         }
@@ -862,7 +774,7 @@ class PrefCardActivity : BasicCardActivity() {
                         viewModel?.moveToLeftTotal(totalList) {
                             if (!it) toast(getString(R.string.moving_not_available))
                             else {
-                                initElementClick()
+                                initClicksOfElements()
                                 reSelectAfterMove(totalList)
                             }
                         }
@@ -883,7 +795,7 @@ class PrefCardActivity : BasicCardActivity() {
                         createTitles()
                         createRecyclerView()
                         clickPrefToAdapter()
-                        initElementClick()
+                        initClicksOfElements()
                     } else {
                         val totalList = getTotalsFromSelectedElements(selectedElementList)
                         selectedControl.unSelectAll()
@@ -898,7 +810,7 @@ class PrefCardActivity : BasicCardActivity() {
                                 }
                             }
                         }
-                        initElementClick()
+                        initClicksOfElements()
                     }
                 }
 
@@ -921,28 +833,30 @@ class PrefCardActivity : BasicCardActivity() {
                         }
                     }
 
-                    DialogSetName {
-                        when (element.elementType) {
-                            ElementType.COLUMN_TITLE -> {
-                                val columnTitleElement =
-                                    element as SelectedElement.ElementColumnTitle
-                                val column = card.columns[columnTitleElement.columnIndex]
-                                column.name = it
-                                val columnTitle =
-                                    columnContainer.getChildAt(columnTitleElement.columnIndex) as TextView
-                                columnTitle.text = it
-                            }
-                            ElementType.TOTAL_TITLE -> {
-                                val totalElement = element as SelectedElement.ElementTotal
-                                card.totals[totalElement.index].title = it
-                                updatePlate()
-                            }
-                            else -> {
-                                card.name = it
-                                updatePlate()
+                    DialogSetName().setName(text)
+                        .setTitle(getString(R.string.name_element))
+                        .setPositiveListener {
+                            when (element.elementType) {
+                                ElementType.COLUMN_TITLE -> {
+                                    val columnTitleElement =
+                                        element as SelectedElement.ElementColumnTitle
+                                    val column = card.columns[columnTitleElement.columnIndex]
+                                    column.name = it
+                                    val columnTitle =
+                                        columnContainer.getChildAt(columnTitleElement.columnIndex) as TextView
+                                    columnTitle.text = it
+                                }
+                                ElementType.TOTAL_TITLE -> {
+                                    val totalElement = element as SelectedElement.ElementTotal
+                                    card.totals[totalElement.index].title = it
+                                    updatePlate()
+                                }
+                                else -> {
+                                    card.name = it
+                                    updatePlate()
+                                }
                             }
                         }
-                    }.setFirstName(text)
                         .show(supportFragmentManager, "setNameElement")
                 }
             }

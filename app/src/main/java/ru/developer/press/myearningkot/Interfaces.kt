@@ -1,11 +1,14 @@
 package ru.developer.press.myearningkot
 
+//import ru.developer.press.myearningkot.model.card
 import android.content.Context
 import android.view.View
 import androidx.lifecycle.MutableLiveData
-import ru.developer.press.myearningkot.model.*
-//import ru.developer.press.myearningkot.model.card
 import ru.developer.press.myearningkot.helpers.Page
+import ru.developer.press.myearningkot.model.Card
+import ru.developer.press.myearningkot.model.Column
+import ru.developer.press.myearningkot.model.Prefs
+import ru.developer.press.myearningkot.model.Row
 
 // для viewPage обратная связь реализатор PageViewModel
 interface AdapterPageInterface {

@@ -1,7 +1,6 @@
 package ru.developer.press.myearningkot.activity
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.View.GONE
@@ -18,40 +17,44 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ru.developer.press.myearningkot.App
-import ru.developer.press.myearningkot.viewmodels.CardViewModel
+import org.jetbrains.anko.backgroundColorResource
+import org.jetbrains.anko.backgroundResource
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.adapters.AdapterRecyclerInCard
-import ru.developer.press.myearningkot.model.createViewInPlate
-import ru.developer.press.myearningkot.model.updateTotalAmount
+import ru.developer.press.myearningkot.databinding.ActivityCardBinding
 import ru.developer.press.myearningkot.helpers.bindTitleOfColumn
 import ru.developer.press.myearningkot.helpers.getColorFromRes
+import ru.developer.press.myearningkot.model.createViewInPlate
+import ru.developer.press.myearningkot.model.updateTotalAmount
+import ru.developer.press.myearningkot.viewmodels.CardViewModel
 
 @SuppressLint("Registered")
 abstract class BasicCardActivity : AppCompatActivity() {
+    private lateinit var root: ActivityCardBinding
     protected lateinit var adapter: AdapterRecyclerInCard
-    val totalViewList = mutableListOf<View>()
-    val columnContainer = LinearLayout(App.instance!!.applicationContext).also {
-        it.layoutParams =
-            LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
-            )
-    }
+    lateinit var columnContainer:LinearLayout
     abstract var viewModel: CardViewModel?
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_card)
+        root = ActivityCardBinding.inflate(layoutInflater)
+        setContentView(root.root)
+        columnContainer = LinearLayout(this).also {
+            it.layoutParams =
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
+                )
+        }
 
-        setSupportActionBar(toolbar)
+        setSupportActionBar(root.toolbar)
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.setTitleTextColor(getColorFromRes(R.color.colorOnPrimary))
+        root.toolbar.setTitleTextColor(getColorFromRes(R.color.colorOnPrimary))
 
         // для того что бы тоталвью не пропускал сквозь себя клики на ресайклер с записями
-        totalAmountView.setOnClickListener { }
+        root.totalAmountView.root.callOnClick()
 
     }
 
@@ -76,8 +79,10 @@ abstract class BasicCardActivity : AppCompatActivity() {
     private fun observePlate() {
         viewModel?.cardLiveData?.observe(this, Observer {
             it.createViewInPlate(totalAmountView)
+            totalAmountView.backgroundResource = R.drawable.background_for_card_in_card_activity
         })
     }
+
     private fun observeTotals() {
         viewModel?.totalLiveData?.observe(this, Observer {
             it.updateTotalAmount(totalAmountView)
@@ -88,6 +93,7 @@ abstract class BasicCardActivity : AppCompatActivity() {
     fun updateHorizontalScrollSwitched() {
         viewModel?.let {
 
+            var currentLayout: View? = null
             if (it.isEnableHorizontalScroll()) {
                 if (columnDisableScrollContainer.contains(columnContainer)) {
                     columnDisableScrollContainer.removeView(columnContainer)
@@ -96,7 +102,7 @@ abstract class BasicCardActivity : AppCompatActivity() {
                 columnScrollContainer.visibility = VISIBLE
                 if (!columnScrollContainer.contains(columnContainer))
                     columnScrollContainer.addView(columnContainer)
-
+                currentLayout = columnScrollContainer
             } else {
                 if (columnScrollContainer.contains(columnContainer)) {
                     columnScrollContainer.removeView(columnContainer)
@@ -106,7 +112,9 @@ abstract class BasicCardActivity : AppCompatActivity() {
 
                 if (!columnDisableScrollContainer.contains(columnContainer))
                     columnDisableScrollContainer.addView(columnContainer)
+                currentLayout = columnDisableScrollContainer
             }
+            currentLayout?.backgroundColorResource = R.color.colorPrimary
         }
     }
 
@@ -155,7 +163,7 @@ abstract class BasicCardActivity : AppCompatActivity() {
         }
     }
 
-    protected fun setShowTotalInfo(showTotalInfo: Boolean){
+    protected fun setShowTotalInfo(showTotalInfo: Boolean) {
         totalAmountView.setShowTotalInfo(showTotalInfo)
 //        if (showTotalInfo)
 //            addTotal.visibility = VISIBLE
@@ -174,8 +182,10 @@ fun View.setShowTotalInfo(showTotalInfo: Boolean) {
     if (showTotalInfo) {
         totalContainerDisableScroll.visibility = VISIBLE
         totalContainerScroll.visibility = VISIBLE
+        divide_line.visibility = GONE
     } else {
         totalContainerDisableScroll.visibility = GONE
         totalContainerScroll.visibility = GONE
+        divide_line.visibility = GONE
     }
 }

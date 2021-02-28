@@ -7,6 +7,7 @@
     android:orientation="vertical">
 
     <include layout="@layout/toolbar_pref" />
+    <include layout="@layout/width_seek_bar_layout"/>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -24,7 +25,7 @@
                 android:background="@color/colorBackground"
                 android:orientation="vertical">
 
-                <Switch
+                <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/enableTextSwitch"
                     style="@style/switch_style"
                     android:layout_width="match_parent"
@@ -93,7 +94,7 @@
                                 android:layout_alignParentEnd="true"
                                 android:background="@color/colorTransparent"
                                 android:elevation="1dp"
-                                android:src="@drawable/ic_font_setting" />
+                                android:src="@drawable/ic_font_setting_button" />
                         </RelativeLayout>
 
                         <RelativeLayout
@@ -139,7 +140,7 @@
                                 android:layout_alignParentEnd="true"
                                 android:background="@color/colorTransparent"
                                 android:elevation="1dp"
-                                android:src="@drawable/ic_font_setting" />
+                                android:src="@drawable/ic_font_setting_button" />
                         </RelativeLayout>
 
                     </LinearLayout>
@@ -158,7 +159,7 @@
                     android:textSize="14sp"
                     app:fontFamily="@font/roboto_medium" />
 
-                <Switch
+                <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/crossRow"
                     style="@style/switch_style"
                     android:layout_width="match_parent"
@@ -179,7 +180,7 @@
                     android:alpha="0.5"
                     android:background="@color/colorDivider" />
 
-                <Switch
+                <androidx.appcompat.widget.SwitchCompat
                     style="@style/switch_style"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -193,7 +194,7 @@
                     android:textColor="@color/textColorPrimary" />
                 <TextView
                     android:textSize="14sp"
-                    android:background="@color/colorDark"
+                    android:background="@color/colorPrimaryDark"
                     android:textColor="@color/colorControlNormal"
                     android:text="При включении данной опции данные в записи будут учитываться в итоговой формуле только при включении флажка"
                     android:paddingStart="16dp"

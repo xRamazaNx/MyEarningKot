@@ -1,31 +1,34 @@
 package ru.developer.press.myearningkot.model
 
+import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.view.View
+import android.widget.FrameLayout
 import androidx.core.text.toSpannable
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.*
-import ru.developer.press.myearningkot.model.Formula.Companion.COLUMN_ID
-import ru.developer.press.myearningkot.model.Formula.Companion.OTHER
-import ru.developer.press.myearningkot.model.Formula.Companion.TOTAL_ID
 import ru.developer.press.myearningkot.helpers.*
 import ru.developer.press.myearningkot.helpers.prefLayouts.multiplyChar
 import ru.developer.press.myearningkot.helpers.prefLayouts.subtractChar
+import ru.developer.press.myearningkot.model.Formula.Companion.COLUMN_ID
+import ru.developer.press.myearningkot.model.Formula.Companion.OTHER
+import ru.developer.press.myearningkot.model.Formula.Companion.TOTAL_ID
 import java.math.BigDecimal
 import java.util.*
-import kotlin.Exception
 import kotlin.random.Random
 
 // каточка
 class Card(var name: String = "") : ProvideCardPropertyForCell {
 
+    var isUpdating = true
     var isShowDatePeriod: Boolean = false
     var idPage = -1L
     var id = -1L
@@ -60,7 +63,7 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
 
     init {
         addColumn(ColumnType.NUMERATION, "№").apply {
-            width = App.instance?.dimen(R.dimen.column_height) ?: 50
+            width = 70
         }
         addTotal()
         // временная суета
@@ -238,13 +241,11 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
             cellTypeControl = column.columnTypeControl
             sourceValue = when (column) {
                 is ImageColumn -> {
-                    getPathForResource(R.drawable.ic_image).toString()
+                    getPathForResource(R.drawable.ic_sample_image).toString()
                 }
                 is SwitchColumn -> {
-
                     val newVal = (0..20).random() > 10
                     newVal.toString()
-
                 }
                 is ColorColumn -> {
                     Color.GREEN.toString()
@@ -259,7 +260,7 @@ class Card(var name: String = "") : ProvideCardPropertyForCell {
                     "12345.987"
                 }
                 is PhoneColumn -> {
-                    "7 999 123-45-67"
+                    Gson().toJson(PhoneTypeValue(phone = "7 999 123-45-67"))
                 }
                 is NumerationColumn -> {
                     "1"
@@ -417,15 +418,20 @@ class PrefForCard(
 
 ) {
 
+    companion object {
+        var nameColor = 0
+    }
+
     init {
         initDefault()
     }
 
     private fun initDefault() {
         dateOfPeriodPref.prefForTextView.textSize = 14
-        App.instance?.apply {
-            dateOfPeriodPref.prefForTextView.color = getColorFromRes(R.color.textColorSecondary)
-        }
+        dateOfPeriodPref.prefForTextView.color = NumerationColumn.color
+        namePref.color = nameColor
+
+        namePref.textSize = 18
     }
 }
 
@@ -433,7 +439,8 @@ class PrefForCard(
 data class Cell(
     @SerializedName("v")
     var sourceValue: String = ""
-) {
+) : Backgrounder() {
+
     @Transient
     var type = ColumnType.TEXT
 
@@ -445,7 +452,6 @@ data class Cell(
 
     @Transient
     lateinit var cellTypeControl: CellTypeControl
-
 
     @Transient
     var displayValue: String = ""
@@ -475,7 +481,7 @@ data class Cell(
             }
             is PhoneTypePref -> {
                 val typeValue =
-                    Gson().fromJson<PhoneTypeValue>(sourceValue, PhoneTypeValue::class.java)
+                    Gson().fromJson(sourceValue, PhoneTypeValue::class.java)
                 val number = typeValue.phone
 
 //                val formatNumber = if (number.isNotEmpty())
@@ -586,7 +592,7 @@ class TotalItem {
             if (element.type == COLUMN_ID) {
                 val elementId = elementVal.toLong()
                 if (card.columns.any { it.id == elementId }) {
-                    val sumFromColumn = card.getSumFromColumn(elementId, isIgnoreSwitchWork)
+                    val sumFromColumn = card.getSumFromColumn(elementId)
                     stringBuilder.append(sumFromColumn)
                 } else {
                     formula.formulaElements.remove(element)
@@ -617,7 +623,7 @@ class TotalItem {
         }
     }
 
-    private fun Card.getSumFromColumn(id: Long, ignoreSwitchWork: Boolean): String {
+    private fun Card.getSumFromColumn(id: Long): String {
 
         var index = -1
         var value = 0.0
@@ -630,7 +636,6 @@ class TotalItem {
         // есть ли в карточке свитч колона
         val isAnySwitchColumn = columns.any { it is SwitchColumn }
         return if (index > -1) {
-            val column = columns[index] as NumberColumn
             rows.forEach { row ->
                 var isAddSum = true
                 if (isAnySwitchColumn)
@@ -663,7 +668,33 @@ class TotalItem {
     }
 }
 
-class Row {
+// пздц имя
+open class Backgrounder {
+    @Transient
+    var currentBackground: Int = -1
+
+    fun setBackground(view: View, backgroundRes: Int) {
+//        if (currentBackground != backgroundRes) {
+        currentBackground = backgroundRes
+        val drawable = view.context.getDrawable(currentBackground)
+        view.background = drawable
+//        }
+    }
+}
+
+class Row : Backgrounder() {
+    fun crossOut(itemView: View, isCrossOut: Boolean) {
+        val frameLayout = itemView as FrameLayout
+        if (isCrossOut) {
+            val drawable = itemView.context.getDrawable(R.drawable.cross_line)
+            frameLayout.foreground = drawable
+            itemView.backgroundColorResource = R.color.textColorSecondary
+        } else {
+            val colorDrawable = ColorDrawable(Color.TRANSPARENT)
+            frameLayout.foreground = colorDrawable
+
+        }
+    }
 
     @Transient
     var id = -1
@@ -758,10 +789,9 @@ class ListType {
 }
 
 class Formula {
-    fun getFormulaString(columnList: List<NumberColumn>, totalList: List<TotalItem>?): Spannable {
+    fun getFormulaString(context:Context, columnList: List<NumberColumn>, totalList: List<TotalItem>?): Spannable {
         val spannable = SpannableStringBuilder()
         val strBuilder = java.lang.StringBuilder()
-        val instance = App.instance!!
         formulaElements.forEach { element ->
             when (element.type) {
                 COLUMN_ID -> {
@@ -771,7 +801,7 @@ class Formula {
                             strBuilder.append(name)
                             spannable.append(SpannableString(name).apply {
                                 setSpan(
-                                    ForegroundColorSpan(instance.getColorFromRes(R.color.md_green_300)),
+                                    ForegroundColorSpan(context.getColorFromRes(R.color.md_green_300)),
                                     0,
                                     name.length,
                                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -788,7 +818,7 @@ class Formula {
                             spannable.append(SpannableString(title).apply {
                                 setSpan(
                                     // fixme добавить нормальные цветовые различия
-                                    ForegroundColorSpan(instance.getColorFromRes(R.color.colorSecondaryLight)),
+                                    ForegroundColorSpan(context.getColorFromRes(R.color.colorSecondaryLight)),
                                     0,
                                     title.length,
                                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE

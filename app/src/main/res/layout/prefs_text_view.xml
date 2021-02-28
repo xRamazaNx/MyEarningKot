@@ -23,7 +23,7 @@
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
             android:background="?android:attr/selectableItemBackground"
-            android:src="@drawable/ic_style_bold" />
+            android:src="@drawable/ic_bold" />
 
         <ImageButton
             android:id="@+id/italicButton"
@@ -34,7 +34,7 @@
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
             android:background="?android:attr/selectableItemBackground"
-            android:src="@drawable/ic_style_italic" />
+            android:src="@drawable/ic_italic" />
 
         <FrameLayout
             android:layout_width="1dp"
@@ -114,7 +114,7 @@
 
             android:id="@+id/textSizeDown"
 
-
+android:tint="@color/colorSecondary"
             android:layout_width="40dp"
             android:layout_height="match_parent"
             android:layout_marginStart="8dp"
@@ -128,14 +128,14 @@
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:text="size"
-            android:textColor="@color/colorAccent"
+            android:textColor="@color/textColorPrimary"
             android:textSize="16sp"
             app:fontFamily="@font/roboto_medium" />
 
         <ImageButton
 
             android:id="@+id/textSizeUp"
-
+            android:tint="@color/colorSecondary"
             android:layout_width="40dp"
             android:layout_height="match_parent"
             android:layout_marginStart="8dp"
@@ -159,14 +159,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?android:attr/selectableItemBackground"
-        android:drawableEnd="@drawable/ic_circle"
         android:drawablePadding="16dp"
         android:gravity="center_vertical"
         android:padding="16dp"
         android:text="@string/text_color"
         android:textColor="@color/textColorPrimary"
         android:textSize="16sp"
-        app:fontFamily="@font/roboto_light" />
+        app:fontFamily="@font/roboto_light"
+        app:drawableEndCompat="@drawable/ic_circle" />
 
 
 </LinearLayout>

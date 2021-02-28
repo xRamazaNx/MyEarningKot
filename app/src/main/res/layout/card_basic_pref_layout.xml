@@ -4,14 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorTransparent"
+    android:background="@color/colorDialogBackground"
     android:orientation="vertical">
 
     <TextView
+        android:background="@color/colorPrimary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="24dp"
         android:paddingTop="16dp"
+        android:paddingBottom="16dp"
         android:paddingEnd="24dp"
         android:text="@string/general_setting"
         android:textColor="@color/colorOnPrimary"
@@ -25,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="12dp"
-        android:paddingTop="24dp"
+        android:paddingTop="8dp"
         android:paddingEnd="12dp"
         android:text="@string/general_setting_card"
         android:textColor="@color/colorTitle"
@@ -39,14 +41,14 @@
         android:layout_height="wrap_content"
         android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
-        android:drawableStart="@drawable/ic_valuta"
         android:drawablePadding="16dp"
         android:focusable="true"
         android:padding="16dp"
         android:singleLine="true"
         android:text="@string/valuta"
         android:textColor="@color/textColorPrimary"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        app:drawableStartCompat="@drawable/ic_valuta" />
 
 
     <FrameLayout
@@ -128,7 +130,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:drawableStart="@drawable/ic_height"
             android:drawablePadding="16dp"
             android:fontFamily="@font/roboto"
             app:fontFamily="@font/roboto"
@@ -136,7 +137,8 @@
             android:padding="16dp"
             android:text="@string/cell_height"
             android:textColor="@color/textColorPrimary"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            app:drawableStartCompat="@drawable/ic_height" />
 
         <ImageButton
             android:tint="@color/colorSecondary"
@@ -194,7 +196,7 @@
         android:background="?android:attr/selectableItemBackground"
         android:checked="true"
         android:clickable="true"
-        android:drawableStart="@drawable/ic_period"
+        android:drawableStart="@drawable/ic_period_view"
         android:drawablePadding="16dp"
         android:focusable="true"
         android:gravity="center_vertical"

@@ -2,15 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorBackground"
+    android:background="@color/colorDialogBackground"
     android:orientation="vertical">
 
     <TextView
 
+        android:background="@color/colorPrimary"
         android:id="@+id/titleTextEdit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
         android:paddingStart="24dp"
         android:paddingEnd="24dp"
         android:paddingTop="16dp"
@@ -33,6 +33,7 @@
         android:paddingBottom="12dp"
         android:paddingTop="16dp"
         android:textColor="@color/textColorPrimary"
-        android:textColorHint="@color/textColorSecondary" />
+        android:textColorHint="@color/textColorSecondary"
+        android:importantForAutofill="no" />
 
 </LinearLayout>

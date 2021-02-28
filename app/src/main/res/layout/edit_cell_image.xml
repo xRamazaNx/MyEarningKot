@@ -4,13 +4,13 @@
     android:id="@+id/imageViewerContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorBackground"
+    android:background="@color/colorDialogBackground"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorSurface"
+        android:background="@color/colorPrimary"
         android:orientation="horizontal">
 
         <TextView
@@ -55,7 +55,7 @@
         android:background="@color/colorDark" />
 
     <LinearLayout
-        android:background="@color/colorSurface"
+        android:background="@color/colorPrimary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">

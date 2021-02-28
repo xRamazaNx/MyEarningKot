@@ -2,14 +2,14 @@
 
 package ru.developer.press.myearningkot.viewmodels
 
+import android.content.Context
 import android.widget.LinearLayout
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import ru.developer.press.myearningkot.App
 import ru.developer.press.myearningkot.ProvideDataRows
-import ru.developer.press.myearningkot.model.*
 import ru.developer.press.myearningkot.helpers.Page
+import ru.developer.press.myearningkot.model.*
 
 
 //
@@ -17,7 +17,7 @@ import ru.developer.press.myearningkot.helpers.Page
 //
 //
 // для отображения открытой карточки
-open class CardViewModel(var card: Card) : ViewModel(),
+open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     ProvideDataRows {
 
     var cellSelectPosition: Int = -1
@@ -92,7 +92,7 @@ open class CardViewModel(var card: Card) : ViewModel(),
     }
     fun addColumnSample(columnType: ColumnType, name: String) {
         card.addColumnSample(columnType, name)
-        updateTypeControl()
+//        updateTypeControl()
         updateCardLD()
     }
 
@@ -284,7 +284,7 @@ open class CardViewModel(var card: Card) : ViewModel(),
 
     }
 
-    private val dataController = DataController()
+    private val dataController = DataController(context)
 
     fun addRow(): Row {
         return card.addRow().apply {
@@ -360,11 +360,10 @@ open class CardViewModel(var card: Card) : ViewModel(),
         updateTypeControlColumn(card.columns[columnPosition])
     }
 
-    fun copySelectedCell(isCut: Boolean) {
+    fun copySelectedCell(isCut: Boolean) :Cell?{
         card.rows.forEach {
             it.cellList.forEachIndexed { index, cell ->
                 if (cell.isSelect) {
-                    App.instance?.copyCell = cell
                     if (isCut) {
                         cell.clear()
                         updateTypeControlColumn(index)
@@ -373,15 +372,15 @@ open class CardViewModel(var card: Card) : ViewModel(),
                     // заного назначаю чтоб меню создалось заного и иконка вставки если надо станет серой или белой
                     selectMode.value =
                         SelectMode.CELL
-                    return
+                    return cell
                 }
             }
         }
+        return null
     }
 
-    fun isEqualTypeCellAndCopyCell(): Boolean {
+    fun isEqualTypeCellAndCopyCell(copyCell: Cell?): Boolean {
         val selectedCellType = getSelectedCellType()
-        val copyCell = App.instance?.copyCell
         var eq = false
         copyCell?.let {
             eq = it.type == selectedCellType
@@ -389,12 +388,12 @@ open class CardViewModel(var card: Card) : ViewModel(),
         return eq
     }
 
-    fun pasteCell(updateRow: (Int) -> Unit) {
-        if (isEqualTypeCellAndCopyCell())
+    fun pasteCell(copyCell: Cell?, updateRow: (Int) -> Unit) {
+        if (isEqualTypeCellAndCopyCell(copyCell))
             card.rows.forEachIndexed { indexRow, row ->
                 row.cellList.forEachIndexed { indexCell, cell ->
                     if (cell.isSelect) {
-                        App.instance?.copyCell?.let {
+                        copyCell?.let {
                             cell.sourceValue = it.sourceValue
                             updateTypeControlColumn(indexCell)//
                             updateTotals()
@@ -505,21 +504,23 @@ open class CardViewModel(var card: Card) : ViewModel(),
         pasteRows()
     }
 
+    fun updateCardIntoDB() = dataController.updateCard(card)
+
     enum class SelectMode {
         CELL, ROW, NONE
     }
 }
 
-class ViewModelMainFactory(private val pageList: MutableList<Page>) :
+class ViewModelMainFactory(private val context: Context, private val pageList: MutableList<Page>) :
     ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return MainViewModel(pageList) as T
+        return MainViewModel(context, pageList) as T
     }
 }
 
-class ViewModelCardFactory(private val card: Card) : ViewModelProvider.NewInstanceFactory() {
+class ViewModelCardFactory(private val context: Context,private val card: Card) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return CardViewModel(card) as T
+        return CardViewModel(context , card) as T
     }
 }
 //

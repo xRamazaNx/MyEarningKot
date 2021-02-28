@@ -23,8 +23,8 @@ import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.adapters.AdapterRecyclerPhoneParams
 import ru.developer.press.myearningkot.adapters.ParamModel
-import ru.developer.press.myearningkot.model.*
 import ru.developer.press.myearningkot.helpers.*
+import ru.developer.press.myearningkot.model.*
 import splitties.alertdialog.appcompat.alertDialog
 import java.util.*
 
@@ -82,7 +82,9 @@ fun Context.getPrefColumnLayout(
 
 // интерфейс для обратной связи когда надо показать изменения столбца в вью
 interface PrefColumnChangedCallback {
+    fun widthChanged()
     fun prefChanged()
+    fun widthProgress()
     fun recreateView() //  для колоны переключателя
     fun getNumberColumns(): MutableList<NumberColumn>
 }
@@ -94,28 +96,28 @@ abstract class PrefColumnLayout(
     abstract fun initBasicPref(view: View)
 
     protected fun initSeekBarAndToolbarButtons(view: View) {
-//        val widthColumnSeekBar = view.widthColumnSeekBar
-//        val column = columnList[0]
-//        widthColumnSeekBar.progress = column.width
-//        widthColumnSeekBar.setOnSeekBarChangeListener(object :
-//            SeekBar.OnSeekBarChangeListener {
-//            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
-//                val progress = p0!!.progress
-//                if (progress > 30) {
-//                    columnList.forEach {
-//                        it.width = progress
-//                    }
-//                    prefColumnChangedCallback.widthProgress()
-//                }
-//            }
-//
-//            override fun onStartTrackingTouch(p0: SeekBar?) {
-//            }
-//
-//            override fun onStopTrackingTouch(p0: SeekBar?) {
-//                prefColumnChangedCallback.widthChanged()
-//            }
-//        })
+        val widthColumnSeekBar = view.widthColumnSeekBar
+        val column = columnList[0]
+        widthColumnSeekBar.progress = column.width
+        widthColumnSeekBar.setOnSeekBarChangeListener(object :
+            SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+                val progress = p0!!.progress
+                if (progress > 30) {
+                    columnList.forEach {
+                        it.width = progress
+                    }
+                    prefColumnChangedCallback.widthProgress()
+                }
+            }
+
+            override fun onStartTrackingTouch(p0: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(p0: SeekBar?) {
+                prefColumnChangedCallback.widthChanged()
+            }
+        })
 
         view.defaultPref.setOnClickListener {
             columnList.forEach {
@@ -609,7 +611,7 @@ class PrefListColumnLayout(
 ) : PrefTextColumnLayout(column, prefColumnChangedCallback) {
 
     override fun initBasicPref(view: View) {
-        val dataController = DataController()
+        val dataController = DataController(view.context)
         val context = view.context
         initSeekBarAndToolbarButtons(view)
         val typePref = (columnList[0] as ListColumn).typePref

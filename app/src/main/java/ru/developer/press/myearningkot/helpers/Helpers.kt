@@ -3,12 +3,11 @@ package ru.developer.press.myearningkot.helpers
 import android.animation.ValueAnimator
 import android.app.AlertDialog
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.Interpolator
-import android.graphics.drawable.ColorDrawable
+import android.graphics.Typeface
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.net.Uri
-import android.os.Build
 import android.text.format.DateFormat
 import android.util.Log
 import android.util.TypedValue
@@ -16,26 +15,19 @@ import android.view.Gravity
 import android.view.View
 import android.view.View.GONE
 import android.view.animation.AccelerateInterpolator
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.MainThread
-import androidx.annotation.RequiresApi
-import androidx.core.animation.addListener
-import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import com.bumptech.glide.request.transition.ViewPropertyTransition
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.list_item_change_layout.view.*
-import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.backgroundColorResource
-import org.jetbrains.anko.textColorResource
-import ru.developer.press.myearningkot.App
+import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.dpsToPixels
 import ru.developer.press.myearningkot.model.Column
 import ru.developer.press.myearningkot.model.NumberTypePref
 import ru.developer.press.myearningkot.model.NumerationColumn
@@ -89,8 +81,7 @@ class SingleLiveEvent<T> : MutableLiveData<T>() {
     }
 }
 
-fun getValutaTypeList(): MutableList<String> {
-    val context = App.instance!!
+fun getValutaTypeList(context: Context): MutableList<String> {
     return context.resources.getStringArray(R.array.valuta_list).toMutableList()
 
 }
@@ -133,7 +124,7 @@ fun bindTitleOfColumn(column: Column, title: TextView) {
     title.layoutParams =
         LinearLayout.LayoutParams(
             width,
-            App.instance!!.dpsToPixels(35)
+            title.dip(35)
         ).apply {
             gravity = Gravity.CENTER
             weight = w
@@ -152,7 +143,6 @@ fun Context.showItemChangeDialog(
 ) {
     val builder = AlertDialog.Builder(this).create()
     builder.apply {
-
         val linear: LinearLayout =
             layoutInflater.inflate(R.layout.list_item_change_layout, null) as LinearLayout
         linear.titleList.text = title
@@ -165,15 +155,28 @@ fun Context.showItemChangeDialog(
                 builder.dismiss()
             }
         val itemListContainer = linear.itemListContainer
-        val dpsToPixels = dpsToPixels(16)
+        val dpsToPixels = dip(16)
+        fun setSelectedItemDecor(textView: TextView) {
+            textView.textColorResource = R.color.colorAccent
+            textView.textSize = 16f
+            textView.setTypeface(textView.typeface, Typeface.BOLD)
+//            list.forEachIndexed { index, it ->
+//                if (it != textView.text.toString()){
+//                    val item = itemListContainer.getChildAt(index) as TextView
+//                    item.textColorResource = R.color.textColorTertiary
+//                    item.textSize = 14f
+//                    item.setTypeface(textView.typeface, Typeface.NORMAL)
+//                }
+//            }
+        }
         list.forEachIndexed { index, name ->
             val itemTextView = TextView(context).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
-                    marginStart = dpsToPixels(8)
-                    marginEnd = dpsToPixels(8)
+                    marginStart = dip(8)
+                    marginEnd = dip(8)
                 }
                 text = name
                 textColorResource = R.color.textColorPrimary
@@ -181,19 +184,19 @@ fun Context.showItemChangeDialog(
                 setPadding(dpsToPixels, dpsToPixels, dpsToPixels, dpsToPixels)
                 setOnClickListener {
                     itemClickEvent(index)
-                    postDelayed({
-                        backgroundColorResource = R.color.textColorSecondary
-                        builder.dismiss()
-                    }, 150)
+                    post {
+                        setSelectedItemDecor(this)
+                        dismiss()
+                    }
                 }
 
                 addRipple()
             }
 
-            if (index == _selectItem) {
-                itemTextView.backgroundColorResource = R.color.textColorSecondary
-            }
             itemListContainer.addView(itemTextView)
+            if (index == _selectItem) {
+                setSelectedItemDecor(itemTextView)
+            }
         }
         setView(linear)
 
@@ -210,7 +213,7 @@ inline fun <reified T> clone(source: T): T {
     return Gson().fromJson<T>(stringProject, T::class.java)
 }
 
-inline fun <reified T> Any.equalGson(equalObject: T): Boolean {
+inline fun <reified T> Any.equalByGson(equalObject: T): Boolean {
     val sourceAny = Gson().toJson(equalObject, T::class.java)
     val any = Gson().toJson(this, T::class.java)
     return sourceAny == any
@@ -255,7 +258,7 @@ fun View.addRipple() = with(TypedValue()) {
 }
 
 fun View.animateColor(colorFrom: Int, colorTo: Int, duration: Long = 325) {
-    val drawable = background
+//    val drawable = background
     val valueAnimator: ValueAnimator = ValueAnimator.ofFloat(0.0f, 1.0f)
     valueAnimator.duration = duration
     valueAnimator.interpolator = AccelerateInterpolator()
@@ -264,9 +267,35 @@ fun View.animateColor(colorFrom: Int, colorTo: Int, duration: Long = 325) {
         backgroundColor = ColorUtils.blendARGB(colorFrom, colorTo, fractionAnim)
 
     }
-    valueAnimator.doOnEnd {
-        background = drawable
-    }
+//    valueAnimator.doOnEnd {
+//        background = drawable
+//    }
     valueAnimator.start()
 }
-// # ширину колоны для цвета можно выбирать такой какая высота ячеек
+
+fun log(log: Any?) {
+    Log.d("RamLog", log.toString())
+}
+
+fun Any.log(message: String) {
+    Log.d(this::class.qualifiedName, message)
+}
+
+fun Context.showImageTest(text: String, imagePath: String) {
+    runOnUiThread {
+        AlertDialog.Builder(this).apply {
+            setView(verticalLayout {
+                addView(ImageView(this@runOnUiThread).apply {
+                    post {
+                        val scaled = BitmapFactory.decodeFile(imagePath)
+                        setImageBitmap(scaled)
+                    }
+                })
+                addView(TextView(this@runOnUiThread).apply {
+                    setText(text)
+                })
+            }
+            )
+        }.show()
+    }
+}

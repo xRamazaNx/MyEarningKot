@@ -1,14 +1,17 @@
 package ru.developer.press.myearningkot.helpers
 
+import android.content.Context
 import android.graphics.Color
-import android.provider.CalendarContract
 import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 import androidx.room.Database
 import com.google.gson.Gson
 import org.jetbrains.anko.doAsyncResult
-import ru.developer.press.myearningkot.App
+import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.model.Card
+import ru.developer.press.myearningkot.model.ColumnType
+import ru.developer.press.myearningkot.model.Formula
+import ru.developer.press.myearningkot.model.NumberColumn
 
 
 @Entity(tableName = "Card")
@@ -35,12 +38,26 @@ class Page {
     var pageName = ""
     var background = Color.parseColor("#161719")
 
-    @Ignore val cards = mutableListOf<MutableLiveData<Card>>()
+    @Ignore
+    val cards = mutableListOf<MutableLiveData<Card>>()
 }
 
 
-@Database(entities = [SampleJson::class, CardJson::class, Page::class, ListTypeJson::class], version = 1)
+@Database(
+    entities = [SampleJson::class, CardJson::class, Page::class, ListTypeJson::class],
+    version = 1
+)
 abstract class Database : RoomDatabase() {
+    companion object {
+        fun create(context: Context): ru.developer.press.myearningkot.helpers.Database =
+            Room.databaseBuilder(
+                context,
+                ru.developer.press.myearningkot.helpers.Database::class.java,
+                "Database.db"
+            ).build()
+
+    }
+
     abstract fun sampleJsonDao(): SampleJsonDao
     abstract fun cardJsonDao(): CardJsonDao
     abstract fun pageDao(): PageDao
@@ -59,7 +76,7 @@ interface ListTypeDao {
     fun delete(listType: ListTypeJson)
 
     @Insert
-    fun insert(listType: ListTypeJson) : Long
+    fun insert(listType: ListTypeJson): Long
 
     @Update
     fun update(listType: ListTypeJson)
@@ -82,6 +99,9 @@ interface SampleJsonDao {
 
     @Update
     fun update(sampleJson: SampleJson)
+
+    @Query("DELETE FROM Sample WHERE id = :deleteId")
+    fun delete(deleteId: Long)
 }
 
 @Dao
@@ -124,8 +144,8 @@ interface PageDao {
 
 
 //
-class SampleHelper {
-    private val sampleJsonDao = App.instance?.database!!.sampleJsonDao()
+class SampleHelper(context: Context) {
+    private val sampleJsonDao = ru.developer.press.myearningkot.helpers.Database.create(context).sampleJsonDao()
     fun getSampleList(): MutableList<Card> {
         return doAsyncResult {
             val sampleJsonLst = sampleJsonDao.getAll()
@@ -155,21 +175,162 @@ class SampleHelper {
     }
 
     fun updateSample(card: Card) {
-            val jsonSample = Gson().toJson(card)
-            sampleJsonDao.update(SampleJson().apply {
-                id = card.id
-                json = jsonSample
-            })
+        val jsonSample = Gson().toJson(card)
+        sampleJsonDao.update(SampleJson().apply {
+            id = card.id
+            json = jsonSample
+        })
     }
 
-    fun getSample(id: Long): Card? {
-        val sampleJson = doAsyncResult {
-            sampleJsonDao.getById(id)
-        }.get()
+    fun getSample(id: Long): Card {
+        val sampleJson: SampleJson = sampleJsonDao.getById(id)
         return getCardFromJson(sampleJson.json).apply {
             this.id = sampleJson.id
             updateTypeControl()
         }
+    }
+
+    fun addDefaultSamples(context: Context) {
+        // доход
+        addSample(Card(name = context.getString(R.string.earning)).apply {
+            //                                    deleteColumn()
+            val summaColumn =
+                addColumn(ColumnType.NUMBER, context.getString(R.string.summa))
+
+            val avansColumn =
+                addColumn(ColumnType.NUMBER, context.getString(R.string.avans))
+
+            addColumn(ColumnType.TEXT, context.getString(R.string.note)).apply {
+                width = 450
+            }
+            addColumn(ColumnType.DATE, context.getString(R.string.date)).apply {
+                width = 430
+            }
+
+            val summaTotal = totals[0]
+            summaTotal.apply {
+                title = context.getString(R.string.SUMMA)
+                formula = Formula().apply {
+                    formulaElements.add(
+                        Formula.FormulaElement(
+                            Formula.COLUMN_ID,
+                            summaColumn.id.toString()
+                        )
+                    )
+                }
+            }
+            val avansTotal = addTotal().apply {
+                title = context.getString(R.string.AVANS)
+                formula = Formula().apply {
+                    formulaElements.add(
+                        Formula.FormulaElement(
+                            Formula.COLUMN_ID,
+                            avansColumn.id.toString()
+                        )
+                    )
+                }
+            }
+            addTotal().apply {
+                title = context.getString(R.string.RESIDUE)
+                formula = Formula().apply {
+                    formulaElements.add(
+                        Formula.FormulaElement(
+                            Formula.TOTAL_ID,
+                            summaTotal.id.toString()
+                        )
+                    )
+                    formulaElements.add(
+                        Formula.FormulaElement(
+                            Formula.OTHER,
+                            "-"
+                        )
+                    )
+                    formulaElements.add(
+                        Formula.FormulaElement(
+                            Formula.TOTAL_ID,
+                            avansTotal.id.toString()
+                        )
+                    )
+                }
+            }
+            enableSomeStroke = false
+        })
+        // расход
+        addSample(Card(name = context.getString(R.string.expenses)).apply {
+            deleteColumn()
+
+            val summaColumn =
+                addColumn(
+                    ColumnType.NUMBER,
+                    context.getString(R.string.budget)
+                ) as NumberColumn
+
+            val avansColumn =
+                addColumn(
+                    ColumnType.NUMBER,
+                    context.getString(R.string.expenses)
+                ) as NumberColumn
+
+            addColumn(ColumnType.LIST, context.getString(R.string.category)).apply {
+                width = 430
+            }
+            addColumn(ColumnType.TEXT, context.getString(R.string.note)).apply {
+                width = 450
+            }
+            addColumn(ColumnType.DATE, context.getString(R.string.date)).apply {
+                width = 430
+            }
+            val summaTotal = totals[0]
+            summaTotal.apply {
+                title = context.getString(R.string.BUDGET)
+                formula = Formula().apply {
+                    formulaElements.add(
+                        Formula.FormulaElement(
+                            Formula.COLUMN_ID,
+                            summaColumn.id.toString()
+                        )
+                    )
+                }
+            }
+            val avansTotal = addTotal().apply {
+                title = context.getString(R.string.EXPENSES)
+                formula = Formula().apply {
+                    formulaElements.add(
+                        Formula.FormulaElement(
+                            Formula.COLUMN_ID,
+                            avansColumn.id.toString()
+                        )
+                    )
+                }
+            }
+            addTotal().apply {
+                title = context.getString(R.string.RESIDUE)
+                formula = Formula().apply {
+                    formulaElements.add(
+                        Formula.FormulaElement(
+                            Formula.TOTAL_ID,
+                            summaTotal.id.toString()
+                        )
+                    )
+                    formulaElements.add(
+                        Formula.FormulaElement(
+                            Formula.OTHER,
+                            "-"
+                        )
+                    )
+                    formulaElements.add(
+                        Formula.FormulaElement(
+                            Formula.TOTAL_ID,
+                            avansTotal.id.toString()
+                        )
+                    )
+                }
+            }
+        })
+    }
+
+    fun deleteSample(deleteId: Long) {
+        sampleJsonDao.delete(deleteId)
     }
 
 }

@@ -2,6 +2,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:id="@+id/root"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark"
 
@@ -34,16 +35,6 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <!--    backgraund of columns-->
-    <FrameLayout
-        android:id="@+id/backGroundOfColumns"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/column_height"
-        android:layout_gravity="bottom"
-        android:background="@color/primary"
-        app:layout_anchor="@id/toolbar"
-        app:layout_anchorGravity="bottom">
-
-    </FrameLayout>
 
     <ru.developer.press.myearningkot.ScrollContainer
         android:id="@+id/tableView"
@@ -84,11 +75,10 @@
 
                 <androidx.recyclerview.widget.RecyclerView
 
+                    android:background="@color/colorBackgroundCard"
                     android:id="@+id/recycler"
                     android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-
+                    android:layout_height="wrap_content"
                     />
                 <!--                    android:background="@drawable/shape_table_view"-->
 
@@ -122,7 +112,6 @@
     <!--        android:layout_width="match_parent"-->
     <!--        android:layout_height="wrap_content"/>-->
     <include
-
         android:id="@+id/totalAmountView"
         layout="@layout/card"
         android:layout_width="match_parent"

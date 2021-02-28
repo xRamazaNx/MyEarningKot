@@ -6,13 +6,15 @@ import com.google.gson.annotations.SerializedName
 import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.adapters.ParamModel
 import ru.developer.press.myearningkot.helpers.*
-import java.lang.Exception
-import java.lang.StringBuilder
 import java.math.BigDecimal
 import java.util.*
 import kotlin.random.Random
 
 abstract class Column(var name: String) {
+    companion object {
+        var titleColor: Int = 0
+    }
+
     @SerializedName(column_cast_gson)
     var className = javaClass.name
 
@@ -21,17 +23,13 @@ abstract class Column(var name: String) {
     @SerializedName("tp")
     val titlePref: PrefForTextView = PrefForTextView().apply {
         isBold = true
-        App.instance?.apply {
-            color = getColorFromRes(R.color.textColorTabsTitleNormal)
-        }
+        color = titleColor
     }
 
     fun resetTitlePref() {
         titlePref.apply {
             isBold = true
-            App.instance?.apply {
-                color = getColorFromRes(R.color.textColorTabsTitleNormal)
-            }
+            color = titleColor
         }
     }
 
@@ -73,6 +71,10 @@ abstract class Column(var name: String) {
 }
 
 class NumerationColumn(name: String) : Column(name) {
+    companion object {
+        var color = 0
+    }
+
     @SerializedName("cp")
     var typePref = TextTypePref()
 
@@ -93,9 +95,7 @@ class NumerationColumn(name: String) : Column(name) {
         typePref.apply {
             prefForTextView.isItalic = true
             prefForTextView.textSize = 14
-            App.instance?.apply {
-                prefForTextView.color = getColorFromRes(R.color.textColorSecondary)
-            }
+            prefForTextView.color = color
         }
     }
 
@@ -169,7 +169,7 @@ class NumberColumn(name: String) : Column(name) {
                     string.append(it.value)
             }
             val value: Double? = Calc.evaluate(string.toString())
-            value?.let { BigDecimal(it).toPlainString() }?: ""
+            value?.let { BigDecimal(it).toPlainString() } ?: ""
         } catch (exception: Exception) {
             "Error formula cell"
         }
@@ -177,6 +177,12 @@ class NumberColumn(name: String) : Column(name) {
 }
 
 class PhoneColumn(name: String) : Column(name) {
+    companion object{
+        var nameOfMan = ""
+        var lastName = ""
+        var phone = ""
+        var organization = ""
+    }
     @SerializedName("cp")
     var typePref = PhoneTypePref()
 
@@ -192,18 +198,13 @@ class PhoneColumn(name: String) : Column(name) {
     }
 
     fun getPhoneParamList(): MutableList<ParamModel> {
-        val app = App.instance!!
 
         return mutableListOf<ParamModel>().apply {
-            val name = app.getString(R.string.name_man)
-            val lastName = app.getString(R.string.last_name)
-            val phone = app.getString(R.string.phone)
-            val organization = app.getString(R.string.organization)
 
             typePref.sort.forEach { id ->
                 when (id) {
                     0 ->
-                        add(ParamModel(name, typePref.name, 0))
+                        add(ParamModel(nameOfMan, typePref.name, 0))
                     1 ->
                         add(ParamModel(lastName, typePref.lastName, 1))
                     2 ->

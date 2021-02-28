@@ -8,7 +8,10 @@ import ru.developer.press.myearningkot.activity.toast
 import ru.developer.press.myearningkot.dialogs.DialogEditCell
 import ru.developer.press.myearningkot.dialogs.DialogEditImageCell
 import ru.developer.press.myearningkot.dialogs.editCellTag
-import ru.developer.press.myearningkot.model.*
+import ru.developer.press.myearningkot.model.Column
+import ru.developer.press.myearningkot.model.ColumnType
+import ru.developer.press.myearningkot.model.InputTypeNumberColumn
+import ru.developer.press.myearningkot.model.NumberColumn
 
 class EditCellControl(
     private val activity: CardActivity,

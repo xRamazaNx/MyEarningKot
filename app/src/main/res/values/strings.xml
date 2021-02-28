@@ -284,8 +284,9 @@
     <string name="name_card">Название карточки</string>
     <string name="set_name_card">Введите название карточки</string>
     <string name="sample_of_card">Шаблон карточки</string>
-    <string name="create_sample_of_card">Создание новой карточки</string>
+    <string name="create_sample_of_card">Создание карточки</string>
     <string name="name_sample">Имя шаблона</string>
+    <string name="select_sample">Выберите шаблон</string>
     <string name="visual_setting">Настройка внешнего вида</string>
     <string name="enable_horizontal_scroll_items">Горизонтальная прокрутка записей</string>
     <string name="enable_horizontal_scroll_totals">Горизонтальная прокрутка итогов</string>
@@ -308,10 +309,10 @@
     <string name="add_column">Добавить колону</string>
     <string name="text_size">Размер шрифта</string>
     <string name="text_color">Цвет текста</string>
-    <string name="set_name">Введите название</string>
+    <string name="set_name">Введите имя</string>
+    <string name="rename">Переименовать</string>
     <string name="new_sample">Новый шаблон</string>
     <string name="set_the_element">Выберите элемент</string>
-    <string name="change_sample_of_card">Выберите шаблон учетной карточки</string>
     <string name="setting_sample">Настройка шаблона</string>
     <string name="setting_card">Настройка карточки</string>
     <string name="setting">Настройка</string>
@@ -373,6 +374,8 @@
     <string name="earning">Доход</string>
     <string name="active">Активные</string>
     <string name="move">Переместить</string>
+    <string name="move_left">Переместить в лево</string>
+    <string name="move_right">Переместить в право</string>
     <string name="plate_setting">Настройки таблички</string>
     <string name="put_in_cell">Поместить в ячейку</string>
     <string name="cut_image">Обрезать изображение</string>
@@ -391,4 +394,9 @@
     <string name="call">Позвонить</string>
     <string name="app_name">Учетные таблицы</string>
     <string name="valuta">Валюта</string>
+    <string name="name_element">Имя Элемента</string>
+    <string name="create_page">Создание вкладки</string>
+    <string name="add_total">Добавить итог</string>
+    <string name="preview">Предпросмотр</string>
+    <string name="sample_menu">Меню шаблона</string>
 </resources>

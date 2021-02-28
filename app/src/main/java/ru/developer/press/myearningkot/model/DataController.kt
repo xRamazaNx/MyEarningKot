@@ -1,31 +1,34 @@
 package ru.developer.press.myearningkot.model
 
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.doAsyncResult
-import ru.developer.press.myearningkot.App
-import ru.developer.press.myearningkot.helpers.CardJson
-import ru.developer.press.myearningkot.helpers.ListTypeJson
-import ru.developer.press.myearningkot.helpers.Page
-import ru.developer.press.myearningkot.helpers.getCardFromJson
+import ru.developer.press.myearningkot.helpers.*
 
-class DataController {
-    private val cardJsonDao = App.instance!!.database.cardJsonDao()
-    private val pageDao = App.instance!!.database.pageDao()
-    private val listTypeDao = App.instance!!.database.listTypeDao()
+class DataController(context: Context) {
+
+    private val cardJsonDao: CardJsonDao
+    private val pageDao: PageDao
+    private val listTypeDao: ListTypeDao
+    private val sampleHelper: SampleHelper
+
+    init {
+        val database = Database.create(context)
+        cardJsonDao = database.cardJsonDao()
+        pageDao = database.pageDao()
+        listTypeDao = database.listTypeDao()
+        sampleHelper = SampleHelper(context)
+    }
 
     fun addCard(card: Card) {
-        //
         val json = Gson().toJson(card)
         val cardJson = CardJson().apply {
             this.json = json
         }
-        val id = doAsyncResult {
-            cardJsonDao.insert(cardJson)
-        }
-        card.id = id.get()
-
+        val insert = cardJsonDao.insert(cardJson)
+        card.id = insert
     }
 
     fun getCard(id: Long): Card {
@@ -93,5 +96,9 @@ class DataController {
 
     fun updatePage(page: Page) {
         doAsync { pageDao.update(page) }
+    }
+
+    fun getSampleCard(sampleID: Long): Card? {
+        return sampleHelper.getSample(sampleID)
     }
 }

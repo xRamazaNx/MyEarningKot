@@ -1,12 +1,9 @@
 package ru.developer.press.myearningkot.helpers.prefLayouts
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.PorterDuff
-import android.os.Build
 import android.util.AttributeSet
 import android.widget.Switch
-import androidx.appcompat.widget.SwitchCompat
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.helpers.getColorFromRes
 

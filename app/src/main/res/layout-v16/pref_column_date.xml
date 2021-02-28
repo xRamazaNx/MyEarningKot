@@ -7,6 +7,7 @@
     android:orientation="vertical">
 
     <include layout="@layout/toolbar_pref" />
+    <include layout="@layout/width_seek_bar_layout"/>
 
     <ScrollView
         android:background="@color/colorBackground"
@@ -44,7 +45,6 @@
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:clickable="true"
-                    android:drawableEnd="@drawable/ic_drop_down"
                     android:focusable="true"
                     android:paddingStart="16dp"
                     android:paddingTop="16dp"
@@ -52,7 +52,7 @@
                     android:paddingBottom="16dp"
                     android:singleLine="true"
                     android:text="@string/date_type"
-                    />
+                    app:drawableEndCompat="@drawable/ic_drop_down" />
 
                 <FrameLayout
                     android:background="@color/colorDivider"
@@ -63,7 +63,7 @@
                     android:alpha="0.5"
                     />
 
-                <Switch
+                <androidx.appcompat.widget.SwitchCompat
                     android:fontFamily="@font/roboto_light"
                     app:fontFamily="@font/roboto_light"
                     android:textSize="16sp"

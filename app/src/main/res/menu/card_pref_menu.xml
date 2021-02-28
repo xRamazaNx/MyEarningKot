@@ -1,46 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/deleteColumn"
-        android:icon="@drawable/ic_delete_forever_red"
-        android:title="@string/setting"
+        android:icon="@drawable/ic_delete_forever"
+        android:title="@string/DELETE"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/moveToLeft"
         android:icon="@drawable/ic_move_to_left"
-        android:title="@string/setting"
+        android:title="@string/move_left"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/moveToRight"
         android:icon="@drawable/ic_move_to_right"
-        android:title="@string/setting"
+        android:title="@string/move_right"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/renameElement"
-        android:icon="@drawable/ic_edit_white"
-        android:title="@string/setting"
+        android:icon="@drawable/ic_rename"
+        android:title="@string/rename"
         app:showAsAction="always" />
     <item
         android:id="@+id/elementSetting"
-        android:icon="@drawable/ic_setting_build"
-        android:title="@string/setting"
+        android:icon="@drawable/ic_pref_element"
+        android:title="@string/selected_element_pref"
         app:showAsAction="always" />
-    <item
 
+    <item
+        android:id="@+id/addTotal"
+        android:enabled="true"
+        android:icon="@drawable/ic_add_total"
+        android:title="@string/add_total"
+        android:visible="true"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/addColumn"
         android:enabled="true"
-        android:icon="@drawable/ic_add_column"
+        android:icon="@drawable/ic_add_column_right"
         android:title="@string/add_column"
         android:visible="true"
         app:showAsAction="always" />
+
 
     <item
         android:id="@+id/basicPref"
         android:icon="@drawable/ic_more_setting"
         android:title="@string/general_pref"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction" />
 </menu>

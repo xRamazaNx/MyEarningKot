@@ -1,7 +1,6 @@
 package ru.developer.press.myearningkot.helpers.prefLayouts
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.view.View
 import android.view.View.GONE
@@ -9,23 +8,17 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import kotlinx.android.synthetic.main.formula_layout.view.*
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.padding
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.wrapContent
+import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.dpsToPixels
+import ru.developer.press.myearningkot.helpers.Calc
+import ru.developer.press.myearningkot.helpers.getColorFromRes
 import ru.developer.press.myearningkot.model.Formula
 import ru.developer.press.myearningkot.model.Formula.Companion.COLUMN_ID
 import ru.developer.press.myearningkot.model.Formula.Companion.OTHER
 import ru.developer.press.myearningkot.model.Formula.Companion.TOTAL_ID
 import ru.developer.press.myearningkot.model.NumberColumn
 import ru.developer.press.myearningkot.model.TotalItem
-import ru.developer.press.myearningkot.helpers.Calc
-import ru.developer.press.myearningkot.helpers.getColorFromRes
 import splitties.alertdialog.appcompat.alertDialog
-import java.lang.Exception
-import java.lang.StringBuilder
 
 
 val subtractChar = " − "
@@ -126,12 +119,10 @@ class FormulaLayout(
     }
 
     private fun TextView.initParamTextView() {
-        padding = context.dpsToPixels(16)
+        padding = context.dip(16)
         textColor = context.getColorFromRes(R.color.textColorPrimary)
         layoutParams = LinearLayout.LayoutParams(wrapContent, matchParent)
     }
-
-
 
     private fun initClickNumbers() {
         val one = view.one
@@ -168,7 +159,7 @@ class FormulaLayout(
     }
 
     private fun displayFormula() {
-        displayTextView.text = formula.getFormulaString(allNColumns, allNTotals)
+        displayTextView.text = formula.getFormulaString(view.context,allNColumns, allNTotals)
     }
 
 
@@ -225,7 +216,7 @@ fun formulaDialogShow(
 
     val dialog = context.alertDialog {
         setCustomTitle(TextView(context).apply {
-            padding = context.dpsToPixels(18)
+            padding = context.dip(18)
             textSize = 18F
             text = "Введите формулу"
             textColor = context.getColorFromRes(R.color.textColorPrimary)

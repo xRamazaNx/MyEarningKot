@@ -31,27 +31,31 @@
         <item name="material_drawer_divider">@color/colorPrimaryDark</item>
         <item name="appBarLayoutStyle">@style/Widget.Design.AppBarLayout</item>
         <item name="android:textColor">@color/textColorPrimary</item>
-        <!--        <item name="android:actionMenuTextColor">@color/greenButton</item>-->
-        <!--        <item name="actionMenuTextColor">@color/greenButton</item>-->
+
         <item name="android:itemTextAppearance">@style/myCustomMenuTextAppearance</item>
         <item name="fontFamily">@font/roboto</item>
+
+        <item name="dialogTheme">@style/myDialogStyle</item>
+
 
     </style>
 
     <style name="myCustomMenuTextAppearance" parent="@android:style/TextAppearance.Widget.IconMenu.Item">
-        <item name="android:textColor">@color/textColorSecondary</item>
+        <item name="android:textColor">@color/colorIconItemMenu</item>
         <item name="font">@font/roboto</item>
     </style>
 
-<!--    <style name="ToolbarTheme" parent="Theme.AppCompat.Light.NoActionBar">-->
+<!--    <style name="ToolbarTheme" parent="Theme.AppCompat.Light.NoAct ionBar">-->
 <!--        <item name="android:textColorPrimary">@color/white</item>-->
 <!--        <item name="android:textColorSecondary">@color/light_gray</item>-->
 <!--        <item name="android:textColor">@color/light_gray</item>-->
 <!--        <item name="android:background">@color/colorPrimary</item>-->
 <!--    </style>-->
 
-    <style name="prosmotr" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="android:windowBackground">@android:color/transparent</item>
+    <style name="myDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+
+        <item name="backgroundColor">@color/colorDialogBackground</item>
+        <item name="android:background">@color/colorDialogBackground</item>
         <item name="fontFamily">@font/roboto</item>
 
     </style>

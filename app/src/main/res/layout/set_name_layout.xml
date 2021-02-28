@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorSurface"
+    android:background="@color/colorDialogBackground"
     android:orientation="vertical"
     android:paddingStart="24dp"
     android:paddingTop="24dp"
@@ -10,13 +10,14 @@
     >
 
     <TextView
+        android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/set_name"
         android:textColor="@color/textColorPrimary"
         android:textSize="20sp" />
 
     <EditText
+        android:hint="@string/set_name"
         android:layout_marginTop="16dp"
         android:textSize="16sp"
         android:id="@+id/editTextSetName"

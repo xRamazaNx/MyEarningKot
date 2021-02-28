@@ -4,8 +4,7 @@
 
     <item
         android:id="@+id/deleteRow"
-        android:iconTint="@color/colorRed"
-        android:icon="@drawable/ic_delete_white"
+        android:icon="@drawable/ic_delete"
         android:title="@string/DELETE"
         app:showAsAction="always" />
     <item
@@ -15,17 +14,17 @@
         />
     <item
         android:id="@+id/cutRow"
-        android:icon="@drawable/ic_cut_white"
+        android:icon="@drawable/ic_cut"
         android:title="@string/cut"
         app:showAsAction="always" />
     <item
         android:id="@+id/copyRow"
-        android:icon="@drawable/ic_copy_white"
+        android:icon="@drawable/ic_copy"
         android:title="@string/COPY"
         app:showAsAction="always" />
     <item
         android:id="@+id/pasteRow"
-        android:icon="@drawable/ic_paste_white"
+        android:icon="@drawable/ic_paste"
         android:title="@string/PASTE"
         app:showAsAction="always" />
 </menu>
