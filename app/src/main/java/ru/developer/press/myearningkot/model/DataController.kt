@@ -3,8 +3,10 @@ package ru.developer.press.myearningkot.model
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.doAsyncResult
+import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.helpers.*
 
 class DataController(context: Context) {
@@ -14,6 +16,13 @@ class DataController(context: Context) {
     private val listTypeDao: ListTypeDao
     private val sampleHelper: SampleHelper
 
+    suspend fun createDefaultSamplesJob(context: Context) {
+        withContext(Dispatchers.Default) {
+            addPage(context.getString(R.string.active))
+            sampleHelper.addDefaultSamples(context)
+        }
+    }
+
     init {
         val database = Database.create(context)
         cardJsonDao = database.cardJsonDao()
@@ -22,83 +31,101 @@ class DataController(context: Context) {
         sampleHelper = SampleHelper(context)
     }
 
-    fun addCard(card: Card) {
-        val json = Gson().toJson(card)
-        val cardJson = CardJson().apply {
-            this.json = json
-        }
-        val insert = cardJsonDao.insert(cardJson)
-        card.id = insert
-    }
+    private val dispatcher = Dispatchers.Default
 
-    fun getCard(id: Long): Card {
-        val cardJson = doAsyncResult { cardJsonDao.getById(id) }.get()
-        return getCardFromJson(cardJson.json).apply {
-            this.id = cardJson.id
+    suspend fun addCard(card: Card) {
+        withContext(dispatcher) {
+            val json = Gson().toJson(card)
+            val cardJson = CardJson().apply {
+                this.json = json
+            }
+            val insert = cardJsonDao.insert(cardJson)
+            card.id = insert
         }
     }
 
-    fun addPage(pageName: String): Page {
-        val page = Page().apply {
-            this.pageName = pageName
-        }
-
-        page.id = doAsyncResult { pageDao.insert(page) }.get()
-        return page
-    }
-
-    fun getPageList(): MutableList<Page> {
-        val cardJsonList = doAsyncResult { cardJsonDao.getAll() }.get()
-        val cardList = mutableListOf<Card>()
-        cardJsonList.forEach {
-            cardList.add(getCardFromJson(it.json).apply {
-                id = it.id
-            })
-        }
-        val pageList = doAsyncResult { pageDao.getAll() }.get()
-
-        pageList.forEach { page ->
-            cardList.forEach { card ->
-                if (page.id == card.idPage)
-                    page.cards.add(MutableLiveData<Card>().apply { postValue(card) })
+    suspend fun getCard(id: Long): Card {
+        return withContext(dispatcher) {
+            val cardJson = cardJsonDao.getById(id)
+            getCardFromJson(cardJson.json).apply {
+                this.id = cardJson.id
             }
         }
-        return pageList
     }
 
-    fun updateCard(card: Card) {
-        val json = Gson().toJson(card)
-        val cardJson = CardJson().apply {
-            this.json = json
-            id = card.id
+    suspend fun addPage(pageName: String): Page {
+        return withContext(dispatcher) {
+            val page = Page().apply {
+                this.pageName = pageName
+            }
+            page.id = pageDao.insert(page)
+            page
         }
-        cardJsonDao.update(cardJson)
     }
 
-    fun getAllListType(): MutableList<ListType> {
-        val allListJson = doAsyncResult { listTypeDao.getAll() }.get()
-        val list = mutableListOf<ListType>()
-        allListJson.forEach {
-            val listTypeJson = it.json
-            val listType = Gson().fromJson<ListType>(listTypeJson, ListType::class.java)
-            list.add(listType)
+    suspend fun getPageList(): MutableList<Page> {
+        return withContext(dispatcher) {
+
+            val cardJsonList = cardJsonDao.getAll()
+            val cardList = mutableListOf<Card>()
+            cardJsonList.forEach {
+                cardList.add(getCardFromJson(it.json).apply {
+                    id = it.id
+                })
+            }
+            val pageList = pageDao.getAll()
+
+            pageList.forEach { page ->
+                cardList.forEach { card ->
+                    if (page.id == card.idPage)
+                        page.cards.add(MutableLiveData<Card>().apply { postValue(card) })
+                }
+            }
+            pageList
         }
-        return list
     }
 
-    fun addListType(listType: ListType) {
-        val json = Gson().toJson(listType)
-        val listTypeJson = ListTypeJson().apply {
-            this.json = json
+    suspend fun updateCard(card: Card) {
+        withContext(dispatcher) {
+            val json = Gson().toJson(card)
+            val cardJson = CardJson().apply {
+                this.json = json
+                id = card.id
+            }
+            cardJsonDao.update(cardJson)
         }
-        listTypeDao.insert(listTypeJson)
+    }
+
+    suspend fun getAllListType(): MutableList<ListType> {
+        return withContext(dispatcher) {
+            val allListJson = listTypeDao.getAll()
+            val list = mutableListOf<ListType>()
+            allListJson.forEach {
+                val listTypeJson = it.json
+                val listType = Gson().fromJson<ListType>(listTypeJson, ListType::class.java)
+                list.add(listType)
+            }
+            list
+        }
+    }
+
+    suspend fun addListType(listType: ListType) {
+        withContext(dispatcher) {
+            val json = Gson().toJson(listType)
+            val listTypeJson = ListTypeJson().apply {
+                this.json = json
+            }
+            listTypeDao.insert(listTypeJson)
+        }
     }
 
     fun updatePage(page: Page) {
         doAsync { pageDao.update(page) }
     }
 
-    fun getSampleCard(sampleID: Long): Card? {
-        return sampleHelper.getSample(sampleID)
+    suspend fun getSampleCard(sampleID: Long): Card {
+        return withContext(dispatcher) {
+            sampleHelper.getSample(sampleID)
+        }
     }
 }

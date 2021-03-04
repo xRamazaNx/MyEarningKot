@@ -14,6 +14,7 @@ import android.view.View.VISIBLE
 import android.widget.*
 import androidx.core.view.forEach
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.AppBarLayout
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_card.*
@@ -23,10 +24,7 @@ import kotlinx.android.synthetic.main.total_item_layout.view.*
 import kotlinx.android.synthetic.main.total_item_value.view.*
 import kotlinx.android.synthetic.main.width_seek_bar_layout.*
 import kotlinx.android.synthetic.main.width_seek_bar_layout.view.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import org.jetbrains.anko.backgroundColorResource
 import org.jetbrains.anko.matchParent
@@ -45,7 +43,6 @@ import ru.developer.press.myearningkot.viewmodels.ViewModelCardFactory
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.negativeButton
 import splitties.alertdialog.appcompat.positiveButton
-import kotlin.concurrent.thread
 
 
 val CARD_ID = "card_id"
@@ -83,21 +80,20 @@ class PrefCardActivity : BasicCardActivity() {
         visibleHideElements()
         disableBehavior()
 
-        thread {
-
+        lifecycleScope.launch(Dispatchers.Default) {
             val prefCardJson = intent.getStringExtra(PREF_CARD_INFO_JSON)
             prefCardInfo = Gson().fromJson(prefCardJson, PrefCardInfo::class.java)
 
-            val card: Card? = if (prefCardInfo.cardCategory == PrefCardInfo.CardCategory.CARD) {
-                DataController(this).getCard(prefCardInfo.idCard)
+            val card: Card = if (prefCardInfo.cardCategory == PrefCardInfo.CardCategory.CARD) {
+                DataController(this@PrefCardActivity).getCard(prefCardInfo.idCard)
             } else {
-                SampleHelper(this).getSample(prefCardInfo.idCard)
+                SampleHelper(this@PrefCardActivity).getSample(prefCardInfo.idCard)
             }
-            runOnUiThread {
+            withContext(Dispatchers.Main) {
                 viewModel = ViewModelProvider(
                     this@PrefCardActivity, ViewModelCardFactory(
-                        this,
-                        card!!
+                        this@PrefCardActivity,
+                        card
                     )
                 ).get(
                     CardViewModel::
@@ -362,20 +358,20 @@ class PrefCardActivity : BasicCardActivity() {
     }
 
     private fun setCardOfResult() {
-        thread {
-            runOnUiThread {
-                progressBar.visibility = VISIBLE
-            }
+        lifecycleScope.launch {
+            progressBar.visibility = VISIBLE
             val card = viewModel?.card
             if (prefCardInfo.cardCategory == PrefCardInfo.CardCategory.CARD)
-                DataController(this).updateCard(card!!)
+                DataController(this@PrefCardActivity).updateCard(card!!)
             else
-                SampleHelper(this).updateSample(card!!)
+                SampleHelper(this@PrefCardActivity).updateSample(card!!)
 
             val data = Intent()
             data.putExtra(CARD_ID, prefCardInfo.idCard)
             setResult(Activity.RESULT_OK, data)
-            finish()
+            withContext(Dispatchers.Main) {
+                finish()
+            }
         }
     }
 

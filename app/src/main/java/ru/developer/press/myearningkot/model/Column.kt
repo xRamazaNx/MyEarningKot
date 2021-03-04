@@ -16,7 +16,7 @@ abstract class Column(var name: String) {
     }
 
     @SerializedName(column_cast_gson)
-    var className = javaClass.name
+    var className: String = javaClass.name
 
     val id: Long = Date().time + Random.nextLong(99999)
 

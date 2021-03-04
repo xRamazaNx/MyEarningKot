@@ -37,7 +37,6 @@ import ru.developer.press.myearningkot.viewmodels.ViewModelCardFactory
 import uk.co.markormesher.android_fab.SpeedDialMenuAdapter
 import uk.co.markormesher.android_fab.SpeedDialMenuItem
 import java.lang.Runnable
-import kotlin.concurrent.thread
 
 
 open class CardActivity : BasicCardActivity() {
@@ -76,20 +75,11 @@ open class CardActivity : BasicCardActivity() {
             }
 
             override fun onAnimationEnd(p0: Animation?) {
-                CoroutineScope(Dispatchers.IO).launch {
-
-                    viewModel?.apply {
-                        deleteRows { indexDel: Int ->
-                            launch(Dispatchers.Main) {
-                                adapter.notifyItemRemoved(indexDel)
-
-                            }
-                        }
-                        launch(Dispatchers.Main) {
-                            updateTotals()
-                            selectMode.value = SelectMode.NONE
-                        }
+                viewModel?.apply {
+                    deleteRows { indexDel: Int ->
+                        adapter.notifyItemRemoved(indexDel)
                     }
+                    selectMode.value = SelectMode.NONE
                 }
             }
 
@@ -549,11 +539,15 @@ open class CardActivity : BasicCardActivity() {
             fbAddRow.closeSpeedDialMenu()
         else
             viewModel?.apply {
-                selectMode.value?.let {
-                    if (it != SelectMode.NONE) {
+                selectMode.value?.let { selectMode1 ->
+                    if (selectMode1 != SelectMode.NONE) {
                         unSelect()
-                    } else
-                        finish()
+                    } else {
+                        updatedCardStatus.observe(this@CardActivity) {
+                            if (!it)
+                                finish()
+                        }
+                    }
                 }
             } ?: finish()
     }
@@ -574,7 +568,7 @@ open class CardActivity : BasicCardActivity() {
                 viewModel?.cellClicked(
                     rowPosition,
                     cellPosition
-                ) {isDoubleTap ->
+                ) { isDoubleTap ->
                     if (isDoubleTap) {
                         editCell()
                     }
@@ -627,10 +621,6 @@ open class CardActivity : BasicCardActivity() {
         }
     }
 
-    private fun updateTotals() {
-        viewModel?.card?.updateTotalAmount(totalAmountView)
-    }
-
     private fun scrollToPosition(position: Int) {
         recycler.scrollToPosition(position) //  у нас на одну больше из за отступа для плейт
         appBar.setExpanded(false, true)
@@ -646,6 +636,7 @@ open class CardActivity : BasicCardActivity() {
             selectCell.sourceValue
         ) { newValue ->
             selectCell.sourceValue = newValue
+            viewModel?.updateCardIntoDB()
             updateTypeControlColumn(cellSelectPosition)
             if (column is NumberColumn) {
                 card.columns.filterIsInstance<NumberColumn>().forEach {
@@ -653,17 +644,8 @@ open class CardActivity : BasicCardActivity() {
                 }
             }
             adapter.notifyItemChanged(rowSelectPosition)
-            updateCardInDB()
 
         }.editCell()
     }
-
-    private fun updateCardInDB() = thread {
-        viewModel?.updateCardIntoDB()
-        runOnUiThread {
-            updateTotals()
-        }
-    }
-
 
 }

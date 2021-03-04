@@ -3,13 +3,16 @@ package ru.developer.press.myearningkot.viewmodels
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.developer.press.myearningkot.AdapterPageInterface
 import ru.developer.press.myearningkot.helpers.Page
 import ru.developer.press.myearningkot.helpers.SingleLiveEvent
 import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.DataController
 import ru.developer.press.myearningkot.model.NumberColumn
-import kotlin.concurrent.thread
 
 // этот класс создается (ViewModelProviders.of(this).get(Class::class.java))
 // и существует пока существует активити до уничтожения он только обновляет данные представления
@@ -66,7 +69,8 @@ class MainViewModel(context: Context, list: MutableList<Page>) : ViewModel(),
         name: String,
         updateView: (position: Int) -> Unit
     ) {
-        thread {
+        viewModelScope.launch(Dispatchers.IO) {
+
             val card: Card = dataController.getSampleCard(sampleID)!!
             // для того что бы удвлить времянки
             card.rows.clear()
@@ -81,32 +85,37 @@ class MainViewModel(context: Context, list: MutableList<Page>) : ViewModel(),
             val position = getPositionCardInPage(indexPage, card)
             // добавляем во вкладку
             page.cards.add(position, MutableLiveData<Card>().apply { postValue(card) })
-            mutableLiveData.postValue(page)
-            updateView(position)
-        }
-
-    }
-
-    fun addPage(pageName: String): Page {
-        val page: Page = dataController.addPage(pageName)
-        pageList.add(MutableLiveData<Page>().apply { value = page })
-        return page
-    }
-
-    fun updateCardInPage(idCard: Long, selectedTabPosition: Int): Int {
-        var position = 0
-        val cards = pageList[selectedTabPosition].value!!.cards
-        cards.forEachIndexed { index, card ->
-            if (card.value!!.id == idCard) {
-                val updatedCard = dataController.getCard(idCard)
-                calcCard(updatedCard)
-                cards[index].postValue(updatedCard)
-                position = index
-                return@forEachIndexed
+            withContext(Dispatchers.Main) {
+                mutableLiveData.value = page
+                updateView(position)
             }
         }
-        return position
     }
+
+    fun addPage(pageName: String, mainBlock: (Page) -> Boolean) {
+        viewModelScope.launch {
+            val page: Page = dataController.addPage(pageName)
+            pageList.add(MutableLiveData<Page>().apply { value = page })
+            mainBlock.invoke(page)
+        }
+    }
+
+//    fun updateCardInPage(idCard: Long, selectedTabPosition: Int): Int {
+//        var position = 0
+//        val cards = pageList[selectedTabPosition].value!!.cards
+//        cards.forEachIndexed { index, card ->
+//            if (card.value!!.id == idCard) {
+//                viewModelScope.launch {
+//                    val updatedCard = dataController.getCard(idCard)
+//                    calcCard(updatedCard)
+//                    cards[index].postValue(updatedCard)
+//                    position = index
+//                    return@launch
+//                }
+//            }
+//        }
+//        return position
+//    }
 
     fun getCardInPage(selectedTabPosition: Int, position: Int): Card {
         return pageList[selectedTabPosition].value!!.cards[position].value!!
@@ -143,7 +152,7 @@ class MainViewModel(context: Context, list: MutableList<Page>) : ViewModel(),
         pageList.forEach { liveData ->
             val find = liveData.value?.cards?.find { it.value?.id == openedCardId }
             find?.let {
-                thread {
+                viewModelScope.launch(Dispatchers.IO) {
                     val card = dataController.getCard(openedCardId)
                     card.isUpdating = true
                     it.postValue(card)

@@ -17,8 +17,7 @@ class JsonDeserializerWithColumn<T> : JsonDeserializer<T> {
         val jsonObject = json.asJsonObject
         val classNamePrimitive = jsonObject[column_cast_gson] as JsonPrimitive
         val className = classNamePrimitive.asString
-        val clazz: Class<*>
-        clazz = try {
+        val clazz: Class<*> = try {
             Class.forName(className)
         } catch (e: ClassNotFoundException) {
             throw JsonParseException(e.message)

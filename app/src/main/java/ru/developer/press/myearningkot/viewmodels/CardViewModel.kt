@@ -7,19 +7,19 @@ import android.widget.LinearLayout
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.developer.press.myearningkot.ProvideDataRows
 import ru.developer.press.myearningkot.helpers.Page
 import ru.developer.press.myearningkot.model.*
 
-
-//
-//
-//
-//
-// для отображения открытой карточки
 open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     ProvideDataRows {
 
+    // статус занесения изменений карточки в базу данных
+    val updatedCardStatus: MutableLiveData<Boolean> = MutableLiveData(false)
     var cellSelectPosition: Int = -1
     var rowSelectPosition: Int = -1
     var selectMode = MutableLiveData<SelectMode>().apply {
@@ -82,7 +82,7 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
         var pair: Pair<Int, Int>?
         sortedRows.forEachIndexed { indexRow, row ->
             row.cellList.forEachIndexed { indexCell, cell ->
-                if (cell.isSelect){
+                if (cell.isSelect) {
                     pair = Pair(indexRow, indexCell)
                     return pair
                 }
@@ -302,7 +302,9 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     fun addRow(): Row {
         return card.addRow().apply {
             sortList()
-            dataController.updateCard(card)
+            viewModelScope.launch {
+                dataController.updateCard(card)
+            }
         }
     }
 
@@ -422,18 +424,22 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     }
 
     fun deleteRows(updateView: (Int) -> Unit) {
-        var delIndex = 0
-        sortedRows.forEach { r ->
-            if (r.status == Row.Status.DELETED) {
-                r.status = Row.Status.NONE
-                updateView(delIndex)
-                delIndex--
-                card.rows.remove(r)
+        viewModelScope.launch(Dispatchers.IO) {
+            var delIndex = 0
+            sortedRows.forEach { r ->
+                if (r.status == Row.Status.DELETED) {
+                    r.status = Row.Status.NONE
+                    withContext(Dispatchers.Main) {
+                        updateView(delIndex)
+                    }
+                    delIndex--
+                    card.rows.remove(r)
+                }
+                delIndex++
             }
-            delIndex++
+            sortList()
+            dataController.updateCard(card)
         }
-        sortList()
-        dataController.updateCard(card)
         // сортировка листа и обновлении происходит после анимации удаления
     }
 
@@ -516,7 +522,12 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
         pasteRows()
     }
 
-    fun updateCardIntoDB() = dataController.updateCard(card)
+    fun updateCardIntoDB() = viewModelScope.launch {
+        updatedCardStatus.value = true
+        dataController.updateCard(card)
+        updatedCardStatus.value = false
+        updateTotals()
+    }
 
     enum class SelectMode {
         CELL, ROW, NONE

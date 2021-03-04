@@ -1,5 +1,6 @@
 package ru.developer.press.myearningkot.helpers.prefLayouts
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -8,6 +9,7 @@ import android.widget.RadioGroup
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ernestoyaquello.dragdropswiperecyclerview.listener.OnItemDragListener
 import kotlinx.android.synthetic.main.pref_column_date.view.*
@@ -21,6 +23,7 @@ import kotlinx.android.synthetic.main.width_seek_bar_layout.view.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.R
+import ru.developer.press.myearningkot.activity.PrefCardActivity
 import ru.developer.press.myearningkot.adapters.AdapterRecyclerPhoneParams
 import ru.developer.press.myearningkot.adapters.ParamModel
 import ru.developer.press.myearningkot.helpers.*
@@ -383,10 +386,10 @@ class PrefDateColumnLayout(
 
         val dateTypeTextView = view.dateTypeTextView
 
-        val typeText = dateTypeTextView.text
         val updateDateType = {
-            val date = getDate(typePref.type, enableTime = false)
-            dateTypeTextView.text = "$typeText ($date)"
+            val dateType = view.context.getString(R.string.date_type)
+            val date: String = getDate(typePref.type, enableTime = false)
+            dateTypeTextView.text = "$dateType ($date)"
         }
         updateDateType()
         val showTime = view.enableTime
@@ -623,59 +626,60 @@ class PrefListColumnLayout(
         val listTextView = view.list_change
         val editList = view.edit_list
 
-
-        var allList: MutableList<ListType> = dataController.getAllListType()
-        val typeIndex = typePref.listTypeIndex
-        val listType: ListType? = if (typeIndex == -1) null else allList[typeIndex]
-        fun updateListTextView() {
-            val listString = context.getString(R.string.list)
-            val listName: String = listType?.listName ?: ""
-            val listText = "$listString ($listName)"
-            listTextView.text = listText
-        }
-        updateListTextView()
-
-
-        listTextView.setOnClickListener {
-            val mutableList = mutableListOf<String>()
-            val newList = context.getString(R.string.new_list)
-
-            val create = context.getString(R.string.create)
-            val createListText = "$create ${newList.toLowerCase(Locale.getDefault())}"
-
-            allList.forEach { listType ->
-                val element = listType.listName
-                mutableList.add(element)
+        (context as PrefCardActivity).lifecycleScope.launch {
+            var allList: MutableList<ListType> = dataController.getAllListType()
+            val typeIndex = typePref.listTypeIndex
+            val listType: ListType? = if (typeIndex == -1) null else allList[typeIndex]
+            fun updateListTextView() {
+                val listString = context.getString(R.string.list)
+                val listName: String = listType?.listName ?: ""
+                val listText = "$listString ($listName)"
+                listTextView.text = listText
             }
+            updateListTextView()
 
-            context.showItemChangeDialog(
-                context.getString(R.string.change_list),
-                mutableList,
-                typeIndex,
-                createListText
-            ) { index ->
-                CoroutineScope(Dispatchers.Main).launch {
-                    if (index == -1) {
-                        withContext(Dispatchers.IO) {
-                            dataController.addListType(ListType().apply {
-                                listName = newList
-                            })
-                        }
-                        allList = dataController.getAllListType()
-                        columnList.filterIsInstance(ListColumn::class.java).forEach {
-                            it.typePref.listTypeIndex = allList.size - 1
-                        }
-                    } else
-                        columnList.filterIsInstance(ListColumn::class.java).forEach {
-                            it.typePref.listTypeIndex = index
-                        }
-                    initBasicPref(view)
-                    prefColumnChangedCallback.prefChanged()
+
+            listTextView.setOnClickListener {
+                val mutableList = mutableListOf<String>()
+                val newList = context.getString(R.string.new_list)
+
+                val create = context.getString(R.string.create)
+                val createListText = "$create ${newList.toLowerCase(Locale.getDefault())}"
+
+                allList.forEach { listType ->
+                    val element = listType.listName
+                    mutableList.add(element)
+                }
+
+                context.showItemChangeDialog(
+                    context.getString(R.string.change_list),
+                    mutableList,
+                    typeIndex,
+                    createListText
+                ) { index ->
+                    CoroutineScope(Dispatchers.Main).launch {
+                        if (index == -1) {
+                            withContext(Dispatchers.IO) {
+                                dataController.addListType(ListType().apply {
+                                    listName = newList
+                                })
+                            }
+                            allList = dataController.getAllListType()
+                            columnList.filterIsInstance(ListColumn::class.java).forEach {
+                                it.typePref.listTypeIndex = allList.size - 1
+                            }
+                        } else
+                            columnList.filterIsInstance(ListColumn::class.java).forEach {
+                                it.typePref.listTypeIndex = index
+                            }
+                        initBasicPref(view)
+                        prefColumnChangedCallback.prefChanged()
+                    }
                 }
             }
-        }
-        editList.setOnClickListener { }
+            editList.setOnClickListener { }
 
+        }
         // дальнеие настройки
     }
 

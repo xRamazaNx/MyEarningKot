@@ -9,13 +9,12 @@ import android.os.Bundle
 import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AppCompatActivity
 import com.bugsnag.android.Bugsnag
+import kotlinx.coroutines.*
 import ru.developer.press.myearningkot.adapters.animationAdd
 import ru.developer.press.myearningkot.adapters.animationDelete
-import ru.developer.press.myearningkot.helpers.SampleHelper
 import ru.developer.press.myearningkot.helpers.filesFolder
 import ru.developer.press.myearningkot.helpers.getColorFromRes
 import ru.developer.press.myearningkot.model.*
-import kotlin.concurrent.thread
 
 
 class App : Application(), ActivityLifecycleCallbacks {
@@ -37,36 +36,39 @@ class App : Application(), ActivityLifecycleCallbacks {
                     type = value.type
                 }
         }
-    val pref: SharedPreferences get() = getSharedPreferences("app.setting", Context.MODE_PRIVATE)
+    private val pref: SharedPreferences
+        get() = getSharedPreferences(
+            "app.setting",
+            Context.MODE_PRIVATE
+        )
 
     override fun onCreate() {
-        registerActivityLifecycleCallbacks(this)
-        animationDelete = AnimationUtils.loadAnimation(applicationContext, R.anim.anim_delete)
-        animationAdd = AnimationUtils.loadAnimation(applicationContext, R.anim.anim_left_to_right)
-        filesFolder = filesDir.path + "/"
-        Column.titleColor = getColorFromRes(R.color.textColorTabsTitleNormal)
-        NumerationColumn.color = getColorFromRes(R.color.textColorSecondary)
-        PrefForCard.nameColor = getColorFromRes(R.color.colorTitle)
+        GlobalScope.launch {
 
-        PhoneColumn.apply {
-            nameOfMan = getString(R.string.name)
-            lastName = getString(R.string.last_name)
-            phone = getString(R.string.phone)
-            organization = getString(R.string.organization)
-        }
+            registerActivityLifecycleCallbacks(this@App)
+            animationDelete = AnimationUtils.loadAnimation(applicationContext, R.anim.anim_delete)
+            animationAdd =
+                AnimationUtils.loadAnimation(applicationContext, R.anim.anim_left_to_right)
+            filesFolder = filesDir.path + "/"
+            Column.titleColor = getColorFromRes(R.color.textColorTabsTitleNormal)
+            NumerationColumn.color = getColorFromRes(R.color.textColorSecondary)
+            PrefForCard.nameColor = getColorFromRes(R.color.colorTitle)
 
-        val isFirst = pref.getBoolean(prefFirstKey, true)
-        if (isFirst) {
-            pref.edit().putBoolean(prefFirstKey, false).apply()
-            // должен быть в главном потоке
-            DataController(this).addPage(getString(R.string.active))
-            thread {
-                SampleHelper(applicationContext).addDefaultSamples(applicationContext)
+            PhoneColumn.apply {
+                nameOfMan = getString(R.string.name_man)
+                lastName = getString(R.string.last_name)
+                phone = getString(R.string.phone)
+                organization = getString(R.string.organization)
             }
-        }
-        super.onCreate()
 
-        Bugsnag.init(this)
+            Bugsnag.init(applicationContext)
+            val isFirst = pref.getBoolean(prefFirstKey, true)
+            if (isFirst) {
+                DataController(applicationContext).createDefaultSamplesJob(applicationContext)
+                pref.edit().putBoolean(prefFirstKey, false).apply()
+            }
+            super.onCreate()
+        }
     }
 
     override fun onActivityPaused(p0: Activity) {

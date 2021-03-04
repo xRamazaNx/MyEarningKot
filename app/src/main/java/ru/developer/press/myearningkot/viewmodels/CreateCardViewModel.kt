@@ -11,8 +11,9 @@ import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.sample_card_item.view.*
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.uiThread
 import org.jetbrains.anko.wrapContent
 import ru.developer.press.myearningkot.App
 import ru.developer.press.myearningkot.ProvideDataRows
@@ -27,7 +28,6 @@ import ru.developer.press.myearningkot.helpers.bindTitleOfColumn
 import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.Column
 import ru.developer.press.myearningkot.model.Row
-import kotlin.concurrent.thread
 
 class CreateCardViewModel : ViewModel() {
     fun updateSamples() {
@@ -150,10 +150,14 @@ class CreateCardViewModel : ViewModel() {
                     override fun isEnableSomeStroke(): Boolean = false
 
                     override fun getRowHeight(): Int = sampleItem.card.heightCells
+                    override fun getSelectCellPairIndexes(): Pair<Int, Int>? {
+                        return null
+                    }
                 }, null)
                 adapterRecyclerInCard.setCellClickListener(object : RowClickListener {
-                    override fun cellClick(view: View, rowPosition: Int, cellPosition: Int) {
+                    override fun cellClick(rowPosition: Int, cellPosition: Int) {
                         click.invoke()
+
                     }
                 })
                 sampleRecycler.adapter = adapterRecyclerInCard
@@ -173,10 +177,10 @@ class CreateCardViewModel : ViewModel() {
                                 )
                             }
                             R.id.delete_sample -> {
-                                thread {
+                                doAsync {
                                     deleteCard.invoke(sampleItem.card.id)
                                     list.remove(sampleItem)
-                                    context.runOnUiThread {
+                                    uiThread {
                                         notifyItemRemoved(adapterPosition)
                                     }
                                 }

@@ -39,6 +39,7 @@ import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.adapters.AdapterViewPagerFromMain
 import ru.developer.press.myearningkot.databinding.ActivityMainBinding
 import ru.developer.press.myearningkot.dialogs.DialogSetName
+import ru.developer.press.myearningkot.helpers.Page
 import ru.developer.press.myearningkot.helpers.getColorFromRes
 import ru.developer.press.myearningkot.helpers.getDrawableRes
 import ru.developer.press.myearningkot.helpers.setFont
@@ -46,10 +47,6 @@ import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.DataController
 import ru.developer.press.myearningkot.viewmodels.MainViewModel
 import ru.developer.press.myearningkot.viewmodels.ViewModelMainFactory
-
-
-// GITHUB
-const val ID_UPDATE_CARD = "id_card"
 
 class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
     private lateinit var drawer: Drawer
@@ -86,7 +83,7 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
         root.toolbar.setTitleTextColor(getColorFromRes(R.color.colorOnPrimary))
 
         initializerViewModel.start()
-        initObserver.observe(this, Observer {
+        initObserver.observe(this, {
             it?.invoke()
         })
 
@@ -103,13 +100,11 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
                         if (id > -1) {
                             val indexPage = tabs.selectedTabPosition
                             viewModel.createCard(indexPage, id, name ?: "") { positionCard ->
-                                runOnUiThread {
-                                    adapterViewPagerFromMain.scrollToPosition(
-                                        indexPage,
-                                        positionCard
-                                    )
-                                    root.appBar.setExpanded(false, true)
-                                }
+                                adapterViewPagerFromMain.scrollToPosition(
+                                    indexPage,
+                                    positionCard
+                                )
+                                root.appBar.setExpanded(false, true)
                             }
                         }
                     }
@@ -174,14 +169,14 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
         root.addPageButton.setOnClickListener {
             DialogSetName().setTitle(getString(R.string.create_page))
                 .setPositiveListener { pageName ->
-                    GlobalScope.launch(Dispatchers.Main) {
-                        viewModel.addPage(pageName)
+                    viewModel.addPage(pageName) { _: Page ->
                         adapterViewPagerFromMain.addPage()
                         linkViewPagerAndTabs()
                         root.tabs.postDelayed({
                             root.tabs.getTabAt(root.tabs.tabCount - 1)?.select()
                         }, 200)
                     }
+
                 }.show(supportFragmentManager, "setName")
         }
         val pages = viewModel.getPages()

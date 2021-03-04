@@ -37,8 +37,7 @@
             android:contentDescription="@string/DELETE"
             android:padding="16dp"
             android:src="@drawable/ic_delete"
-            android:tint="@color/colorRed"
-            />
+            android:tint="@color/colorRed" />
     </LinearLayout>
 
     <androidx.viewpager2.widget.ViewPager2
@@ -55,25 +54,23 @@
         android:background="@color/colorDark" />
 
     <LinearLayout
-        android:background="@color/colorPrimary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
         android:orientation="horizontal">
 
-        <ImageButton
-
-            android:tint="@color/textColorPrimary"
-            android:id="@+id/imagePickButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:background="?android:attr/selectableItemBackground"
-            android:contentDescription="@string/add_image"
-            android:padding="16dp"
-            android:scaleX="-1.3"
-            android:scaleY="1.3"
-            android:src="@drawable/ic_add_image"
-            />
+            <ImageButton
+                android:id="@+id/imagePickButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:background="?android:attr/selectableItemBackground"
+                android:contentDescription="@string/add_image"
+                android:padding="16dp"
+                android:scaleX="-1.3"
+                android:scaleY="1.3"
+                android:src="@drawable/ic_add_photo"
+                android:tint="@color/textColorPrimary" />
 
         <FrameLayout
             android:layout_width="1dp"
@@ -86,7 +83,7 @@
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/imagesTabs"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="match_parent"
             android:background="@color/colorPrimary"
             android:padding="6dp"
             app:tabGravity="fill"

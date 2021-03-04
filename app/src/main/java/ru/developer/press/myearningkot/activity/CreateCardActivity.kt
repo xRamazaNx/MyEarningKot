@@ -16,6 +16,7 @@ import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.helpers.PrefCardInfo
 import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.viewmodels.CreateCardViewModel
+import kotlin.concurrent.thread
 
 class CreateCardActivity : AppCompatActivity() {
 
@@ -30,26 +31,35 @@ class CreateCardActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.create_card_activity)
-        viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(
-            CreateCardViewModel::class.java
-        ).apply { create(app()) }
-        adapter = viewModel.getAdapter()
-        recycler.layoutManager = LinearLayoutManager(this)
-        recycler.adapter = adapter
+        thread {
 
-        create.setOnClickListener {
-            adapter.selectId?.let {
-                setResult(RESULT_OK, Intent().apply {
-                    putExtra(createCardID, it)
-                    putExtra(createCardName, sampleEditTextName.text.toString())
-                })
-                finish()
-            }?: kotlin.run {
-                toast(getString(R.string.select_sample))
+            viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(
+                CreateCardViewModel::class.java
+            ).apply { create(app()) }
+            adapter = viewModel.getAdapter()
+            runOnUiThread {
+                recycler.layoutManager = LinearLayoutManager(this)
+                recycler.adapter = adapter
             }
-        }
-        cancel.setOnClickListener {
-            finish()
+
+            create.setOnClickListener {
+                adapter.selectId?.let {
+                    setResult(RESULT_OK, Intent().apply {
+                        putExtra(createCardID, it)
+                        putExtra(createCardName, sampleEditTextName.text.toString())
+                    })
+                    finish()
+                } ?: kotlin.run {
+                    runOnUiThread {
+                        toast(getString(R.string.select_sample))
+                    }
+                }
+            }
+            cancel.setOnClickListener {
+                runOnUiThread {
+                    finish()
+                }
+            }
         }
     }
 
@@ -74,8 +84,8 @@ class CreateCardActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            R.id.new_sample ->{
+        when (item.itemId) {
+            R.id.new_sample -> {
 
             }
         }

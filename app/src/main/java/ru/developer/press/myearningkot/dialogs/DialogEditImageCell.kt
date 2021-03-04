@@ -178,11 +178,9 @@ class DialogEditImageCell(
                         }
                     }
                 }
-            } else {
-                toast("что то не то")
             }
         } catch (e: Exception) {
-            toast("error")
+            toast("Ошибка при добавлении фото.")
         }
 
         CoroutineScope(Dispatchers.Main).launch {
