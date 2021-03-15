@@ -1,6 +1,7 @@
 package ru.developer.press.myearningkot.activity
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -12,6 +13,7 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.*
+import androidx.activity.result.ActivityResultLauncher
 import androidx.core.view.forEach
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -30,17 +32,18 @@ import org.jetbrains.anko.backgroundColorResource
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.wrapContent
 import ru.developer.press.myearningkot.R
+import ru.developer.press.myearningkot.database.CardRef
+import ru.developer.press.myearningkot.database.DataController
 import ru.developer.press.myearningkot.dialogs.DialogBasicPrefCard
 import ru.developer.press.myearningkot.dialogs.DialogSetName
-import ru.developer.press.myearningkot.helpers.PrefCardInfo
-import ru.developer.press.myearningkot.helpers.SampleHelper
+import ru.developer.press.myearningkot.dialogs.myDialog
+import ru.developer.press.myearningkot.database.SampleHelper
 import ru.developer.press.myearningkot.helpers.prefLayouts.*
 import ru.developer.press.myearningkot.helpers.prefLayouts.ElementPrefType.*
 import ru.developer.press.myearningkot.helpers.showItemChangeDialog
 import ru.developer.press.myearningkot.model.*
 import ru.developer.press.myearningkot.viewmodels.CardViewModel
 import ru.developer.press.myearningkot.viewmodels.ViewModelCardFactory
-import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.negativeButton
 import splitties.alertdialog.appcompat.positiveButton
 
@@ -50,7 +53,41 @@ val PREF_CARD_INFO_JSON = "card_category_json"
 val TITLE_PREF_ACTIVITY = "title_pref_activity"
 val CARD_EDIT_JSON_REQ_CODE = 0
 
+fun ActivityResultLauncher<Intent>.startPrefActivity(
+    category: PrefCardInfo.CardCategory,
+    activity: Context? = null,
+    card: CardRef,
+    title: String,
+) {
+
+    val intent = Intent(activity, PrefCardActivity::class.java)
+    val cardInfo = PrefCardInfo(
+        card.refId,
+        cardCategory =
+        category
+    )
+    val prefCategoryJson = Gson().toJson(cardInfo)
+
+    intent.putExtra(PREF_CARD_INFO_JSON, prefCategoryJson)
+    intent.putExtra(TITLE_PREF_ACTIVITY, title)
+
+    launch(intent)
+}
+
+// чтобы узнать мы открыли в настройках карточку или шаблон
+class PrefCardInfo(
+    var idCard: String,
+    var cardCategory: CardCategory
+) {
+
+    enum class CardCategory {
+        CARD,
+        SAMPLE
+    }
+}
+
 class PrefCardActivity : BasicCardActivity() {
+
     private val totalContainer: LinearLayout
         get() {
             return if (totalContainerDisableScroll.childCount > 0)
@@ -333,8 +370,8 @@ class PrefCardActivity : BasicCardActivity() {
 
     override fun onBackPressed() {
         if (!selectedControl.unSelectAll())
-
-            alertDialog(getString(R.string.save_changes)) {
+            myDialog {
+                setTitle(R.string.save_changes)
                 setMessage("")
                 positiveButton(R.string.save) {
                     setCardOfResult()
@@ -343,7 +380,9 @@ class PrefCardActivity : BasicCardActivity() {
                     setResult(Activity.RESULT_CANCELED)
                     finish()
                 }
-            }.show()
+            }.apply {
+                negativeButtonColorRes = R.color.colorRed
+            }.show(supportFragmentManager, "pref_confirm")
     }
 
     fun getColumnsFromSelectedElements(selectedElementList: List<SelectedElement>): MutableList<Column> {
@@ -369,9 +408,7 @@ class PrefCardActivity : BasicCardActivity() {
             val data = Intent()
             data.putExtra(CARD_ID, prefCardInfo.idCard)
             setResult(Activity.RESULT_OK, data)
-            withContext(Dispatchers.Main) {
-                finish()
-            }
+            finish()
         }
     }
 
@@ -558,7 +595,7 @@ class PrefCardActivity : BasicCardActivity() {
                             TOTAL -> {
                                 yOff = totalAmountView.height
 
-                                val listTotal = mutableListOf<TotalItem>().apply {
+                                val listTotal = mutableListOf<Total>().apply {
                                     elementPref.selectedElementList.filterIsInstance(SelectedElement.ElementTotal::class.java)
                                         .forEach {
                                             add(card.totals[it.index])
@@ -581,7 +618,7 @@ class PrefCardActivity : BasicCardActivity() {
                                             .toMutableList()
                                     }
 
-                                    override fun getTotals(): List<TotalItem> = card.totals
+                                    override fun getTotals(): List<Total> = card.totals
                                     override fun widthProgress() {
                                         listTotal.forEach { total ->
 
@@ -698,7 +735,7 @@ class PrefCardActivity : BasicCardActivity() {
                             selectColumn(columnIndex)
                         }
                     else
-                        list.filterIsInstance<TotalItem>().forEach { total ->
+                        list.filterIsInstance<Total>().forEach { total ->
                             val columnIndex = card.totals.indexOf(total)
                             selectTotal(columnIndex)
                         }
@@ -727,7 +764,7 @@ class PrefCardActivity : BasicCardActivity() {
                             }
                         }
                     } else {
-                        val totalList: List<TotalItem> =
+                        val totalList: List<Total> =
                             getTotalsFromSelectedElements(selectedElementList)
                         viewModel?.moveToRightTotal(totalList) {
                             if (!it)
@@ -740,8 +777,8 @@ class PrefCardActivity : BasicCardActivity() {
                     }
                 }
 
-                private fun getTotalsFromSelectedElements(selectedElementList: List<SelectedElement>): List<TotalItem> {
-                    return mutableListOf<TotalItem>().apply {
+                private fun getTotalsFromSelectedElements(selectedElementList: List<SelectedElement>): List<Total> {
+                    return mutableListOf<Total>().apply {
                         selectedElementList.filterIsInstance(SelectedElement.ElementTotal::class.java)
                             .forEach {
                                 val totalIndex = it.index

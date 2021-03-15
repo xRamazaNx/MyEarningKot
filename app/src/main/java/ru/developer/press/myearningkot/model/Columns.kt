@@ -5,20 +5,22 @@ import android.view.View
 import com.google.gson.annotations.SerializedName
 import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.adapters.ParamModel
+import ru.developer.press.myearningkot.database.CardRef
+import ru.developer.press.myearningkot.database.IdsRef
 import ru.developer.press.myearningkot.helpers.*
 import java.math.BigDecimal
 import java.util.*
-import kotlin.random.Random
 
-abstract class Column(var name: String) {
+abstract class Column(var name: String, pageId: String, cardId: String) : IdsRef(pageId,cardId) {
     companion object {
+        @SerializedName("tc")
         var titleColor: Int = 0
     }
 
-    @SerializedName(column_cast_gson)
-    var className: String = javaClass.name
+    var width: Int = 350
 
-    val id: Long = Date().time + Random.nextLong(99999)
+    @SerializedName(column_cast_gson)
+    var className: Class<out Column> = this::class.java
 
     @SerializedName("tp")
     val titlePref: PrefForTextView = PrefForTextView().apply {
@@ -33,7 +35,6 @@ abstract class Column(var name: String) {
         }
     }
 
-    var width: Int = 350
 
     @Transient
     lateinit var columnTypeControl: ColumnTypeControl
@@ -70,7 +71,7 @@ abstract class Column(var name: String) {
 
 }
 
-class NumerationColumn(name: String) : Column(name) {
+class NumerationColumn(name: String, pageId: String, cardId: String) : Column(name,pageId,cardId) {
     companion object {
         var color = 0
     }
@@ -101,7 +102,7 @@ class NumerationColumn(name: String) : Column(name) {
 
 }
 
-class TextColumn(name: String) : Column(name) {
+class TextColumn(name: String, pageId: String, cardId: String) : Column(name,pageId,cardId) {
     @SerializedName("cp")
     var typePref = TextTypePref()
 
@@ -117,7 +118,7 @@ class TextColumn(name: String) : Column(name) {
     }
 }
 
-class NumberColumn(name: String) : Column(name) {
+class NumberColumn(name: String, pageId: String, cardId: String) : Column(name,pageId,cardId) {
     @SerializedName("cp")
     var typePref = NumberTypePref()
 
@@ -136,14 +137,14 @@ class NumberColumn(name: String) : Column(name) {
 
     }
 
-    fun calcFormula(rowIndex: Int, card: Card): String {
+    fun calcFormula(rowIndex: Int, card: CardRef): String {
         val string = StringBuilder()
         return try {
             formula.formulaElements.forEach {
                 if (it.type == Formula.COLUMN_ID) {
                     var index = -1
                     card.columns.forEachIndexed { i, column ->
-                        if (column.id == it.value.toLong()) {
+                        if (column.refId == it.value) {
                             index = i
                             return@forEachIndexed
                         }
@@ -176,13 +177,14 @@ class NumberColumn(name: String) : Column(name) {
     }
 }
 
-class PhoneColumn(name: String) : Column(name) {
-    companion object{
+class PhoneColumn(name: String, pageId: String, cardId: String) : Column(name,pageId,cardId) {
+    companion object {
         var nameOfMan = ""
         var lastName = ""
         var phone = ""
         var organization = ""
     }
+
     @SerializedName("cp")
     var typePref = PhoneTypePref()
 
@@ -234,7 +236,7 @@ class PhoneColumn(name: String) : Column(name) {
 
 }
 
-class DateColumn(name: String) : Column(name) {
+class DateColumn(name: String, pageId: String, cardId: String) : Column(name,pageId,cardId) {
     @SerializedName("cp")
     var typePref = DateTypePref()
 
@@ -251,7 +253,7 @@ class DateColumn(name: String) : Column(name) {
 
 }
 
-class ColorColumn(name: String) : Column(name) {
+class ColorColumn(name: String, pageId: String, cardId: String) : Column(name,pageId,cardId) {
     @SerializedName("cp")
     var typePref = ColorTypePref()
 
@@ -267,7 +269,7 @@ class ColorColumn(name: String) : Column(name) {
 //        выбор фигруы для цвета
 }
 
-class SwitchColumn(name: String) : Column(name) {
+class SwitchColumn(name: String, pageId: String, cardId: String) : Column(name,pageId,cardId) {
     @SerializedName("cp")
     var typePref = SwitchTypePref()
 
@@ -283,7 +285,7 @@ class SwitchColumn(name: String) : Column(name) {
     // может будут выборы типа
 }
 
-class ImageColumn(name: String) : Column(name) {
+class ImageColumn(name: String, pageId: String, cardId: String) : Column(name,pageId,cardId) {
     @SerializedName("cp")
     var typePref = ImageTypePref()
 
@@ -299,7 +301,7 @@ class ImageColumn(name: String) : Column(name) {
     // может рамки не знаю
 }
 
-class ListColumn(name: String) : Column(name) {
+class ListColumn(name: String, pageId: String, cardId: String) : Column(name,pageId,cardId) {
     @SerializedName("cp")
     var typePref = ListTypePref()
 

@@ -12,7 +12,7 @@ import kotlinx.android.synthetic.main.card.view.*
 import ru.developer.press.myearningkot.CardClickListener
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.activity.setShowTotalInfo
-import ru.developer.press.myearningkot.helpers.Page
+import ru.developer.press.myearningkot.database.Page
 import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.createViewInPlate
 import ru.developer.press.myearningkot.model.hideAddTotalButton
@@ -40,7 +40,7 @@ class AdapterCard(
         view: View,
         cardClickListener: CardClickListener
     ) : RecyclerView.ViewHolder(view) {
-        private var idCard: Long = -1
+        private var idCard: String = ""
 
         init {
             val click: (View) -> Unit = {
@@ -53,7 +53,7 @@ class AdapterCard(
         fun bind(card: MutableLiveData<Card>) {
             val owner = itemView.context as AppCompatActivity
             card.observe(owner, {
-                idCard = it.id
+                idCard = it.refId
                 it.createViewInPlate(itemView)
                 itemView.setShowTotalInfo(it.isShowTotalInfo)
                 itemView.hideAddTotalButton(it)

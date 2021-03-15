@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.4.30'
+    ext.kotlin_version = '1.4.31'
     ext.splitties_version =  "3.0.0-alpha06"
     repositories {
         google()
@@ -14,10 +14,19 @@ buildscript {
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
         classpath 'com.bugsnag:bugsnag-android-gradle-plugin:5.4.0'
+        classpath 'com.google.gms:google-services:4.3.5'
     }
 }
 
+
 allprojects {
+    pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
+        kotlin.targets.matching { it.platformType.name == "jvm" }.all {
+            compilations.all {
+                kotlinOptions.useIR = true
+            }
+        }
+    }
     repositories {
         google()
         jcenter()

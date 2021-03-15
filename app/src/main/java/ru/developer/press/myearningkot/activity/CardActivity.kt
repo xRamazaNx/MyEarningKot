@@ -12,7 +12,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View.GONE
 import android.view.animation.Animation
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.RecyclerView.ItemAnimator.ItemAnimatorFinishedListener
 import com.google.android.material.appbar.AppBarLayout
 import kotlinx.android.synthetic.main.activity_card.*
@@ -24,10 +26,11 @@ import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.App.Companion.app
 import ru.developer.press.myearningkot.adapters.animationAdd
 import ru.developer.press.myearningkot.adapters.animationDelete
+import ru.developer.press.myearningkot.database.DataController
 import ru.developer.press.myearningkot.dialogs.PICK_IMAGE_MULTIPLE
 import ru.developer.press.myearningkot.dialogs.editCellTag
 import ru.developer.press.myearningkot.helpers.EditCellControl
-import ru.developer.press.myearningkot.helpers.PrefCardInfo
+import ru.developer.press.myearningkot.database.PrefCardInfo
 import ru.developer.press.myearningkot.helpers.getColorFromRes
 import ru.developer.press.myearningkot.helpers.getDrawableRes
 import ru.developer.press.myearningkot.model.*
@@ -40,10 +43,38 @@ import java.lang.Runnable
 
 
 open class CardActivity : BasicCardActivity() {
+    private val editCardRegister =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            val data = it.data
+            if (data != null) {
+                val id = data.getStringExtra(CARD_ID)?:""
+                if (id!!.isNotEmpty()) {
+                    if (viewModel == null) {
+                        recreate()
+                    } else {
+                        viewModel?.viewModelScope?.launch {
+                            val card = withContext(Dispatchers.Default) {
+                                DataController(this@CardActivity).getCard(id)
+                            }
+
+                            viewModel!!.updateCard(card)
+                            createTitles()
+                            updateHorizontalScrollSwitched()
+                            createRecyclerView()
+                            viewModel?.apply {
+                                selectMode.value = SelectMode.NONE
+                            }
+
+                            onResume()
+                        }
+                    }
+                }
+            }
+        }
     override var viewModel: CardViewModel? = null
     private var isLongClick = false
     private val launch = CoroutineScope(Dispatchers.Main).launch {
-        val id = intent.getLongExtra(CARD_ID, 0)
+        val id = intent.getStringExtra(CARD_ID)!!
         val card = withContext(Dispatchers.IO) {
             DataController(this@CardActivity).getCard(id)
         }
@@ -300,28 +331,7 @@ open class CardActivity : BasicCardActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == CARD_EDIT_JSON_REQ_CODE) {
             if (resultCode == Activity.RESULT_OK) {
-                if (data != null) {
-                    val id = data.getLongExtra(CARD_ID, -1)
-                    if (id > -1) {
-                        if (viewModel == null) {
-                            recreate()
-                        } else {
-                            CoroutineScope(Dispatchers.IO).launch {
-                                val card = DataController(this@CardActivity).getCard(id)
-                                withContext(Dispatchers.Main) {
-                                    viewModel!!.updateCard(card)
-                                    createTitles()
-                                    updateHorizontalScrollSwitched()
-                                    createRecyclerView()
-                                    viewModel?.apply {
-                                        selectMode.value = SelectMode.NONE
-                                    }
-                                    onResume()
-                                }
-                            }
-                        }
-                    }
-                }
+
             }
         }
         if (requestCode == PICK_IMAGE_MULTIPLE) {
@@ -339,7 +349,7 @@ open class CardActivity : BasicCardActivity() {
             R.id.sort -> {
             }
             R.id.setting -> {
-                startPrefActivity(
+                editCardRegister.startPrefActivity(
                     PrefCardInfo.CardCategory.CARD,
                     activity = this,
                     card = viewModel!!.card,

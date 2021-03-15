@@ -25,7 +25,7 @@ import org.jetbrains.anko.dip
 import org.jetbrains.anko.matchParent
 import ru.developer.press.myearningkot.activity.MainActivity
 import ru.developer.press.myearningkot.adapters.AdapterCard
-import ru.developer.press.myearningkot.helpers.Page
+import ru.developer.press.myearningkot.database.Page
 
 
 class PageFragment : Fragment() {
@@ -46,7 +46,7 @@ class PageFragment : Fragment() {
         recycler?.layoutManager = LinearLayoutManager(context)
         adapterCard = AdapterCard(page.value!!, activity as MainActivity)
 
-        page.observe(activity!!, {
+        page.observe(requireActivity(), {
             view.backgroundColor = it.background
         })
         updateRecycler()

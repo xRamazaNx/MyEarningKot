@@ -8,7 +8,7 @@
     android:orientation="vertical">
 
     <TextView
-        android:background="@color/colorPrimary"
+        android:background="@color/colorBackgroundToolbarDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="24dp"
@@ -141,7 +141,6 @@
             app:drawableStartCompat="@drawable/ic_height" />
 
         <ImageButton
-            android:tint="@color/colorSecondary"
             android:id="@+id/heightSizeDown"
             android:layout_width="40dp"
             android:layout_height="match_parent"
@@ -149,7 +148,8 @@
             android:layout_marginEnd="8dp"
             android:background="?android:attr/selectableItemBackground"
             android:contentDescription="@string/down_size"
-            android:src="@drawable/ic_down" />
+            android:src="@drawable/ic_down"
+            app:tint="@color/colorSecondary" />
 
         <TextView
             android:textSize="16sp"
@@ -163,7 +163,6 @@
         <ImageButton
 
             android:id="@+id/heightSizeUp"
-            android:tint="@color/colorSecondary"
             android:layout_width="40dp"
             android:layout_height="match_parent"
             android:layout_marginStart="8dp"
@@ -171,7 +170,8 @@
             android:background="?android:attr/selectableItemBackground"
             android:contentDescription="@string/up_size"
             android:rotation="180"
-            android:src="@drawable/ic_down" />
+            android:src="@drawable/ic_down"
+            app:tint="@color/colorSecondary" />
 
     </LinearLayout>
 

@@ -4,7 +4,7 @@ package ru.developer.press.myearningkot
 import android.content.Context
 import android.view.View
 import androidx.lifecycle.MutableLiveData
-import ru.developer.press.myearningkot.helpers.Page
+import ru.developer.press.myearningkot.database.Page
 import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.Column
 import ru.developer.press.myearningkot.model.Prefs
@@ -52,7 +52,7 @@ interface ProvideValueProperty {
 
 // listeners
 interface CardClickListener {
-    fun cardClick(idCard: Long)
+    fun cardClick(idCard: String)
 }
 
 interface RowClickListener {
@@ -83,4 +83,7 @@ interface ProvideCardPropertyForCell{
     fun getValutaType():Int
 }
 
+interface JsonValue {
+    var json :String
+}
 

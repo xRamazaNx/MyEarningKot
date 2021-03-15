@@ -17,7 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activity.CreateCardActivity"></activity>
+        <activity android:name=".activity.CreateCardActivity">
+
+        </activity>
 
         <meta-data
             android:name="com.bugsnag.android.API_KEY"

@@ -8,17 +8,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.developer.press.myearningkot.AdapterPageInterface
-import ru.developer.press.myearningkot.helpers.Page
+import ru.developer.press.myearningkot.database.Page
 import ru.developer.press.myearningkot.helpers.SingleLiveEvent
 import ru.developer.press.myearningkot.model.Card
-import ru.developer.press.myearningkot.model.DataController
+import ru.developer.press.myearningkot.database.DataController
 import ru.developer.press.myearningkot.model.NumberColumn
 
 // этот класс создается (ViewModelProviders.of(this).get(Class::class.java))
 // и существует пока существует активити до уничтожения он только обновляет данные представления
 class MainViewModel(context: Context, list: MutableList<Page>) : ViewModel(),
     AdapterPageInterface {
-    private var openedCardId: Long = -1
+    private var openedCardId: String = ""
     private val pageList: MutableList<MutableLiveData<Page>> = mutableListOf()
 
     init {
@@ -28,12 +28,12 @@ class MainViewModel(context: Context, list: MutableList<Page>) : ViewModel(),
     }
 
     // нажали на карточку
-    fun cardClick(idCard: Long) {
+    fun cardClick(idCard: String) {
         openCardEvent.call(idCard)
         openedCardId = idCard
     }
 
-    val openCardEvent = SingleLiveEvent<Long>()
+    val openCardEvent = SingleLiveEvent<String>()
     //
 
     // реализация для адаптера чтоб брал количество страниц
@@ -65,20 +65,21 @@ class MainViewModel(context: Context, list: MutableList<Page>) : ViewModel(),
 
     fun createCard(
         indexPage: Int,
-        sampleID: Long,
+        sampleID: String,
         name: String,
         updateView: (position: Int) -> Unit
     ) {
         viewModelScope.launch(Dispatchers.IO) {
 
-            val card: Card = dataController.getSampleCard(sampleID)!!
+            val card: Card = dataController.getSampleCard(sampleID)
             // для того что бы удвлить времянки
             card.rows.clear()
             // добавляем в базу данных новую Card присовение ид очень важно
             val mutableLiveData = pageList[indexPage]
             val page = mutableLiveData.value!!
-            card.idPage = page.id
-            card.name = name
+            card.pageId = page.refId
+            if (name.isNotEmpty())
+                card.name = name
             // добавляем в базу
             dataController.addCard(card)
             // узнать позицию для добавления во вкладку и для ее обновления во вью... а ее надо узнавать смотря какая сортировка
@@ -142,21 +143,23 @@ class MainViewModel(context: Context, list: MutableList<Page>) : ViewModel(),
     fun pageColorChanged(color: Int, selectedPage: Int) {
         val mutableLiveData = pageList[selectedPage]
         val page: Page? = mutableLiveData.value
-        dataController.updatePage(page!!)
-        page.background = color
-        mutableLiveData.postValue(page)
+        page?.let {
+            dataController.updatePage(it)
+            it.background = color
+            mutableLiveData.postValue(it)
+        }
 
     }
 
     fun checkUpdatedCard() {
         pageList.forEach { liveData ->
-            val find = liveData.value?.cards?.find { it.value?.id == openedCardId }
+            val find = liveData.value?.cards?.find { it.value?.refId == openedCardId }
             find?.let {
                 viewModelScope.launch(Dispatchers.IO) {
                     val card = dataController.getCard(openedCardId)
                     card.isUpdating = true
                     it.postValue(card)
-                    openedCardId = -1
+                    openedCardId = ""
                 }
                 return@forEach
             }

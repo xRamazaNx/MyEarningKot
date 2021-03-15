@@ -50,7 +50,7 @@ fun Context.getPrefTextLayout(
 }
 
 fun Context.getPrefTotalLayout(
-    totals: MutableList<TotalItem>,
+    totals: MutableList<Total>,
     callback: PrefTotalChangedCallBack
 ): View {
 
@@ -146,14 +146,14 @@ fun Context.getPrefTotalLayout(
     }
 
     view.formulaTotal.setOnClickListener {
-        val allTotals: List<TotalItem> = callback.getTotals()
-        val filterTotalList = mutableListOf<TotalItem>().apply {
+        val allTotals: List<Total> = callback.getTotals()
+        val filterTotalList = mutableListOf<Total>().apply {
             addAll(allTotals)
             // удаляем сами выбранные колоны
             removeAll(totals)
             //удаляем те колоны которые указывают в формуле на выбранные колоны
             // цикл по всем нумберколонам
-            mutableListOf<TotalItem>().also { listToFind ->
+            mutableListOf<Total>().also { listToFind ->
                 listToFind.addAll(this)
             }.forEach {
                 // достаем из этой колоны все ид колон задействованных в формуле
@@ -436,7 +436,7 @@ interface PrefChangedCallBack {
 interface PrefTotalChangedCallBack : PrefChangedCallBack {
     fun calcFormula()
     fun getNumberColumns(): MutableList<NumberColumn>
-    fun getTotals(): List<TotalItem>
+    fun getTotals(): List<Total>
     fun widthProgress()
     fun widthChanged()
 }

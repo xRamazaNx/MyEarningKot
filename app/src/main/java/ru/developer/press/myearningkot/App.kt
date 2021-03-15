@@ -9,15 +9,21 @@ import android.os.Bundle
 import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AppCompatActivity
 import com.bugsnag.android.Bugsnag
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.*
 import ru.developer.press.myearningkot.adapters.animationAdd
 import ru.developer.press.myearningkot.adapters.animationDelete
+import ru.developer.press.myearningkot.database.DataController
 import ru.developer.press.myearningkot.helpers.filesFolder
 import ru.developer.press.myearningkot.helpers.getColorFromRes
 import ru.developer.press.myearningkot.model.*
 
 
 class App : Application(), ActivityLifecycleCallbacks {
+
+    lateinit var authUser: FirebaseAuth
 
     companion object {
         fun Activity.app(): App {
@@ -43,6 +49,8 @@ class App : Application(), ActivityLifecycleCallbacks {
         )
 
     override fun onCreate() {
+        authUser = Firebase.auth
+
         GlobalScope.launch {
 
             registerActivityLifecycleCallbacks(this@App)
@@ -91,7 +99,8 @@ class App : Application(), ActivityLifecycleCallbacks {
     }
 
     override fun onActivityResumed(activity: Activity) {
-        currentActivity = activity as AppCompatActivity
+        if (activity is AppCompatActivity)
+            currentActivity = activity
     }
 
 

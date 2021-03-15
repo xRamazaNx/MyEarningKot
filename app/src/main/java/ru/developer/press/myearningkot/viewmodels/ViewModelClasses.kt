@@ -5,7 +5,7 @@ import ru.developer.press.myearningkot.CellTypeControl
 import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.Row
 import ru.developer.press.myearningkot.model.SortMethod
-import ru.developer.press.myearningkot.model.TotalItem
+import ru.developer.press.myearningkot.model.Total
 
 class PageVM {
     val name = MutableLiveData<String>()
@@ -29,7 +29,7 @@ class CardVM {
     val dateModify = MutableLiveData<Long>()
     val rows = mutableListOf<RowVM>()
     val columns = mutableListOf<ColumnVM>()
-    val totals = mutableListOf<TotalItem>()
+    val totals = mutableListOf<Total>()
 
     val dateOfPeriod = MutableLiveData<String>()
 }

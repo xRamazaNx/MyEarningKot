@@ -1,7 +1,7 @@
 package ru.developer.press.myearningkot.helpers
 
 import com.google.gson.*
-import ru.developer.press.myearningkot.model.Card
+import ru.developer.press.myearningkot.database.ColumnRef
 import ru.developer.press.myearningkot.model.Column
 import java.lang.reflect.Type
 
@@ -33,8 +33,7 @@ class JsonDeserializerWithColumnType<T> : JsonDeserializer<T> {
         val jsonObject = json.asJsonObject
         val classNamePrimitive = jsonObject[column_type_gson] as JsonPrimitive
         val className = classNamePrimitive.asString
-        val clazz: Class<*>
-        clazz = try {
+        val clazz: Class<*> = try {
             Class.forName(className)
         } catch (e: ClassNotFoundException) {
             throw JsonParseException(e.message)
@@ -43,12 +42,10 @@ class JsonDeserializerWithColumnType<T> : JsonDeserializer<T> {
     }
 }
 
-fun getCardFromJson(json: String): Card {
-    val gson = GsonBuilder().registerTypeAdapter(
-        Column::class.java,
-        JsonDeserializerWithColumn<Column>()
-    ).create()
-    return gson.fromJson(json, Card::class.java).apply {
-        updateTypeControl()
-    }
+fun getColumnFromJson(columnRef: ColumnRef): Column {
+//    val gson = GsonBuilder().registerTypeAdapter(
+//        Column::class.java,
+//        JsonDeserializerWithColumn<Column>()
+//    ).create()
+    return Gson().fromJson(columnRef.json, columnRef.columnClass)
 }

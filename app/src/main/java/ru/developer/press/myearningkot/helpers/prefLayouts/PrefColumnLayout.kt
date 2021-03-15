@@ -1,6 +1,5 @@
 package ru.developer.press.myearningkot.helpers.prefLayouts
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -26,6 +25,7 @@ import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.activity.PrefCardActivity
 import ru.developer.press.myearningkot.adapters.AdapterRecyclerPhoneParams
 import ru.developer.press.myearningkot.adapters.ParamModel
+import ru.developer.press.myearningkot.database.DataController
 import ru.developer.press.myearningkot.helpers.*
 import ru.developer.press.myearningkot.model.*
 import splitties.alertdialog.appcompat.alertDialog
@@ -275,7 +275,7 @@ class PrefNumberColumnLayout(
                             // проверяем у всех выделенных
                             numberColumns.forEach { selectColumn ->
                                 // одна из выбранных колон учавствует в формуле в не выделеной колоне(все выделенные и так не попадают в список в формуле)
-                                if (selectColumn.id == id) {
+                                if (selectColumn.refId == id) {
                                     // удаляем в алл эту колону
                                     this.remove(it)
                                 }

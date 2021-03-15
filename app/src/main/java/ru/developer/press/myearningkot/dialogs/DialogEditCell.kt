@@ -29,7 +29,7 @@ import ru.developer.press.myearningkot.model.PhoneTypeValue
 import java.util.*
 
 
-val PICK_IMAGE_MULTIPLE = 1
+const val PICK_IMAGE_MULTIPLE = 1
 const val editCellTag = "dialogEditCell"
 
 class DialogEditCell(
@@ -62,7 +62,7 @@ class DialogEditCell(
             }
         }
         return DatePickerDialog(
-            context!!, { _, year, month, dayOfMonth ->
+            requireContext(), { _, year, month, dayOfMonth ->
                 calendar.set(year, month, dayOfMonth)
                 value = calendar.timeInMillis.toString()
                 changed(value)

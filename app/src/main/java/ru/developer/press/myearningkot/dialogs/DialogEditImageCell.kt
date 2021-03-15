@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
@@ -64,7 +65,7 @@ class DialogEditImageCell(
         val viewPager = imageViewer.imagesPager
         val tabs = imageViewer.imagesTabs
 
-        val activity = activity!!
+        val activity = requireActivity()
         val adapter = AdapterViewPagerFromImageCell(
             fragmentManager = activity.supportFragmentManager,
             lifecycle = lifecycle,
@@ -186,8 +187,7 @@ class DialogEditImageCell(
         CoroutineScope(Dispatchers.Main).launch {
             withContext(Dispatchers.IO) {
                 imageUriList.forEach {
-
-                    val openInputStream = context!!.contentResolver.openInputStream(it)
+                    val openInputStream = requireContext().contentResolver.openInputStream(it)
                     val nameFile = it.path?.substringAfterLast('/')
                     val file =
                         File(imageFolder + nameFile)

@@ -1,10 +1,10 @@
 package ru.developer.press.myearningkot.dialogs
 
-import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.set_name_layout.view.*
@@ -31,7 +31,7 @@ class DialogSetName : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog: AlertDialog.Builder = AlertDialog.Builder(context).apply {
+        val dialog: AlertDialog.Builder = AlertDialog.Builder(requireContext()).apply {
             val view = context.layoutInflater.inflate(R.layout.set_name_layout, null)
 
             view.title.setText(title)

@@ -3,10 +3,12 @@ package ru.developer.press.myearningkot.activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.View.GONE
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
@@ -14,6 +16,7 @@ import android.widget.LinearLayout
 import android.widget.TableLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.MutableLiveData
@@ -26,6 +29,10 @@ import co.zsmb.materialdrawerkt.draweritems.badgeable.primaryItem
 import co.zsmb.materialdrawerkt.draweritems.badgeable.secondaryItem
 import co.zsmb.materialdrawerkt.draweritems.expandable.expandableItem
 import co.zsmb.materialdrawerkt.draweritems.profile.profile
+import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.ErrorCodes
+import com.firebase.ui.auth.IdpResponse
+import com.github.zawadz88.materialpopupmenu.popupMenu
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -36,15 +43,14 @@ import org.jetbrains.anko.collections.forEachReversedWithIndex
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.textColorResource
 import ru.developer.press.myearningkot.*
+import ru.developer.press.myearningkot.App.Companion.app
 import ru.developer.press.myearningkot.adapters.AdapterViewPagerFromMain
 import ru.developer.press.myearningkot.databinding.ActivityMainBinding
 import ru.developer.press.myearningkot.dialogs.DialogSetName
-import ru.developer.press.myearningkot.helpers.Page
-import ru.developer.press.myearningkot.helpers.getColorFromRes
-import ru.developer.press.myearningkot.helpers.getDrawableRes
-import ru.developer.press.myearningkot.helpers.setFont
+import ru.developer.press.myearningkot.helpers.*
 import ru.developer.press.myearningkot.model.Card
-import ru.developer.press.myearningkot.model.DataController
+import ru.developer.press.myearningkot.database.DataController
+import ru.developer.press.myearningkot.database.Page
 import ru.developer.press.myearningkot.viewmodels.MainViewModel
 import ru.developer.press.myearningkot.viewmodels.ViewModelMainFactory
 
@@ -52,6 +58,23 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
     private lateinit var drawer: Drawer
     private lateinit var adapterViewPagerFromMain: AdapterViewPagerFromMain
     private val initObserver = MutableLiveData<(() -> Unit)>()
+    private val registerForActivityResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            val id: String? = it.data?.getStringExtra(CreateCardActivity.createCardID)
+            val name = it.data?.getStringExtra(CreateCardActivity.createCardName)
+            if (id != null) {
+                if (id.isNotEmpty()) {
+                    val indexPage = tabs.selectedTabPosition
+                    viewModel.createCard(indexPage, id, name ?: "") { positionCard ->
+                        adapterViewPagerFromMain.scrollToPosition(
+                            indexPage,
+                            positionCard
+                        )
+                        root.appBar.setExpanded(false, true)
+                    }
+                }
+            }
+        }
 
     private var initializerViewModel: Job = GlobalScope.launch(Dispatchers.Main) {
         val pageList = withContext(Dispatchers.IO) {
@@ -75,6 +98,7 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         root = ActivityMainBinding.inflate(layoutInflater)
         setContentView(root.root)
         setSupportActionBar(root.toolbar)
@@ -86,35 +110,11 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
         initObserver.observe(this, {
             it?.invoke()
         })
-
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK)
-            when (requestCode) {
-                CreateCardActivity.createCardRequest -> {
-                    val id = data?.getLongExtra(CreateCardActivity.createCardID, -1)
-                    val name = data?.getStringExtra(CreateCardActivity.createCardName)
-                    if (id != null) {
-                        if (id > -1) {
-                            val indexPage = tabs.selectedTabPosition
-                            viewModel.createCard(indexPage, id, name ?: "") { positionCard ->
-                                adapterViewPagerFromMain.scrollToPosition(
-                                    indexPage,
-                                    positionCard
-                                )
-                                root.appBar.setExpanded(false, true)
-                            }
-                        }
-                    }
-                }
-            }
     }
 
     private fun viewInit() {
         // нажали на карточку
-        viewModel.openCardEvent.observe(this, Observer { id ->
+        viewModel.openCardEvent.observe(this, { id ->
             // для дальнейшего обновления когда опять выйду в маин
             val intent =
                 Intent(this@MainActivity, CardActivity::class.java).apply {
@@ -149,21 +149,7 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
         })
         // настройка клика fb
         root.fbMain.setOnClickListener {
-
-            val indexPage = root.tabs.selectedTabPosition
-            //            viewModel.addCard(indexPage, Card())
-            startActivityForResult(
-                Intent(this, CreateCardActivity::class.java),
-                CreateCardActivity.createCardRequest
-            )
-//            DialogCreateCard { card ->
-//                 что произхойдет при нажатии на "создать"
-//                viewModel.addCard(indexPage, card) { positionCard ->
-//                    root.appBar.setExpanded(false, true).apply {
-//                        adapterViewPagerMain.scrollToPosition(indexPage, positionCard)
-//                    }
-//                }
-//            }.show(supportFragmentManager, "createCard")
+            registerForActivityResult.launch(Intent(this, CreateCardActivity::class.java))
         }
 
         root.addPageButton.setOnClickListener {
@@ -185,11 +171,6 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
                 root.tabs.getTabAt(index)?.select()
             })
         }
-//        pages.forEachIndexed { index, it ->
-//            it.observe(this@MainActivity, Observer {
-//                tabs.getTabAt(index)?.select()
-//            })
-//        }
     }
 
     private fun initTabAndViewPager() {
@@ -210,15 +191,16 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
         drawer = drawer {
             selectedItem = -1
             toolbar = root.toolbar
-            closeOnClick = false
             sliderBackgroundColorRes = R.color.colorPrimary
             actionBarDrawerToggleAnimated = true
 //            headerViewRes = R.layout.card_view
 //            footerDivider = true
             headerDivider = true
 
+            val currentUser = app().authUser.currentUser
             accountHeader {
 
+                this.closeOnClick = false
                 this.emailTypeface =
                     ResourcesCompat.getFont(this@MainActivity, R.font.roboto_light)!!
                 selectionListEnabledForSingleProfile = false
@@ -226,20 +208,39 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
 //                selectionSecondLine = "This is not an email!" // вместо него показан маил
                 threeSmallProfileImages = false
                 textColorRes = textColor
-//                background = ContextCompat.getColor(this@MainActivity, R.color.centDark)
                 backgroundDrawable = ColorDrawable(getColorFromRes(R.color.colorBackground))
 
-                profile("Profile 1", "user1@gmail.com") {
+                var name = "Гость"
+                var email = ""
+                var iconUri: Uri? = null
+                if (currentUser != null) {
+                    val email1 = currentUser.email!!
+                    name = currentUser.displayName ?: email1.substringBeforeLast('@')
+                    email = email1
+                    iconUri = currentUser.photoUrl
+                }
+                profile(name, email) {
+                    iconUri?.let {
+                        this.iconUri = it
+                    }
                     textColorRes = R.color.textColorTertiary
                 }
-
-                onProfileChanged { _, profile, _ ->
-                    toast("Selected ${profile.name}")
+                onProfileChanged { view: View, profile, _ ->
+                    if (currentUser == null) {
+                        login()
+                    } else{
+                        popupMenu {
+                            section {
+                                item {
+                                    this.label = "Выйти"
+                                    this.callback = {
+                                        logOut()
+                                    }
+                                }
+                            }
+                        }.show(this@MainActivity, view)
+                    }
                     false
-                }
-                onProfileImageLongClick { _, profile, _ ->
-                    toast("Long clicked ${profile.name}")
-                    true
                 }
             }
             //
@@ -280,7 +281,6 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
                 textColorRes = textColor
                 iconDrawable = getDrawableRes(R.drawable.ic_setting)!!
                 onClick { _ ->
-                    drawer.closeDrawer()
                     true
                 }
                 // значок с надписью с право от item
@@ -306,6 +306,67 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
             getColorFromRes(R.color.colorOnPrimary)
     }
 
+    private val loginRegister =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+
+            val data = it.data
+            val response: IdpResponse? = IdpResponse.fromResultIntent(data)
+            val toast: Toast
+            // Successfully signed in
+            if (it.resultCode == RESULT_OK) {
+                response?.let {
+                    initDrawer() }
+                return@registerForActivityResult
+            } else {
+                // Sign in failed
+                if (response == null) {
+                    // User pressed back button
+                    toast = Toast.makeText(this, "Ошибка авторизации!", Toast.LENGTH_LONG)
+                    toast.show()
+                    return@registerForActivityResult
+                }
+                if (response.error?.errorCode == ErrorCodes.NO_NETWORK) {
+                    toast = Toast.makeText(
+                        this,
+                        "Проверьте подключение и повторите попытку",
+                        Toast.LENGTH_LONG
+                    )
+                    toast.show()
+                    return@registerForActivityResult
+                }
+                if (response.error?.errorCode == ErrorCodes.UNKNOWN_ERROR) {
+                    toast = Toast.makeText(this, "Неизвестная ошибка!", Toast.LENGTH_LONG)
+                    toast.show()
+                    return@registerForActivityResult
+                }
+            }
+            toast = Toast.makeText(this, "Что то пошло не так!", Toast.LENGTH_LONG)
+            toast.show()
+
+        }
+
+    private fun login() {
+        val build: Intent = AuthUI
+            .getInstance()
+            .createSignInIntentBuilder()
+            .setIsSmartLockEnabled(false)
+            .setAvailableProviders(
+                listOf(
+                    AuthUI.IdpConfig.GoogleBuilder().build()
+                )
+            )
+            .build()
+        loginRegister.launch(build)
+    }
+    private fun logOut(){
+        AuthUI.getInstance().signOut(this)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    initDrawer()
+                }
+            }
+    }
+
     override fun getCard(position: Int): Card {
         return viewModel.getCardInPage(root.tabs.selectedTabPosition, position)
     }
@@ -321,7 +382,7 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
         return viewModel.getPages()[root.tabs.selectedTabPosition].value!!.cards.size
     }
 
-    override fun cardClick(idCard: Long) {
+    override fun cardClick(idCard: String) {
         viewModel.cardClick(idCard)
     }
 

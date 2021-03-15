@@ -1,10 +1,10 @@
 package ru.developer.press.myearningkot.dialogs
 
-import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.card_basic_pref_layout.view.*
@@ -25,7 +25,7 @@ class DialogBasicPrefCard(
 ) : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = AlertDialog.Builder(context).apply {
+        val dialog = AlertDialog.Builder(requireContext()).apply {
 //            setCustomTitle(TextView(context).apply {
 //                text = context.getString(R.string.general_setting)
 //                textColorResource = R.color.light_gray

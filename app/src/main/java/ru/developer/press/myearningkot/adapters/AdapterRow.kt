@@ -18,6 +18,7 @@ import ru.developer.press.myearningkot.ProvideDataRows
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.RowClickListener
 import ru.developer.press.myearningkot.RowDataListener
+import ru.developer.press.myearningkot.activity.CreateCardActivity
 import ru.developer.press.myearningkot.helpers.animateColor
 import ru.developer.press.myearningkot.helpers.getColorFromRes
 import ru.developer.press.myearningkot.helpers.prefLayouts.setSelectBackground
@@ -111,7 +112,7 @@ class AdapterRecyclerInCard(
                     cell.setBackground(R.drawable.cell_selected_background)
                 }
                 else ->
-                    cell.setBackground( R.drawable.cell_default_background)
+                    cell.setBackground(R.drawable.cell_default_background)
             }
 
             if (cellClickPrefFunction != null) {
@@ -122,18 +123,21 @@ class AdapterRecyclerInCard(
                 if (columnIndex > 0) {
                     rowClickListener?.let {
                         view.setOnClickListener { _ ->
-                            // индексы (ряд и колона) предыдущего выделеного элемента (ячейки)
-                            val selectCellPairIndexes = provideDataRows.getSelectCellPairIndexes()
-                            selectCellPairIndexes?.let {
-                                val selectedCell = sortedRows[it.first].cellList[it.second]
-                                // если ячейка на которую кликнули не равна той что была кликнута
-                                // то надо убирается выделение из предыдущего элемента
-                                if (selectedCell !== cell) {
-                                    selectedCell.isSelect = false
-                                    selectedCell.setBackground(R.drawable.cell_default_background)
+                            if (view.context !is CreateCardActivity) {
+                                // индексы (ряд и колона) предыдущего выделеного элемента (ячейки)
+                                val selectCellPairIndexes =
+                                    provideDataRows.getSelectCellPairIndexes()
+                                selectCellPairIndexes?.let {
+                                    val selectedCell = sortedRows[it.first].cellList[it.second]
+                                    // если ячейка на которую кликнули не равна той что была кликнута
+                                    // то надо убирается выделение из предыдущего элемента
+                                    if (selectedCell !== cell) {
+                                        selectedCell.isSelect = false
+                                        selectedCell.setBackground(R.drawable.cell_default_background)
+                                    }
                                 }
+                                cell.setBackground(R.drawable.cell_selected_background)
                             }
-                            cell.setBackground(R.drawable.cell_selected_background)
                             it.cellClick(position, columnIndex)
                         }
                     }
@@ -195,9 +199,9 @@ class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataList
                 else if (isPrevSelect) {
                     row.setBackground(R.drawable.row_selected_background_bottom)
                 } else if (isSecondSelect) {
-                    row.setBackground( R.drawable.row_selected_background_top)
+                    row.setBackground(R.drawable.row_selected_background_top)
                 } else {
-                    row.setBackground( R.drawable.row_selected_background)
+                    row.setBackground(R.drawable.row_selected_background)
                 }
             }
             Row.Status.ADDED -> {

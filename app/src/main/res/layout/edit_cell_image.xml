@@ -37,7 +37,7 @@
             android:contentDescription="@string/DELETE"
             android:padding="16dp"
             android:src="@drawable/ic_delete"
-            android:tint="@color/colorRed" />
+            app:tint="@color/colorRed" />
     </LinearLayout>
 
     <androidx.viewpager2.widget.ViewPager2
@@ -70,7 +70,7 @@
                 android:scaleX="-1.3"
                 android:scaleY="1.3"
                 android:src="@drawable/ic_add_photo"
-                android:tint="@color/textColorPrimary" />
+                app:tint="@color/textColorPrimary" />
 
         <FrameLayout
             android:layout_width="1dp"

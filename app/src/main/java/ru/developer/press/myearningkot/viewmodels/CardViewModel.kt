@@ -12,7 +12,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.developer.press.myearningkot.ProvideDataRows
-import ru.developer.press.myearningkot.helpers.Page
+import ru.developer.press.myearningkot.database.DataController
+import ru.developer.press.myearningkot.database.Page
 import ru.developer.press.myearningkot.model.*
 
 open class CardViewModel(context: Context, var card: Card) : ViewModel(),
@@ -99,13 +100,11 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
 
     fun addColumn(columnType: ColumnType, name: String) {
         card.addColumn(columnType, name)
-        updateTypeControl()
         updateCardLD()
     }
 
     fun addColumnSample(columnType: ColumnType, name: String) {
         card.addColumnSample(columnType, name)
-//        updateTypeControl()
         updateCardLD()
     }
 
@@ -136,7 +135,7 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     }
 
     // prefFun
-    fun moveToRightTotal(selectedTotals: List<TotalItem>, result: (Boolean) -> Unit) {
+    fun moveToRightTotal(selectedTotals: List<Total>, result: (Boolean) -> Unit) {
         val totals = card.totals
         selectedTotals.forEach {
             val index = totals.indexOf(it)
@@ -206,7 +205,7 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     }
 
     // prefFun
-    fun moveToLeftTotal(selectedTotals: List<TotalItem>, result: (Boolean) -> Unit) {
+    fun moveToLeftTotal(selectedTotals: List<Total>, result: (Boolean) -> Unit) {
         val totals = card.totals
 
         selectedTotals.forEach {
@@ -292,7 +291,7 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
         card.addTotal()
     }
 
-    fun deleteTotal(it: TotalItem): Boolean {
+    fun deleteTotal(it: Total): Boolean {
         return card.deleteTotal(card.totals.indexOf(it))
 
     }

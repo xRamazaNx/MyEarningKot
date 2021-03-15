@@ -17,7 +17,7 @@ import ru.developer.press.myearningkot.model.Formula.Companion.COLUMN_ID
 import ru.developer.press.myearningkot.model.Formula.Companion.OTHER
 import ru.developer.press.myearningkot.model.Formula.Companion.TOTAL_ID
 import ru.developer.press.myearningkot.model.NumberColumn
-import ru.developer.press.myearningkot.model.TotalItem
+import ru.developer.press.myearningkot.model.Total
 import splitties.alertdialog.appcompat.alertDialog
 
 
@@ -28,13 +28,13 @@ class FormulaLayout(
     val view: View,
     filterNColumns: List<NumberColumn>,
     private val allNColumns: List<NumberColumn> = filterNColumns,
-    filterNTotals: List<TotalItem>? = null,
-    private val allNTotals: List<TotalItem>? = filterNTotals,
+    filterNTotals: List<Total>? = null,
+    private val allNTotals: List<Total>? = filterNTotals,
     _formula: Formula
 ) {
     private var formula = Formula()
     private val columnList = mutableListOf<NumberColumn>()
-    private val totalList = mutableListOf<TotalItem>()
+    private val totalList = mutableListOf<Total>()
     private val displayTextView: TextView = view.formulaTextView
 
     init {
@@ -106,7 +106,7 @@ class FormulaLayout(
                 setOnClickListener {
                     elementList.add(Formula.FormulaElement().apply {
                         type = COLUMN_ID
-                        value = column.id.toString()
+                        value = column.refId
                     })
 
                     displayFormula()
@@ -200,8 +200,8 @@ fun formulaDialogShow(
     context: Context,
     filterNColumns: List<NumberColumn>,
     allNColumns: List<NumberColumn> = filterNColumns,
-    filterNTotals: List<TotalItem>?,
-    allNTotals: List<TotalItem>?,
+    filterNTotals: List<Total>?,
+    allNTotals: List<Total>?,
     positiveClick: (Formula) -> Unit
 ) {
     val inflate = View.inflate(context, R.layout.formula_layout, null)

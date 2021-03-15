@@ -1,81 +1,81 @@
 package ru.developer.press.myearningkot.activity
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.gson.Gson
 import kotlinx.android.synthetic.main.create_card_activity.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.toast
-import ru.developer.press.myearningkot.App.Companion.app
 import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.helpers.PrefCardInfo
-import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.viewmodels.CreateCardViewModel
-import kotlin.concurrent.thread
 
 class CreateCardActivity : AppCompatActivity() {
 
     companion object {
         const val createCardID: String = "createCardID"
         const val createCardName: String = "createCardName"
-        const val createCardRequest = 100
     }
 
     private lateinit var adapter: CreateCardViewModel.AdapterForSamples
     private lateinit var viewModel: CreateCardViewModel
+    val editSampleRegister: ActivityResultLauncher<Intent> =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            val data = it.data
+            if (data != null) {
+                val id = data.getStringExtra(CARD_ID)?:""
+                if (id.isNotEmpty()) {
+                    lifecycleScope.launch {
+                        viewModel.updateSamples {
+                            adapter.updateItem(id)
+                        }
+                    }
+                }
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.create_card_activity)
-        thread {
+        lifecycleScope.launch(Dispatchers.IO) {
 
-            viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(
+            viewModel = ViewModelProvider(
+                this@CreateCardActivity,
+                ViewModelProvider.NewInstanceFactory()
+            ).get(
                 CreateCardViewModel::class.java
-            ).apply { create(app()) }
+            ).apply { create(this@CreateCardActivity) }
             adapter = viewModel.getAdapter()
-            runOnUiThread {
-                recycler.layoutManager = LinearLayoutManager(this)
+            withContext(Dispatchers.Main) {
+                recycler.layoutManager = LinearLayoutManager(this@CreateCardActivity)
                 recycler.adapter = adapter
             }
 
             create.setOnClickListener {
-                adapter.selectId?.let {
+                val selectId = adapter.selectId
+                if (selectId == null) {
+                    toast(getString(R.string.select_sample))
+                } else {
+
                     setResult(RESULT_OK, Intent().apply {
-                        putExtra(createCardID, it)
+                        putExtra(createCardID, selectId)
                         putExtra(createCardName, sampleEditTextName.text.toString())
                     })
                     finish()
-                } ?: kotlin.run {
-                    runOnUiThread {
-                        toast(getString(R.string.select_sample))
-                    }
                 }
             }
             cancel.setOnClickListener {
-                runOnUiThread {
-                    finish()
-                }
+                finish()
             }
         }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == CARD_EDIT_JSON_REQ_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                if (data != null) {
-                    val id = data.getLongExtra(CARD_ID, -1)
-                    if (id > -1) {
-                        viewModel.updateSamples()
-                        adapter.updateItem(id)
-                    }
-                }
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -91,23 +91,4 @@ class CreateCardActivity : AppCompatActivity() {
         }
         return true
     }
-}
-
-fun startPrefActivity(
-    category: PrefCardInfo.CardCategory,
-    activity: Activity? = null,
-    card: Card,
-    title: String
-) {
-    val intent = Intent(activity, PrefCardActivity::class.java)
-    val cardInfo = PrefCardInfo(
-        card.id,
-        cardCategory =
-        category
-    )
-    val prefCategoryJson = Gson().toJson(cardInfo)
-
-    intent.putExtra(PREF_CARD_INFO_JSON, prefCategoryJson)
-    intent.putExtra(TITLE_PREF_ACTIVITY, title)
-    activity?.startActivityForResult(intent, CARD_EDIT_JSON_REQ_CODE)
 }

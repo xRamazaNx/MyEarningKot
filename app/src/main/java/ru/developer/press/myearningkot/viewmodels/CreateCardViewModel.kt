@@ -1,5 +1,6 @@
 package ru.developer.press.myearningkot.viewmodels
 
+import android.content.Context
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -8,30 +9,30 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.ViewModel
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.sample_card_item.view.*
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.uiThread
-import org.jetbrains.anko.wrapContent
-import ru.developer.press.myearningkot.App
-import ru.developer.press.myearningkot.ProvideDataRows
+import kotlinx.coroutines.launch
+import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.RowClickListener
 import ru.developer.press.myearningkot.activity.CreateCardActivity
 import ru.developer.press.myearningkot.activity.startPrefActivity
-import ru.developer.press.myearningkot.adapters.AdapterRecyclerInCard
-import ru.developer.press.myearningkot.helpers.PrefCardInfo
-import ru.developer.press.myearningkot.helpers.SampleHelper
+import ru.developer.press.myearningkot.dialogs.MyDialog
+import ru.developer.press.myearningkot.dialogs.myDialog
+import ru.developer.press.myearningkot.database.PrefCardInfo
+import ru.developer.press.myearningkot.database.SampleHelper
 import ru.developer.press.myearningkot.helpers.bindTitleOfColumn
 import ru.developer.press.myearningkot.model.Card
-import ru.developer.press.myearningkot.model.Column
-import ru.developer.press.myearningkot.model.Row
+import ru.developer.press.myearningkot.model.NumerationColumn
+import splitties.alertdialog.appcompat.negativeButton
+import splitties.alertdialog.appcompat.positiveButton
 
 class CreateCardViewModel : ViewModel() {
-    fun updateSamples() {
-        sampleList = sampleHelper.getSampleList()
+    fun updateSamples(update: () -> Unit) {
+        viewModelScope.launch {
+            sampleList = sampleHelper.getSampleList()
+            update.invoke()
+        }
     }
 
     fun getAdapter(): AdapterForSamples {
@@ -40,25 +41,25 @@ class CreateCardViewModel : ViewModel() {
             list.add(AdapterForSamples.SampleItem(card))
             list
         })
-        adapterForSamples.getCard = { id: Long ->
-            sampleList.find { it.id == id }!!
+        adapterForSamples.getCard = { id: String ->
+            sampleList.find { it.refId == id }!!
         }
         adapterForSamples.deleteCard = { deleteId ->
             sampleHelper.deleteSample(deleteId)
-            sampleList.remove(sampleList.find { it.id == deleteId })
+            sampleList.remove(sampleList.find { it.refId == deleteId })
 
         }
         adapterForSamples.updateItemInCard = { item ->
             item?.let { sampleItem ->
-                val find = sampleList.find { it.id == sampleItem.card.id }!!
+                val find = sampleList.find { it.refId == sampleItem.card.refId }!!
                 sampleItem.card = find
             }
         }
         return adapterForSamples
     }
 
-    fun create(app: App) {
-        sampleHelper = SampleHelper(app)
+    suspend fun create(context: Context) {
+        sampleHelper = SampleHelper(context)
         sampleList = sampleHelper.getSampleList()
     }
 
@@ -68,9 +69,9 @@ class CreateCardViewModel : ViewModel() {
     class AdapterForSamples(val list: MutableList<SampleItem>) :
         RecyclerView.Adapter<AdapterForSamples.SampleCardHolder>() {
 
-        lateinit var deleteCard: (Long) -> Unit
-        lateinit var getCard: (Long) -> Card
-        var selectId: Long? = null
+        lateinit var deleteCard: (String) -> Unit
+        lateinit var getCard: (String) -> Card
+        var selectId: String? = null
 
         data class SampleItem(var card: Card) {
             var isSelect: Boolean = false
@@ -99,15 +100,15 @@ class CreateCardViewModel : ViewModel() {
                     notifyItemChanged(list.indexOf(find))
                 }
                 sampleItem.isSelect = true
-                selectId = sampleItem.card.id
+                selectId = sampleItem.card.refId
                 notifyItemChanged(position)
             }
         }
 
-        fun updateItem(id: Long) {
-            val find = list.find { it.card.id == id }
+        fun updateItem(id: String) {
+            val find = list.find { it.card.refId == id }
             updateItemInCard(find)
-            notifyItemChanged(list.indexOfFirst { it.card.id == id })
+            notifyItemChanged(list.indexOfFirst { it.card.refId == id })
         }
 
         lateinit var updateItemInCard: (find: SampleItem?) -> Unit
@@ -116,6 +117,7 @@ class CreateCardViewModel : ViewModel() {
             fun bind(sampleItem: SampleItem, click: () -> Unit) {
 
                 val context = itemView.context
+                val dip = context.dip(2)
                 itemView.setOnClickListener {
                     click.invoke()
                 }
@@ -125,71 +127,67 @@ class CreateCardViewModel : ViewModel() {
                 val columnContainer = itemView.sampleColumnContainer
                 columnContainer.removeAllViews()
                 sampleItem.card.columns.forEach {
+                    if (it is NumerationColumn)
+                        return@forEach
                     val title: TextView =
                         LayoutInflater.from(context)
                             .inflate(R.layout.title_column, null) as TextView
                     bindTitleOfColumn(it, title)
+                    val layoutParams = title.layoutParams
+                    layoutParams.width = wrapContent
+                    title.layoutParams = layoutParams
+                    title.setPadding(0, 0, dip, 0)
                     columnContainer.addView(title)
 
                 }
                 columnContainer.setOnClickListener { click.invoke() }
-                val sampleRecycler = itemView.sampleRecycler
-                sampleRecycler.setOnClickListener { click.invoke() }
 
-                sampleRecycler.layoutManager = LinearLayoutManager(context)
-                val adapterRecyclerInCard = AdapterRecyclerInCard(null, object : ProvideDataRows {
-                    override val sortedRows: MutableList<Row>
-                        get() = sampleItem.card.rows
-
-                    override fun getColumns(): MutableList<Column> = sampleItem.card.columns
-
-                    override fun getWidth(): Int = matchParent
-
-                    override fun isEnableHorizontalScroll() = true
-
-                    override fun isEnableSomeStroke(): Boolean = false
-
-                    override fun getRowHeight(): Int = sampleItem.card.heightCells
-                    override fun getSelectCellPairIndexes(): Pair<Int, Int>? {
-                        return null
-                    }
-                }, null)
-                adapterRecyclerInCard.setCellClickListener(object : RowClickListener {
-                    override fun cellClick(rowPosition: Int, cellPosition: Int) {
-                        click.invoke()
-
-                    }
-                })
-                sampleRecycler.adapter = adapterRecyclerInCard
                 itemView.sampleMenu.setOnClickListener { view ->
                     val popupMenu = PopupMenu(context, view)
                     popupMenu.gravity = Gravity.BOTTOM
                     popupMenu.inflate(R.menu.sample_item_menu)
                     popupMenu.show()
                     popupMenu.setOnMenuItemClickListener {
+                        val activity = context as CreateCardActivity
                         when (it.itemId) {
                             R.id.edit_sample -> {
-                                startPrefActivity(
+
+                                activity.editSampleRegister.startPrefActivity(
                                     PrefCardInfo.CardCategory.SAMPLE,
-                                    activity = context as CreateCardActivity,
-                                    card = getCard(sampleItem.card.id),
+                                    activity = activity,
+                                    card = getCard(sampleItem.card.refId),
                                     title = view.context.getString(R.string.setting_sample)
                                 )
                             }
                             R.id.delete_sample -> {
-                                doAsync {
-                                    deleteCard.invoke(sampleItem.card.id)
-                                    list.remove(sampleItem)
-                                    uiThread {
-                                        notifyItemRemoved(adapterPosition)
+                                var myDialog: MyDialog? = null
+                                myDialog = myDialog {
+                                    setTitle("Удалить шаблон \"${sampleItem.card.name}\"?")
+                                    setMessage("")
+                                    positiveButton(R.string.DELETE) {
+                                        doAsync {
+                                            deleteCard.invoke(sampleItem.card.refId)
+                                            list.remove(sampleItem)
+                                            uiThread {
+                                                notifyItemRemoved(adapterPosition)
+                                            }
+                                        }
+                                    }
+                                    negativeButton(R.string.cancel) {
+                                        myDialog?.dismiss()
                                     }
                                 }
+                                myDialog.negativeButtonColorRes = R.color.colorRed
+                                myDialog.show(
+                                    activity.supportFragmentManager,
+                                    "delete_sample_wrong"
+                                )
                             }
                         }
                         true
                     }
                 }
-                if(sampleItem.isSelect){
+                if (sampleItem.isSelect) {
                     itemView.sampleContainer.setBackgroundResource(R.drawable.row_selected_background)
                 } else
                     itemView.sampleContainer.setBackgroundResource(R.drawable.background_for_card)
