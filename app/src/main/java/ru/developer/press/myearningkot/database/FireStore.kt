@@ -7,16 +7,14 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
-import ru.developer.press.myearningkot.helpers.getColumnFromJson
-import ru.developer.press.myearningkot.model.Column
 import ru.developer.press.myearningkot.model.Row
 import ru.developer.press.myearningkot.model.Total
 
-private const val PAGE_PATH = "pages"
-private const val CARD_PATH = "cards"
-private const val COLUMN_PATH = "columns"
-private const val ROW_PATH = "rows"
-private const val TOTAL_PATH = "totals"
+const val PAGE_PATH = "pages"
+const val CARD_PATH = "cards"
+const val COLUMN_PATH = "columns"
+const val ROW_PATH = "rows"
+const val TOTAL_PATH = "totals"
 
 class FireStore {
     private val store: FirebaseFirestore = Firebase.firestore
@@ -30,10 +28,11 @@ class FireStore {
         }
     }
 
-    fun deleteRow(row: Row){
+    fun deleteRow(row: Row) {
 
     }
-    fun addPage(page: PageRef) {
+
+    fun addPage(page: Page) {
         userStore {
             collection(PAGE_PATH)
                 .document(page.refId)
@@ -45,7 +44,7 @@ class FireStore {
         }
     }
 
-    fun addCard(card: CardRef) {
+    fun addCard(card: Card) {
         userStore {
             val cardDocument = cardDocument(card.pageId, card.refId)
             // добавить карточку
@@ -58,70 +57,33 @@ class FireStore {
                     Bugsnag.notify(it)
                 }
 
-            card.columns.forEach { addColumn(it) }
-            card.rows.forEach { addRow(it) }
-            card.totals.forEach { addTotal(it) }
-        }
-    }
-
-    fun addTotal(total: Total) {
-        userStore {
-            val totalRef = RowRef(total.pageId, total.cardId).apply {
-                refId = total.refId
-                json = Gson().toJson(total)
+            card.columns.forEach {
+                addJsonValue(it.columnJson(), COLUMN_PATH)
             }
-            cardDocument(total.pageId, total.cardId)
-                .collection(TOTAL_PATH)
-                .document(total.refId)
-                .set(totalRef)
-                .addOnSuccessListener {
-
-                }
-                .addOnFailureListener {
-                    Bugsnag.notify(it)
-                }
+            card.rows.forEach {
+                addJsonValue(it.rowJson(), ROW_PATH)
+            }
+            card.totals.forEach {
+                addJsonValue(it.totalJson(), TOTAL_PATH)
+            }
         }
     }
 
     private fun DocumentReference.cardDocument(
         pageId: String,
-        refId: String
+        cardId: String
     ) = collection(PAGE_PATH)
         .document(pageId)
         .collection(CARD_PATH)
-        .document(refId)
+        .document(cardId)
 
-    fun addColumn(column: Column){
+    fun addJsonValue(jsonValue: JsonValue, firePath: String) {
         userStore {
-            val columnRef = ColumnRef(column.className, column.pageId, column.cardId).apply {
-                refId = column.refId
-                json = Gson().toJson(column)
-            }
-            val cardDocument = cardDocument(column.pageId, column.cardId)
-            val columnCollection = cardDocument.collection(COLUMN_PATH)
-
+            val cardDocument = cardDocument(jsonValue.pageId, jsonValue.cardId)
+            val columnCollection = cardDocument.collection(firePath)
             columnCollection
-                .document(columnRef.refId)
-                .set(columnRef)
-                .addOnSuccessListener {
-
-                }
-                .addOnFailureListener {
-                    Bugsnag.notify(it)
-                }
-        }
-    }
-
-    fun addRow(row: Row) {
-        userStore {
-            val rowRef = RowRef(row.pageId, row.cardId).apply {
-                refId = row.refId
-                json = Gson().toJson(row)
-            }
-            cardDocument(row.pageId, row.cardId)
-                .collection(ROW_PATH)
-                .document(row.refId)
-                .set(rowRef)
+                .document(jsonValue.refId)
+                .set(jsonValue)
                 .addOnSuccessListener {
 
                 }
@@ -133,5 +95,19 @@ class FireStore {
 
     fun synchronization() {
 
+    }
+
+    fun deleteJsonValue(it: JsonValue, firePath: String) {
+        userStore {
+            val cardDocument = cardDocument(it.pageId, it.cardId)
+            cardDocument
+                .collection(firePath)
+                .document(it.refId).delete()
+                .addOnSuccessListener {
+
+                }.addOnFailureListener {
+                    Bugsnag.notify(it)
+                }
+        }
     }
 }

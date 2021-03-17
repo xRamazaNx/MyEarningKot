@@ -2,15 +2,18 @@ package ru.developer.press.myearningkot.database
 
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
+import androidx.room.Transaction
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import ru.developer.press.myearningkot.R
+import ru.developer.press.myearningkot.helpers.scoups.updateTypeControl
 import ru.developer.press.myearningkot.model.ListType
 import ru.developer.press.myearningkot.model.Row
 import ru.developer.press.myearningkot.model.Total
 
+val gson = Gson()
 class DataController(context: Context) {
 
     private val sampleDao: SampleDao
@@ -25,34 +28,38 @@ class DataController(context: Context) {
     private val fireStore = FireStore()
     private val dispatcher = Dispatchers.Default
 
-    private fun inflateCard(cardRef: CardRef): CardRef {
-        // add columns
-        val columnsRef: List<ColumnRef> = columnDao.getAllOf(cardRef.refId)
-        val columns = convertRefToColumn(columnsRef)
-        cardRef.columns.addAll(columns)
-        // add rows
-        val rowRefs: List<RowRef> = rowDao.getAllOf(cardRef.refId)
-        val rows = rowRefs.fold(mutableListOf<Row>()) { list, rowRef ->
-            list.add(Gson().fromJson(rowRef.json, Row::class.java))
-            list
-        }
-        cardRef.rows.addAll(rows)
-        // add totals
-        val totalRefs = totalDao.getAllOf(cardRef.refId)
-        val totals = totalRefs.fold(mutableListOf<Total>()) { list, totalRef ->
-            list.add(Gson().fromJson(totalRef.json, Total::class.java))
-            list
-        }
-        cardRef.totals.addAll(totals)
 
-        return cardRef
+    private fun inflateCard(card: Card): Card {
+        // add columns
+        val columnsRef: List<JsonValue> = columnDao.getAllOf(card.refId)
+        val columns = convertRefToColumn(columnsRef)
+        card.columns.addAll(columns)
+        // add rows
+        val rowRefs: List<JsonValue> = rowDao.getAllOf(card.refId)
+        val rows = rowRefs.fold(mutableListOf<Row>()) { list, rowRef ->
+            list.add(gson.fromJson(rowRef.json, Row::class.java))
+            list
+        }
+        card.rows.addAll(rows)
+        // add totals
+        val totalRefs = totalDao.getAllOf(card.refId)
+        val totals = totalRefs.fold(mutableListOf<Total>()) { list, totalRef ->
+            list.add(gson.fromJson(totalRef.json, Total::class.java))
+            list
+        }
+        card.totals.addAll(totals)
+
+        return card
     }
 
+    @Transaction
     suspend fun createDefaultSamplesJob(context: Context) {
         withContext(dispatcher) {
             val pageName = context.getString(R.string.active)
-            val pageRef = PageRef(pageName)
+            val pageRef = Page(pageName)
+            val samplePageRef = Page(samplePageName).apply { refId = samplePageName }
             pageDao.insert(pageRef)
+            pageDao.insert(samplePageRef)
             SampleHelper.defaultSamples(context).forEach { cardRef ->
                 addSample(cardRef)
             }
@@ -72,61 +79,68 @@ class DataController(context: Context) {
         totalDao = database.totalDao()
     }
 
-    suspend fun addCard(card: CardRef) {
+    @Transaction
+    suspend fun addCard(card: Card) {
         withContext(dispatcher) {
-            val gson = Gson()
+            card.newRef()
             cardDao.insert(card)
             card.columns.forEach { column ->
-                val columnRef = ColumnRef(column.className, card.pageId, card.refId).apply { refId = column.refId }
-                columnRef.json = gson.toJson(column)
+                column.newRef()
+                column.pageId = card.pageId
+                column.cardId = card.refId
+
+                val columnRef = column.columnJson()
                 columnDao.insert(columnRef)
             }
             card.rows.forEach { row ->
-                val rowRef = RowRef(card.pageId, card.refId).apply { refId = row.refId }
-                rowRef.json = gson.toJson(row)
+                row.newRef()
+                row.pageId = card.pageId
+                row.cardId = card.refId
+
+                val rowRef = row.rowJson()
                 rowDao.insert(rowRef)
             }
             card.totals.forEach { total ->
-                val totalRef = TotalRef(card.pageId, card.refId).apply { refId = total.refId }
-                totalRef.json = gson.toJson(total)
+                total.newRef()
+                total.pageId = card.pageId
+                total.cardId = card.refId
+
+                val totalRef = total.totalJson()
                 totalDao.insert(totalRef)
             }
             fireStore.addCard(card)
         }
     }
 
-    suspend fun getCard(refId: String): CardRef {
+    suspend fun getCard(refId: String): Card {
         return withContext(dispatcher) {
-            inflateCard(cardDao.getById(refId))
+            inflateCard(cardDao.getById(refId)).apply { updateTypeControl() }
         }
     }
 
-    suspend fun addPage(pageName: String): PageRef {
+    suspend fun addPage(pageName: String): Page {
         return withContext(dispatcher) {
-            val page = PageRef(pageName)
+            val page = Page(pageName)
             fireStore.addPage(page)
             pageDao.insert(page)
             page
         }
     }
 
-    suspend fun getPageList(): MutableList<PageRef> {
+    suspend fun getPageList(): MutableList<Page> {
         return withContext(dispatcher) {
-            val pageList = pageDao.getAll()
+            val pageList = pageDao.getAll().toMutableList()
+            pageList.find { it.name == samplePageName }?.let { samplePage ->
+                pageList.remove(samplePage)
+            }
             pageList.forEach { page ->
                 val cards = cardDao.getAllOf(page.refId)
                 cards.forEach { card ->
                     inflateCard(card)
-                    page.cards.add(MutableLiveData<CardRef>().apply { postValue(card) })
+                    page.cards.add(MutableLiveData<Card>().apply { postValue(card) })
                 }
             }
             pageList.toMutableList()
-        }
-    }
-
-    suspend fun updateCard(card: CardRef) {
-        withContext(dispatcher) {
-            cardDao.update(card)
         }
     }
 
@@ -136,7 +150,7 @@ class DataController(context: Context) {
             val list = mutableListOf<ListType>()
             allListJson.forEach { listTypeJson ->
                 val typeJson = listTypeJson.json
-                val listType = Gson().fromJson(typeJson, ListType::class.java)
+                val listType = gson.fromJson(typeJson, ListType::class.java)
                 list.add(listType)
             }
             list
@@ -145,7 +159,7 @@ class DataController(context: Context) {
 
     suspend fun addListType(listType: ListType) {
         withContext(dispatcher) {
-            val json = Gson().toJson(listType)
+            val json = gson.toJson(listType)
             val listTypeJson = ListTypeJson().apply {
                 this.json = json
             }
@@ -153,17 +167,17 @@ class DataController(context: Context) {
         }
     }
 
-    fun updatePage(page: PageRef) {
+    fun updatePage(page: Page) {
         doAsync { pageDao.update(page) }
     }
 
-    suspend fun getSampleCard(sampleID: String): CardRef {
+    suspend fun getSampleCard(sampleID: String): Card {
         return withContext(dispatcher) {
-            inflateCard(sampleDao.getByRefId(sampleID)) as CardRef
+            inflateCard(sampleDao.getByRefId(sampleID)) as Card
         }
     }
 
-    suspend fun getSampleList(): List<CardRef> {
+    suspend fun getSampleList(): List<Card> {
         return withContext(Dispatchers.Default) {
             sampleDao.getAll().onEach { cardRef ->
                 inflateCard(cardRef)
@@ -171,37 +185,105 @@ class DataController(context: Context) {
         }
     }
 
-    suspend fun addSample(card: CardRef): List<CardRef> {
+    suspend fun addSample(card: Card): List<Card> {
         return withContext(dispatcher) {
-            val gson = Gson()
             sampleDao.insert(card)
             card.columns.forEach { column ->
-                val columnRef = ColumnRef(column.className,card.pageId, card.refId).apply { refId = column.refId }
-                columnRef.json = gson.toJson(column)
+                val columnRef = column.columnJson()
                 columnDao.insert(columnRef)
             }
             card.rows.forEach { row ->
-                val rowRef = RowRef(card.pageId, card.refId).apply { refId = row.refId }
-                rowRef.json = gson.toJson(row)
+                val rowRef = row.rowJson()
                 rowDao.insert(rowRef)
             }
             card.totals.forEach { total ->
-                val totalRef = TotalRef(card.pageId, card.refId).apply { refId = total.refId }
-                totalRef.json = gson.toJson(total)
+                val totalRef = total.totalJson()
                 totalDao.insert(totalRef)
             }
-            fireStore.addCard(card)
             getSampleList()
         }
     }
 
-    suspend fun updateSample(card: CardRef) {
+    suspend fun updateSample(card: Card) {
         withContext(Dispatchers.Default) {
             sampleDao.update(card)
         }
     }
 
     suspend fun deleteSample(deleteId: String) {
-        sampleDao.delete(deleteId)
+        withContext(dispatcher) {
+            sampleDao.delete(deleteId)
+        }
+    }
+
+    @Transaction // для обновления всей карточки после настройки
+    suspend fun updateCard(card: Card) {
+        withContext(dispatcher) {
+            cardDao.update(card)
+            // удалить все имеющиеся колоны этой карточки
+            val columnsFromDB = columnDao.getAllOf(card.refId)
+            columnsFromDB.forEach {
+                columnDao.delete(it)
+                fireStore.deleteJsonValue(it, COLUMN_PATH)
+            }
+            // удалить все имеющиеся строки этой карточки
+            val rowsFromDB = rowDao.getAllOf(card.refId)
+            rowsFromDB.forEach {
+                rowDao.delete(it)
+                fireStore.deleteJsonValue(it, ROW_PATH)
+            }
+            // удалить все имеющиеся total этой карточки
+            val totalsFromDB = totalDao.getAllOf(card.refId)
+            totalsFromDB.forEach {
+                totalDao.delete(it)
+                fireStore.deleteJsonValue(it, TOTAL_PATH)
+            }
+//////////////////////////////////////////////
+            // добавляем все колоны
+            card.columns.forEach {
+                val columnRef = it.columnJson()
+                columnDao.insert(columnRef)
+                fireStore.addJsonValue(columnRef, COLUMN_PATH)
+            }
+            // добавляем все строки
+            card.rows.forEach {
+                val rowRef = it.rowJson()
+                rowDao.insert(rowRef)
+                fireStore.addJsonValue(rowRef, ROW_PATH)
+            }
+            // добавляем все итоги
+            card.totals.forEach {
+                val totalRef = it.totalJson()
+                totalDao.insert(totalRef)
+                fireStore.addJsonValue(totalRef, TOTAL_PATH)
+            }
+        }
+    }
+
+    suspend fun deleteRows(rows: List<Row>) {
+        withContext(dispatcher) {
+
+            rows.forEach {
+                rowDao.delete(it.refId)
+                fireStore.deleteJsonValue(it.rowJson(), ROW_PATH)
+            }
+        }
+    }
+
+    suspend fun addRow(row: Row) {
+        withContext(dispatcher) {
+            row.status = Row.Status.NONE
+            val jsonValue = row.rowJson()
+            rowDao.insert(jsonValue)
+            fireStore.addJsonValue(jsonValue, ROW_PATH)
+        }
+    }
+
+    suspend fun updateRow(row: Row) {
+        withContext(dispatcher) {
+            val jsonValue = row.rowJson()
+            rowDao.update(jsonValue)
+            fireStore.addJsonValue(jsonValue, ROW_PATH)
+        }
     }
 }

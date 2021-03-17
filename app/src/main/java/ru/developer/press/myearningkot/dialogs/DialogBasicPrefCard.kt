@@ -14,10 +14,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.layoutInflater
 import ru.developer.press.myearningkot.R
+import ru.developer.press.myearningkot.database.Card
 import ru.developer.press.myearningkot.helpers.getValutaTypeList
 import ru.developer.press.myearningkot.helpers.setAlertButtonColors
 import ru.developer.press.myearningkot.helpers.showItemChangeDialog
-import ru.developer.press.myearningkot.model.Card
 
 class DialogBasicPrefCard(
     val card: Card,

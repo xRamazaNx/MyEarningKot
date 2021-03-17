@@ -2,7 +2,7 @@ package ru.developer.press.myearningkot.viewmodels
 
 import androidx.lifecycle.MutableLiveData
 import ru.developer.press.myearningkot.CellTypeControl
-import ru.developer.press.myearningkot.model.Card
+import ru.developer.press.myearningkot.database.Card
 import ru.developer.press.myearningkot.model.Row
 import ru.developer.press.myearningkot.model.SortMethod
 import ru.developer.press.myearningkot.model.Total

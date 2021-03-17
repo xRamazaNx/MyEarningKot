@@ -3,14 +3,14 @@ package ru.developer.press.myearningkot.helpers.scoups
 import android.graphics.Color
 import com.google.gson.Gson
 import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.database.CardRef
+import ru.developer.press.myearningkot.database.Card
 import ru.developer.press.myearningkot.helpers.getPathForResource
 import ru.developer.press.myearningkot.model.*
 import java.util.*
 
 
-fun CardRef.addTotal(): Total {
-    val totalItem = Total().apply {
+fun Card.addTotal(): Total {
+    val totalItem = Total(pageId, refId).apply {
         formula.formulaElements.add(Formula.FormulaElement(Formula.OTHER, "0"))
     }
     totals.add(totalItem)
@@ -18,7 +18,7 @@ fun CardRef.addTotal(): Total {
     return totalItem
 }
 
-fun CardRef.deleteTotal(index: Int): Boolean {
+fun Card.deleteTotal(index: Int): Boolean {
     return if (totals.size > 1) {
         totals.removeAt(index)
         true
@@ -58,8 +58,8 @@ private fun getNewCell(column: Column): Cell = Cell().apply {
     cellTypeControl = column.columnTypeControl
 }
 
-fun CardRef.addRow(
-    row: Row = Row().apply {
+fun Card.addRow(
+    row: Row = Row(pageId, refId).apply {
         cellList = mutableListOf<Cell>().apply {
             columns.forEach { column ->
                 add(getNewCell(column))
@@ -73,20 +73,21 @@ fun CardRef.addRow(
     return row
 }
 
-fun CardRef.addColumn(type: ColumnType, name: String, position: Int = columns.size): Column {
+fun Card.addColumn(type: ColumnType, name: String, position: Int = columns.size): Column {
     val column = when (type) {
-        ColumnType.NUMERATION -> NumerationColumn(name)
-        ColumnType.NUMBER -> NumberColumn(name)
-        ColumnType.PHONE -> PhoneColumn(name)
-        ColumnType.DATE -> DateColumn(name)
-        ColumnType.COLOR -> ColorColumn(name)
-        ColumnType.SWITCH -> SwitchColumn(name)
-        ColumnType.IMAGE -> ImageColumn(name)
-        ColumnType.LIST -> ListColumn(name)
-        ColumnType.TEXT -> TextColumn(name)
+        ColumnType.NUMERATION -> NumerationColumn(name,pageId, refId)
+        ColumnType.NUMBER -> NumberColumn(name,pageId, refId)
+        ColumnType.PHONE -> PhoneColumn(name,pageId, refId)
+        ColumnType.DATE -> DateColumn(name,pageId, refId)
+        ColumnType.COLOR -> ColorColumn(name,pageId, refId)
+        ColumnType.SWITCH -> SwitchColumn(name,pageId, refId)
+        ColumnType.IMAGE -> ImageColumn(name,pageId, refId)
+        ColumnType.LIST -> ListColumn(name,pageId, refId)
+        ColumnType.TEXT -> TextColumn(name,pageId, refId)
         // не будет ни когда использоваться
-        ColumnType.NONE -> TextColumn(name)
+        ColumnType.NONE -> TextColumn(name,pageId, refId)
     }
+
     columns.add(position, column)
     column.updateTypeControl(this)
     rows.forEach {
@@ -97,20 +98,23 @@ fun CardRef.addColumn(type: ColumnType, name: String, position: Int = columns.si
 
 }
 
-fun CardRef.addColumnSample(type: ColumnType, name: String, position: Int = columns.size) {
+fun Card.addColumnSample(type: ColumnType, name: String, position: Int = columns.size) {
     val column = when (type) {
-        ColumnType.NUMERATION -> NumerationColumn(name)
-        ColumnType.NUMBER -> NumberColumn(name)
-        ColumnType.PHONE -> PhoneColumn(name)
-        ColumnType.DATE -> DateColumn(name)
-        ColumnType.COLOR -> ColorColumn(name)
-        ColumnType.SWITCH -> SwitchColumn(name)
-        ColumnType.IMAGE -> ImageColumn(name)
-        ColumnType.LIST -> ListColumn(name)
-        ColumnType.TEXT -> TextColumn(name)
+        ColumnType.NUMERATION -> NumerationColumn(name,pageId, refId)
+        ColumnType.NUMBER -> NumberColumn(name,pageId, refId)
+        ColumnType.PHONE -> PhoneColumn(name,pageId, refId)
+        ColumnType.DATE -> DateColumn(name,pageId, refId)
+        ColumnType.COLOR -> ColorColumn(name,pageId, refId)
+        ColumnType.SWITCH -> SwitchColumn(name,pageId, refId)
+        ColumnType.IMAGE -> ImageColumn(name,pageId, refId)
+        ColumnType.LIST -> ListColumn(name,pageId, refId)
+        ColumnType.TEXT -> TextColumn(name,pageId, refId)
         // не будет ни когда использоваться
-        ColumnType.NONE -> TextColumn(name)
+        ColumnType.NONE -> TextColumn(name,pageId, refId)
     }
+    column.pageId = pageId
+    column.cardId = refId
+
     columns.add(position, column)
     column.updateTypeControl(this)
     rows.forEach {
@@ -119,7 +123,7 @@ fun CardRef.addColumnSample(type: ColumnType, name: String, position: Int = colu
     updateTypeControlColumn(column)
 }
 
-fun CardRef.deleteColumn(column: Column? = null): Boolean {
+fun Card.deleteColumn(column: Column? = null): Boolean {
     // если колоны пусты то ни чего не делаем
     if (column is NumerationColumn || columns.size == 1)
         return false
@@ -155,7 +159,7 @@ fun CardRef.deleteColumn(column: Column? = null): Boolean {
     return true
 }
 
-fun CardRef.findColumnAtId(idColumn: String): Column? {
+fun Card.findColumnAtId(idColumn: String): Column? {
     columns.forEach {
         if (it.refId == idColumn)
             return it
@@ -163,7 +167,7 @@ fun CardRef.findColumnAtId(idColumn: String): Column? {
     return null
 }
 
-fun CardRef.getCellOfSample(position: Int): Cell {
+fun Card.getCellOfSample(position: Int): Cell {
     val column = columns[position]
     return Cell().apply {
         cellTypeControl = column.columnTypeControl
@@ -205,29 +209,29 @@ fun CardRef.getCellOfSample(position: Int): Cell {
     }
 }
 
-fun CardRef.updateTypeControl() {
+fun Card.updateTypeControl() {
     columns.forEach { column ->
         updateTypeControlColumn(column)
     }
 //        fillTotalAmount()
 }
 
-fun CardRef.addSampleRow() {
+fun Card.addSampleRow() {
     val row = mutableListOf<Cell>()
     columns.forEachIndexed { index, _ ->
         row.add(getCellOfSample(index))
     }
-    rows.add(Row().apply { cellList = row })
+    rows.add(Row(pageId, refId).apply { cellList = row })
 }
 
-fun CardRef.deleteRow(index: Int = rows.size - 1) {
+fun Card.deleteRow(index: Int = rows.size - 1) {
     if (rows.isEmpty())
         return
     rows.removeAt(index)
 
 }
 
-fun CardRef.updateTypeControlColumn(column: Column) {
+fun Card.updateTypeControlColumn(column: Column) {
     column.updateTypeControl(this)
     val indexOf = columns.indexOf(column)
     rows.forEachIndexed { rowIndex, row ->
@@ -263,7 +267,7 @@ fun CardRef.updateTypeControlColumn(column: Column) {
     }
 }
 
-fun CardRef.updateTypeControlRow(indexRow: Int) {
+fun Card.updateTypeControlRow(indexRow: Int) {
     columns.forEachIndexed { index, column ->
         rows[indexRow].cellList[index].also { cell ->
             cell.cellTypeControl = column.columnTypeControl
@@ -297,7 +301,7 @@ fun CardRef.updateTypeControlRow(indexRow: Int) {
     }
 }
 
-fun CardRef.unSelectCell(): Int {
+fun Card.unSelectCell(): Int {
     rows.forEachIndexed { rowIndex, row ->
         val cell = row.cellList.find { it.isSelect }
         if (cell != null) {
@@ -308,13 +312,13 @@ fun CardRef.unSelectCell(): Int {
     return -1
 }
 
-fun CardRef.unSelectRows() {
+fun Card.unSelectRows() {
     rows.forEach {
         it.status = Row.Status.NONE
     }
 }
 
-fun CardRef.getSelectedCell(): Cell? {
+fun Card.getSelectedCell(): Cell? {
     rows.forEach { row ->
         row.cellList.forEach { cell ->
             if (cell.isSelect) {
@@ -325,11 +329,11 @@ fun CardRef.getSelectedCell(): Cell? {
     return null
 }
 
-fun CardRef.deleteRow(row: Row) {
+fun Card.deleteRow(row: Row) {
     rows.remove(row)
 }
 
-fun CardRef.getSelectedRows(): MutableList<Row> {
+fun Card.getSelectedRows(): MutableList<Row> {
     val selRows = mutableListOf<Row>()
     rows.forEach {
         if (it.status == Row.Status.SELECT)

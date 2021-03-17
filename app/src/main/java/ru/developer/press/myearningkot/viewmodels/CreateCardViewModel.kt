@@ -12,17 +12,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.sample_card_item.view.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.activity.CreateCardActivity
+import ru.developer.press.myearningkot.activity.PrefCardInfo
 import ru.developer.press.myearningkot.activity.startPrefActivity
+import ru.developer.press.myearningkot.database.Card
+import ru.developer.press.myearningkot.database.DataController
 import ru.developer.press.myearningkot.dialogs.MyDialog
 import ru.developer.press.myearningkot.dialogs.myDialog
-import ru.developer.press.myearningkot.database.PrefCardInfo
-import ru.developer.press.myearningkot.database.SampleHelper
 import ru.developer.press.myearningkot.helpers.bindTitleOfColumn
-import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.NumerationColumn
 import splitties.alertdialog.appcompat.negativeButton
 import splitties.alertdialog.appcompat.positiveButton
@@ -30,7 +31,7 @@ import splitties.alertdialog.appcompat.positiveButton
 class CreateCardViewModel : ViewModel() {
     fun updateSamples(update: () -> Unit) {
         viewModelScope.launch {
-            sampleList = sampleHelper.getSampleList()
+            sampleList = dataController.getSampleList().toMutableList()
             update.invoke()
         }
     }
@@ -45,8 +46,10 @@ class CreateCardViewModel : ViewModel() {
             sampleList.find { it.refId == id }!!
         }
         adapterForSamples.deleteCard = { deleteId ->
-            sampleHelper.deleteSample(deleteId)
-            sampleList.remove(sampleList.find { it.refId == deleteId })
+            viewModelScope.launch(Dispatchers.IO) {
+                dataController.deleteSample(deleteId)
+                sampleList.remove(sampleList.find { it.refId == deleteId })
+            }
 
         }
         adapterForSamples.updateItemInCard = { item ->
@@ -59,11 +62,11 @@ class CreateCardViewModel : ViewModel() {
     }
 
     suspend fun create(context: Context) {
-        sampleHelper = SampleHelper(context)
-        sampleList = sampleHelper.getSampleList()
+        dataController = DataController(context)
+        sampleList = dataController.getSampleList().toMutableList()
     }
 
-    private lateinit var sampleHelper: SampleHelper
+    private lateinit var dataController: DataController
     private lateinit var sampleList: MutableList<Card>
 
     class AdapterForSamples(val list: MutableList<SampleItem>) :

@@ -3,47 +3,66 @@ package ru.developer.press.myearningkot.database
 import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 import com.google.firebase.firestore.Exclude
-import ru.developer.press.myearningkot.JsonValue
 import ru.developer.press.myearningkot.ProvideCardPropertyForCell
 import ru.developer.press.myearningkot.helpers.getDate
-import ru.developer.press.myearningkot.helpers.scoups.addColumn
-import ru.developer.press.myearningkot.helpers.scoups.addTotal
 import ru.developer.press.myearningkot.model.*
 import java.util.*
 
 open class Ref {
+    /*
+    используется при добавлении новой сушности
+    из существующей, которая наследуется от нее,
+    что бы они имели новый ид и дату создания!
+     */
+    fun newRef() {
+        refId = UUID.randomUUID().toString()
+        dateCreate = System.currentTimeMillis()
+        dateChange = dateCreate
+    }
+
+    fun copyRefFrom(ref: Ref) {
+        refId = ref.refId
+        dateCreate = ref.dateCreate
+        dateChange = ref.dateChange
+    }
+
     @PrimaryKey
     var refId: String = UUID.randomUUID().toString()
-    val dateCreate = System.currentTimeMillis()
+    var dateCreate = System.currentTimeMillis()
     var dateChange: Long = dateCreate
 }
 
+open class IdsRef(
+    var pageId: String,
+    var cardId: String
+) : Ref()
+
 @Entity
-class PageRef(
+class Page(
     var name: String = ""
 ) : Ref() {
     var position = 0
 
     @Exclude
     @Ignore
-    val cards = mutableListOf<MutableLiveData<CardRef>>()
+    val cards = mutableListOf<MutableLiveData<Card>>()
 }
 
 @Entity(
     foreignKeys = [ForeignKey(
-        entity = PageRef::class,
+        entity = Page::class,
         parentColumns = arrayOf("refId"),
         childColumns = arrayOf("pageId"),
         onDelete = ForeignKey.CASCADE
     )]
 )
-open class CardRef(var pageId: String, var name: String = "") : Ref(), ProvideCardPropertyForCell {
+open class Card(var pageId: String, var name: String = "") : Ref(), ProvideCardPropertyForCell {
 
     @Embedded(prefix = "card_pref")
-    val cardPref = PrefForCard()
+    var cardPref = PrefForCard()
 
     @Embedded(prefix = "sort_pref")
-    val sortPref = SortPref()
+    var sortPref = SortPref()
     var isUpdating = false
     var isShowDatePeriod: Boolean = false
     var isShowTotalInfo = true
@@ -64,11 +83,11 @@ open class CardRef(var pageId: String, var name: String = "") : Ref(), ProvideCa
 
     @Ignore
     @Exclude
-    var columns = mutableListOf<Column>()
+    val columns = mutableListOf<Column>()
 
     @Ignore
     @Exclude
-    var totals = mutableListOf<Total>()
+    val totals = mutableListOf<Total>()
 
     val dateOfPeriod: String
         get() {
@@ -79,65 +98,67 @@ open class CardRef(var pageId: String, var name: String = "") : Ref(), ProvideCa
             return "$first - $last"
         }
 
-    init {
-        addColumn(ColumnType.NUMERATION, "№").apply {
-            width = 70
-        }
-        addTotal()
-    }
-
     override fun isSingleLine(): Boolean = !enableSomeStroke
 
     override fun getValutaType(): Int = valuta
 }
 
-open class IdsRef(
-    var pageId: String,
-    var cardId: String
-) : Ref()
+open class JsonValue(pageId: String, cardId: String) : IdsRef(pageId, cardId) {
+    var json: String = ""
+}
 
 @Entity(
     foreignKeys = [ForeignKey(
-        entity = CardRef::class,
+        entity = Card::class,
         parentColumns = arrayOf("refId"),
         childColumns = arrayOf("cardId"),
         onDelete = ForeignKey.CASCADE
     )]
 )
-open class RowRef(pageId: String, cardId: String) : JsonValue, IdsRef(pageId, cardId) {
-    override var json: String = ""
-
-}
+class ColumnJson(pageId: String, cardId: String) : JsonValue(pageId, cardId)
 
 @Entity(
     foreignKeys = [ForeignKey(
-        entity = CardRef::class,
+        entity = Card::class,
         parentColumns = arrayOf("refId"),
         childColumns = arrayOf("cardId"),
         onDelete = ForeignKey.CASCADE
     )]
 )
-open class ColumnRef(
-    val columnClass: Class<out Column>,
-    pageId: String,
-    cardId: String
-) : JsonValue, IdsRef(pageId, cardId) {
-    override var json: String = ""
-}
+class RowJson(pageId: String, cardId: String) : JsonValue(pageId, cardId)
 
 @Entity(
     foreignKeys = [ForeignKey(
-        entity = CardRef::class,
+        entity = Card::class,
         parentColumns = arrayOf("refId"),
         childColumns = arrayOf("cardId"),
         onDelete = ForeignKey.CASCADE
     )]
 )
-class TotalRef(pageId: String, cardId: String) : JsonValue, IdsRef(pageId, cardId) {
-    override var json: String = ""
-}
+class TotalJson(pageId: String, cardId: String) : JsonValue(pageId, cardId)
 
 @Entity
-class ListTypeJson : JsonValue, Ref() {
-    override var json: String = ""
+class ListTypeJson : Ref() {
+    var json: String = ""
 }
+
+fun Column.columnJson():ColumnJson{
+    val columnJson = ColumnJson(pageId, cardId)
+    columnJson.json = gson.toJson(this)
+    columnJson.copyRefFrom(this)
+    return columnJson
+}
+
+fun Row.rowJson():RowJson{
+    val rowJson = RowJson(pageId, cardId)
+    rowJson.json = gson.toJson(this)
+    rowJson.copyRefFrom(this)
+    return rowJson
+}
+fun Total.totalJson():TotalJson{
+    val totalJson = TotalJson(pageId, cardId)
+    totalJson.json = gson.toJson(this)
+    totalJson.copyRefFrom(this)
+    return totalJson
+}
+

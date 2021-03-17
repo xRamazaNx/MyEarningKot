@@ -10,8 +10,8 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.text.toSpannable
 import com.google.gson.annotations.SerializedName
-import ru.developer.press.myearningkot.*
-import ru.developer.press.myearningkot.helpers.*
+import ru.developer.press.myearningkot.R
+import ru.developer.press.myearningkot.helpers.getColorFromRes
 import ru.developer.press.myearningkot.helpers.prefLayouts.multiplyChar
 import ru.developer.press.myearningkot.helpers.prefLayouts.subtractChar
 
@@ -100,7 +100,7 @@ class Formula {
             when (element.type) {
                 COLUMN_ID -> {
                     columnList.forEach {
-                        if (it.refId == element.value) {
+                        if (it.idToFormula.toString() == element.value) {
                             val name = it.name
                             strBuilder.append(name)
                             spannable.append(SpannableString(name).apply {
@@ -116,7 +116,7 @@ class Formula {
                 }
                 TOTAL_ID -> {
                     totalList?.forEach {
-                        if (it.id == element.value.toLong()) {
+                        if (it.idToFormula == element.value.toLong()) {
                             val title = it.title
                             strBuilder.append(title)
                             spannable.append(SpannableString(title).apply {

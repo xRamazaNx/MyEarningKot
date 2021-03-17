@@ -12,10 +12,10 @@ import kotlinx.android.synthetic.main.card.view.*
 import ru.developer.press.myearningkot.CardClickListener
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.activity.setShowTotalInfo
+import ru.developer.press.myearningkot.database.Card
 import ru.developer.press.myearningkot.database.Page
-import ru.developer.press.myearningkot.model.Card
-import ru.developer.press.myearningkot.model.createViewInPlate
-import ru.developer.press.myearningkot.model.hideAddTotalButton
+import ru.developer.press.myearningkot.helpers.scoups.createViewInPlate
+import ru.developer.press.myearningkot.helpers.scoups.hideAddTotalButton
 
 class AdapterCard(
     page: Page,

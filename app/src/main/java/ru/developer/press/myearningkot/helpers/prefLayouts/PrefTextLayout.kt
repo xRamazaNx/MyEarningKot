@@ -163,7 +163,7 @@ fun Context.getPrefTotalLayout(
                     // проверяем у всех выделенных
                     totals.forEach { selectTotal ->
                         // одна из выбранных колон учавствует в формуле в не выделеной колоне(все выделенные и так не попадают в список в формуле)
-                        if (selectTotal.id == id) {
+                        if (selectTotal.idToFormula == id) {
                             // удаляем в алл эту колону
                             this.remove(it)
                         }

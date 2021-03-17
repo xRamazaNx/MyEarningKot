@@ -8,10 +8,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.developer.press.myearningkot.AdapterPageInterface
+import ru.developer.press.myearningkot.database.Card
+import ru.developer.press.myearningkot.database.DataController
 import ru.developer.press.myearningkot.database.Page
 import ru.developer.press.myearningkot.helpers.SingleLiveEvent
-import ru.developer.press.myearningkot.model.Card
-import ru.developer.press.myearningkot.database.DataController
+import ru.developer.press.myearningkot.helpers.scoups.*
 import ru.developer.press.myearningkot.model.NumberColumn
 
 // этот класс создается (ViewModelProviders.of(this).get(Class::class.java))
@@ -47,7 +48,7 @@ class MainViewModel(context: Context, list: MutableList<Page>) : ViewModel(),
     }
 
     fun getTabName(position: Int): String {
-        return pageList[position].value!!.pageName
+        return pageList[position].value!!.name
     }
 
     private fun getPositionCardInPage(indexPage: Int, card: Card): Int {
@@ -71,12 +72,13 @@ class MainViewModel(context: Context, list: MutableList<Page>) : ViewModel(),
     ) {
         viewModelScope.launch(Dispatchers.IO) {
 
+            val mutableLiveData = pageList[indexPage]
+            val page = mutableLiveData.value!!
+
             val card: Card = dataController.getSampleCard(sampleID)
             // для того что бы удвлить времянки
             card.rows.clear()
             // добавляем в базу данных новую Card присовение ид очень важно
-            val mutableLiveData = pageList[indexPage]
-            val page = mutableLiveData.value!!
             card.pageId = page.refId
             if (name.isNotEmpty())
                 card.name = name
@@ -145,7 +147,6 @@ class MainViewModel(context: Context, list: MutableList<Page>) : ViewModel(),
         val page: Page? = mutableLiveData.value
         page?.let {
             dataController.updatePage(it)
-            it.background = color
             mutableLiveData.postValue(it)
         }
 

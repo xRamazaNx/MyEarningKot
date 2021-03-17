@@ -5,13 +5,16 @@ import android.view.View
 import com.google.gson.annotations.SerializedName
 import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.adapters.ParamModel
-import ru.developer.press.myearningkot.database.CardRef
+import ru.developer.press.myearningkot.database.Card
 import ru.developer.press.myearningkot.database.IdsRef
 import ru.developer.press.myearningkot.helpers.*
 import java.math.BigDecimal
 import java.util.*
+import kotlin.random.Random
 
-abstract class Column(var name: String, pageId: String, cardId: String) : IdsRef(pageId,cardId) {
+abstract class Column(var name: String, pageId: String, cardId: String) : IdsRef(pageId,cardId), FormulaId {
+    @SerializedName("itf")
+    override var idToFormula: Long = Random.nextLong()
     companion object {
         @SerializedName("tc")
         var titleColor: Int = 0
@@ -20,7 +23,7 @@ abstract class Column(var name: String, pageId: String, cardId: String) : IdsRef
     var width: Int = 350
 
     @SerializedName(column_cast_gson)
-    var className: Class<out Column> = this::class.java
+    var className: String = javaClass.name
 
     @SerializedName("tp")
     val titlePref: PrefForTextView = PrefForTextView().apply {
@@ -137,14 +140,14 @@ class NumberColumn(name: String, pageId: String, cardId: String) : Column(name,p
 
     }
 
-    fun calcFormula(rowIndex: Int, card: CardRef): String {
+    fun calcFormula(rowIndex: Int, card: Card): String {
         val string = StringBuilder()
         return try {
             formula.formulaElements.forEach {
                 if (it.type == Formula.COLUMN_ID) {
                     var index = -1
                     card.columns.forEachIndexed { i, column ->
-                        if (column.refId == it.value) {
+                        if (column.idToFormula.toString() == it.value) {
                             index = i
                             return@forEachIndexed
                         }

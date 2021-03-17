@@ -20,7 +20,6 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.stfalcon.imageviewer.StfalconImageViewer
 import kotlinx.android.synthetic.main.main_cards_layout.*
-import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.matchParent
 import ru.developer.press.myearningkot.activity.MainActivity
@@ -46,9 +45,6 @@ class PageFragment : Fragment() {
         recycler?.layoutManager = LinearLayoutManager(context)
         adapterCard = AdapterCard(page.value!!, activity as MainActivity)
 
-        page.observe(requireActivity(), {
-            view.backgroundColor = it.background
-        })
         updateRecycler()
         super.onViewCreated(view, savedInstanceState)
     }

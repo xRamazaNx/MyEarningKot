@@ -5,25 +5,31 @@ import androidx.room.*
 import androidx.room.Database
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.helpers.getColumnFromJson
+import ru.developer.press.myearningkot.helpers.log
 import ru.developer.press.myearningkot.helpers.scoups.addColumn
 import ru.developer.press.myearningkot.helpers.scoups.addTotal
-import ru.developer.press.myearningkot.helpers.scoups.deleteColumn
-import ru.developer.press.myearningkot.model.Column
-import ru.developer.press.myearningkot.model.ColumnType
-import ru.developer.press.myearningkot.model.Formula
-import ru.developer.press.myearningkot.model.NumberColumn
+import ru.developer.press.myearningkot.model.*
 
+class Converter {
+    @TypeConverter
+    fun toSortMethod(enum: String) = enumValueOf<SortMethod>(enum)
+
+    @TypeConverter
+    fun fromSortMethod(sortMethod: SortMethod) = sortMethod.name
+}
 
 @Database(
     entities = [
-        PageRef::class,
-        CardRef::class,
-        RowRef::class,
-        ColumnRef::class,
+        Page::class,
+        Card::class,
+        ColumnJson::class,
+        RowJson::class,
+        TotalJson::class,
         ListTypeJson::class],
     version = 1,
     exportSchema = false
 )
+@TypeConverters(Converter::class)
 abstract class Database : RoomDatabase() {
     companion object {
         private var database: ru.developer.press.myearningkot.database.Database? = null
@@ -49,58 +55,67 @@ abstract class Database : RoomDatabase() {
 
 @Dao
 interface TotalDao {
-    @Query("Select * FROM TotalRef where cardId = :id")
-    fun getAllOf(id: String): List<TotalRef>
+    @Query("Select * FROM TotalJson where cardId = :id")
+    fun getAllOf(id: String): List<TotalJson>
 
-    @Query("Select * FROM TotalRef where refId = :id")
-    fun getById(id: String): TotalRef
+    @Query("Select * FROM TotalJson where refId = :id")
+    fun getById(id: String): TotalJson
 
     @Delete
-    fun delete(totalRef: TotalRef)
+    fun delete(totalRef: TotalJson)
+
+    @Query("delete from TotalJson where refId = :refId")
+    fun delete(refId: String)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(totalRef: TotalRef): String
+    fun insert(totalRef: TotalJson)
 
     @Update
-    fun update(totalRef: TotalRef)
+    fun update(totalRef: TotalJson)
 }
 
 @Dao
 interface ColumnDao {
 
-    @Query("Select * FROM ColumnRef where refId = :id")
-    fun getById(id: String): ColumnRef
+    @Query("Select * FROM ColumnJson where refId = :id")
+    fun getById(id: String): ColumnJson
 
     @Delete
-    fun delete(columnRef: ColumnRef)
+    fun delete(columnRef: ColumnJson)
+
+    @Query("delete from ColumnJson where refId = :refId")
+    fun delete(refId: String)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(columnRef: ColumnRef): String
+    fun insert(columnRef: ColumnJson)
 
     @Update
-    fun update(columnRef: ColumnRef)
+    fun update(columnRef: ColumnJson)
 
-    @Query("Select * FROM ColumnRef where cardId = :id")
-    fun getAllOf(id: String): List<ColumnRef>
+    @Query("Select * FROM ColumnJson where cardId = :id")
+    fun getAllOf(id: String): List<ColumnJson>
 }
 
 @Dao
 interface RowDao {
 
-    @Query("SELECT * FROM RowRef where cardId = :id")
-    fun getAllOf(id: String): List<RowRef>
+    @Query("SELECT * FROM RowJson where cardId = :id")
+    fun getAllOf(id: String): List<RowJson>
 
-    @Query("Select * FROM RowRef where refId = :id")
-    fun getById(id: String): RowRef
+    @Query("Select * FROM RowJson where refId = :id")
+    fun getById(id: String): RowJson
 
     @Delete
-    fun delete(rowRef: RowRef)
+    fun delete(jsonValue: RowJson)
+
+    @Query("delete from RowJson where refId = :refId")
+    fun delete(refId: String)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(rowRef: RowRef): String
+    fun insert(jsonValue: RowJson)
 
     @Update
-    fun update(rowRef: RowRef)
+    fun update(jsonValue: RowJson)
 }
 
 @Dao
@@ -115,7 +130,7 @@ interface ListTypeDao {
     fun delete(listType: ListTypeJson)
 
     @Insert
-    fun insert(listType: ListTypeJson): String
+    fun insert(listType: ListTypeJson)
 
     @Update
     fun update(listType: ListTypeJson)
@@ -124,77 +139,83 @@ interface ListTypeDao {
 @Dao
 interface SampleDao {
 
-    @Query("SELECT * FROM CardRef")
-    fun getAll(): List<CardRef>
+    @Query("SELECT * FROM Card where pageId = :pageRefId")
+    fun getAll(pageRefId: String = samplePageName): List<Card>
 
-    @Query("Select * FROM CardRef where refId = :id")
-    fun getByRefId(id: String): CardRef
+    @Query("Select * FROM Card where refId = :id")
+    fun getByRefId(id: String): Card
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(sample: CardRef): String
+    fun insert(sample: Card)
 
     @Update
-    fun update(sample: CardRef)
+    fun update(sample: Card)
 
-    @Query("DELETE FROM CardRef WHERE refId = :deleteId")
+    @Query("DELETE FROM Card WHERE refId = :deleteId")
     fun delete(deleteId: String)
 }
 
 @Dao
 interface CardDao {
 
-    @Query("SELECT * FROM CardRef where pageId = :id")
-    fun getAllOf(id: String): List<CardRef>
+    @Query("SELECT * FROM Card where pageId = :id")
+    fun getAllOf(id: String): List<Card>
 
-    @Query("Select * FROM CardRef where refId = :id")
-    fun getById(id: String): CardRef
+    @Query("Select * FROM Card where refId = :id")
+    fun getById(id: String): Card
 
-    @Query("DELETE FROM CardRef WHERE refId = :deleteId")
+    @Query("DELETE FROM Card WHERE refId = :deleteId")
     fun delete(deleteId: String)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(cardJson: CardRef): String
+    fun insert(card: Card)
 
     @Update
-    fun update(cardJson: CardRef)
+    fun update(card: Card)
 }
 
 @Dao
 interface PageDao {
 
-    @Query("SELECT * FROM PageRef")
-    fun getAll(): List<PageRef>
+    @Query("SELECT * FROM Page")
+    fun getAll(): List<Page>
 
-    @Query("Select * FROM PageRef where refId = :id")
-    fun getById(id: String): PageRef
+    @Query("Select * FROM Page where refId = :id")
+    fun getById(id: String): Page
 
-    @Query("DELETE FROM PageRef WHERE refId = :deleteId")
+    @Query("DELETE FROM Page WHERE refId = :deleteId")
     fun delete(deleteId: String)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(page: PageRef): String
+    fun insert(page: Page)
 
     @Update
-    fun update(page: PageRef)
+    fun update(page: Page)
 }
 
-fun convertRefToColumn(refs: List<ColumnRef>): List<Column> {
+fun convertRefToColumn(refs: List<JsonValue>): List<Column> {
     return refs.fold(mutableListOf()) { list, columnRef ->
+        log(columnRef.json)
         list.add(getColumnFromJson(columnRef))
         list
     }
 }
+
 //
+const val samplePageName = "|/*sample_cards*/|"
+
 class SampleHelper {
 
     companion object {
 
-        fun defaultSamples(context: Context) :List<CardRef> {
-            val samplePageName = "|/*sample_cards*/|"
-            val list = mutableListOf<CardRef>()
+        fun defaultSamples(context: Context): List<Card> {
+            val list = mutableListOf<Card>()
             // доход
-            list.add(CardRef(samplePageName, name = context.getString(R.string.earning)).apply {
-                //                                    deleteColumn()
+            list.add(Card(samplePageName, name = context.getString(R.string.earning)).apply {
+                addColumn(ColumnType.NUMERATION, "№").apply {
+                    width = 70
+                }
+
                 val summaColumn =
                     addColumn(ColumnType.NUMBER, context.getString(R.string.summa))
 
@@ -208,14 +229,13 @@ class SampleHelper {
                     width = 430
                 }
 
-                val summaTotal = totals[0]
-                summaTotal.apply {
+                val summaTotal = addTotal().apply {
                     title = context.getString(R.string.SUMMA)
                     formula = Formula().apply {
                         formulaElements.add(
                             Formula.FormulaElement(
                                 Formula.COLUMN_ID,
-                                summaColumn.refId
+                                summaColumn.idToFormula.toString()
                             )
                         )
                     }
@@ -226,7 +246,7 @@ class SampleHelper {
                         formulaElements.add(
                             Formula.FormulaElement(
                                 Formula.COLUMN_ID,
-                                avansColumn.refId
+                                avansColumn.idToFormula.toString()
                             )
                         )
                     }
@@ -237,7 +257,7 @@ class SampleHelper {
                         formulaElements.add(
                             Formula.FormulaElement(
                                 Formula.TOTAL_ID,
-                                summaTotal.id.toString()
+                                summaTotal.idToFormula.toString()
                             )
                         )
                         formulaElements.add(
@@ -249,7 +269,7 @@ class SampleHelper {
                         formulaElements.add(
                             Formula.FormulaElement(
                                 Formula.TOTAL_ID,
-                                avansTotal.id.toString()
+                                avansTotal.idToFormula.toString()
                             )
                         )
                     }
@@ -257,8 +277,10 @@ class SampleHelper {
                 enableSomeStroke = false
             })
             // расход
-            list.add(CardRef(samplePageName,name = context.getString(R.string.expenses)).apply {
-                deleteColumn()
+            list.add(Card(samplePageName, name = context.getString(R.string.expenses)).apply {
+                addColumn(ColumnType.NUMERATION, "№").apply {
+                    width = 70
+                }
                 val summaColumn =
                     addColumn(
                         ColumnType.NUMBER,
@@ -280,14 +302,13 @@ class SampleHelper {
                 addColumn(ColumnType.DATE, context.getString(R.string.date)).apply {
                     width = 430
                 }
-                val summaTotal = totals[0]
-                summaTotal.apply {
+                val summaTotal = addTotal().apply {
                     title = context.getString(R.string.BUDGET)
                     formula = Formula().apply {
                         formulaElements.add(
                             Formula.FormulaElement(
                                 Formula.COLUMN_ID,
-                                summaColumn.refId
+                                summaColumn.idToFormula.toString()
                             )
                         )
                     }
@@ -298,7 +319,7 @@ class SampleHelper {
                         formulaElements.add(
                             Formula.FormulaElement(
                                 Formula.COLUMN_ID,
-                                avansColumn.refId
+                                avansColumn.idToFormula.toString()
                             )
                         )
                     }
@@ -309,7 +330,7 @@ class SampleHelper {
                         formulaElements.add(
                             Formula.FormulaElement(
                                 Formula.TOTAL_ID,
-                                summaTotal.id.toString()
+                                summaTotal.idToFormula.toString()
                             )
                         )
                         formulaElements.add(
@@ -321,7 +342,7 @@ class SampleHelper {
                         formulaElements.add(
                             Formula.FormulaElement(
                                 Formula.TOTAL_ID,
-                                avansTotal.id.toString()
+                                avansTotal.idToFormula.toString()
                             )
                         )
                     }

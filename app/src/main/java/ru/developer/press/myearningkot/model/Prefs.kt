@@ -9,9 +9,9 @@ import ru.developer.press.myearningkot.helpers.getColorFromText
 import ru.developer.press.myearningkot.helpers.setFont
 
 class PrefForCard(
-    @Embedded
+    @Embedded(prefix = "name_pref")
     var namePref: PrefForTextView = PrefForTextView(),
-    @Embedded
+    @Embedded(prefix = "date_period_pref")
     var dateOfPeriodPref: DateTypePref = DateTypePref()
 
 ) {
@@ -87,6 +87,7 @@ class PrefForTextView(
 
 open class TextTypePref(
     @SerializedName("pftv")
+    @Embedded
     var prefForTextView: PrefForTextView = PrefForTextView().apply {
         textSize = 14
     }

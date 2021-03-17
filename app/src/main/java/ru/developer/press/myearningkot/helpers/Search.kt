@@ -1,6 +1,7 @@
 package ru.developer.press.myearningkot.helpers
 
-import ru.developer.press.myearningkot.model.Card
+import ru.developer.press.myearningkot.database.Card
+
 
 sealed class Search
 

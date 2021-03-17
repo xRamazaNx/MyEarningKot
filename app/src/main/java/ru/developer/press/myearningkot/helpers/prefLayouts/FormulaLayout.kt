@@ -84,7 +84,7 @@ class FormulaLayout(
                 setOnClickListener {
                     elementList.add(Formula.FormulaElement().apply {
                         type = TOTAL_ID
-                        value = total.id.toString()
+                        value = total.idToFormula.toString()
                     })
 
                     displayFormula()
@@ -106,7 +106,7 @@ class FormulaLayout(
                 setOnClickListener {
                     elementList.add(Formula.FormulaElement().apply {
                         type = COLUMN_ID
-                        value = column.refId
+                        value = column.idToFormula.toString()
                     })
 
                     displayFormula()

@@ -45,12 +45,12 @@ import org.jetbrains.anko.textColorResource
 import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.App.Companion.app
 import ru.developer.press.myearningkot.adapters.AdapterViewPagerFromMain
+import ru.developer.press.myearningkot.database.Card
+import ru.developer.press.myearningkot.database.DataController
+import ru.developer.press.myearningkot.database.Page
 import ru.developer.press.myearningkot.databinding.ActivityMainBinding
 import ru.developer.press.myearningkot.dialogs.DialogSetName
 import ru.developer.press.myearningkot.helpers.*
-import ru.developer.press.myearningkot.model.Card
-import ru.developer.press.myearningkot.database.DataController
-import ru.developer.press.myearningkot.database.Page
 import ru.developer.press.myearningkot.viewmodels.MainViewModel
 import ru.developer.press.myearningkot.viewmodels.ViewModelMainFactory
 

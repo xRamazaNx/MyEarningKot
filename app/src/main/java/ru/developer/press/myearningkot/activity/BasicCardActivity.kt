@@ -24,8 +24,8 @@ import ru.developer.press.myearningkot.adapters.AdapterRecyclerInCard
 import ru.developer.press.myearningkot.databinding.ActivityCardBinding
 import ru.developer.press.myearningkot.helpers.bindTitleOfColumn
 import ru.developer.press.myearningkot.helpers.getColorFromRes
-import ru.developer.press.myearningkot.model.createViewInPlate
-import ru.developer.press.myearningkot.model.updateTotalAmount
+import ru.developer.press.myearningkot.helpers.scoups.createViewInPlate
+import ru.developer.press.myearningkot.helpers.scoups.updateTotalAmount
 import ru.developer.press.myearningkot.viewmodels.CardViewModel
 
 @SuppressLint("Registered")

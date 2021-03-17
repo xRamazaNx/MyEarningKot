@@ -26,13 +26,15 @@ import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.App.Companion.app
 import ru.developer.press.myearningkot.adapters.animationAdd
 import ru.developer.press.myearningkot.adapters.animationDelete
+import ru.developer.press.myearningkot.database.Card
 import ru.developer.press.myearningkot.database.DataController
 import ru.developer.press.myearningkot.dialogs.PICK_IMAGE_MULTIPLE
 import ru.developer.press.myearningkot.dialogs.editCellTag
 import ru.developer.press.myearningkot.helpers.EditCellControl
-import ru.developer.press.myearningkot.database.PrefCardInfo
 import ru.developer.press.myearningkot.helpers.getColorFromRes
 import ru.developer.press.myearningkot.helpers.getDrawableRes
+import ru.developer.press.myearningkot.helpers.scoups.getSelectedRows
+import ru.developer.press.myearningkot.helpers.scoups.hideAddTotalButton
 import ru.developer.press.myearningkot.model.*
 import ru.developer.press.myearningkot.viewmodels.CardViewModel
 import ru.developer.press.myearningkot.viewmodels.CardViewModel.SelectMode
@@ -48,7 +50,7 @@ open class CardActivity : BasicCardActivity() {
             val data = it.data
             if (data != null) {
                 val id = data.getStringExtra(CARD_ID)?:""
-                if (id!!.isNotEmpty()) {
+                if (id.isNotEmpty()) {
                     if (viewModel == null) {
                         recreate()
                     } else {
@@ -107,8 +109,8 @@ open class CardActivity : BasicCardActivity() {
 
             override fun onAnimationEnd(p0: Animation?) {
                 viewModel?.apply {
-                    deleteRows { indexDel: Int ->
-                        adapter.notifyItemRemoved(indexDel)
+                    deleteRows { first, last ->
+                        adapter.notifyItemRangeRemoved(first, last)
                     }
                     selectMode.value = SelectMode.NONE
                 }
@@ -646,7 +648,7 @@ open class CardActivity : BasicCardActivity() {
             selectCell.sourceValue
         ) { newValue ->
             selectCell.sourceValue = newValue
-            viewModel?.updateCardIntoDB()
+            viewModel?.updateEditCellRow()
             updateTypeControlColumn(cellSelectPosition)
             if (column is NumberColumn) {
                 card.columns.filterIsInstance<NumberColumn>().forEach {

@@ -4,8 +4,8 @@ package ru.developer.press.myearningkot
 import android.content.Context
 import android.view.View
 import androidx.lifecycle.MutableLiveData
+import ru.developer.press.myearningkot.database.Card
 import ru.developer.press.myearningkot.database.Page
-import ru.developer.press.myearningkot.model.Card
 import ru.developer.press.myearningkot.model.Column
 import ru.developer.press.myearningkot.model.Prefs
 import ru.developer.press.myearningkot.model.Row
@@ -29,10 +29,11 @@ interface ProvideDataCards : ProvideData {
 }
 
 // для получения данных списка записей реализатор CardViewModel
-interface ProvideDataRows{
+interface ProvideDataRows {
     val sortedRows: MutableList<Row>
 
     fun getColumns(): MutableList<Column>
+
     // отдает ширину или мачпарент или ширину дисплея
     fun getWidth(): Int
 
@@ -44,9 +45,9 @@ interface ProvideDataRows{
 }
 
 interface ProvideValueProperty {
-    fun getWidthColumn():Int
-    var provideCardPropertyForCell :ProvideCardPropertyForCell
-    var typePref : Prefs?
+    fun getWidthColumn(): Int
+    var provideCardPropertyForCell: ProvideCardPropertyForCell
+    var typePref: Prefs?
 }
 
 
@@ -73,17 +74,17 @@ interface RowDataListener {
 interface CellTypeControl {
     fun display(view: View, value: String)
 }
+
 interface ColumnTypeControl : CellTypeControl {
     fun createCellView(context: Context): View
     override fun display(view: View, value: String)
 }
 
-interface ProvideCardPropertyForCell{
-    fun isSingleLine ():Boolean
-    fun getValutaType():Int
+interface ProvideCardPropertyForCell {
+    fun isSingleLine(): Boolean
+    fun getValutaType(): Int
 }
 
-interface JsonValue {
-    var json :String
+interface FormulaId {
+    var idToFormula: Long
 }
-

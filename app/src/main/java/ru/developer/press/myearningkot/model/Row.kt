@@ -11,7 +11,6 @@ import ru.developer.press.myearningkot.database.IdsRef
 import java.util.*
 
 class Row(pageId:String, cardId:String) : IdsRef(pageId, cardId), Backgrounder {
-    var status = Status.NONE
     fun crossOut(itemView: View, isCrossOut: Boolean) {
         val frameLayout = itemView as FrameLayout
         if (isCrossOut) {
@@ -25,8 +24,12 @@ class Row(pageId:String, cardId:String) : IdsRef(pageId, cardId), Backgrounder {
         }
     }
 
+    var status = Status.NONE
+    @Transient
     override var currentBackground: Int = -1
+    @Transient
     override lateinit var elementView: View
+
     var cellList = mutableListOf<Cell>()
 
 

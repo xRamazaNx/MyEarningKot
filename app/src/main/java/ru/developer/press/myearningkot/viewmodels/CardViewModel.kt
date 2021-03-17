@@ -12,8 +12,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.developer.press.myearningkot.ProvideDataRows
+import ru.developer.press.myearningkot.database.Card
 import ru.developer.press.myearningkot.database.DataController
 import ru.developer.press.myearningkot.database.Page
+import ru.developer.press.myearningkot.helpers.scoups.*
 import ru.developer.press.myearningkot.model.*
 
 open class CardViewModel(context: Context, var card: Card) : ViewModel(),
@@ -46,24 +48,24 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     }
 
     private fun updateCardLD() {
-        cardLiveData.value = card
-        titleLiveData.value = card.name
+        cardLiveData.postValue(card)
+        titleLiveData.postValue(card.name)
 
         columnLDList.clear()
         card.apply {
             columns.forEach {
-                columnLDList.add(MutableLiveData<Column>().apply { value = it })
+                columnLDList.add(MutableLiveData<Column>().apply { postValue(it) })
             }
 
         }
     }
 
     fun updatePlateChanged() {
-        cardLiveData.value = card
+        cardLiveData.postValue(card)
     }
 
     fun updateTotals() {
-        totalLiveData.value = card
+        totalLiveData.postValue(card)
     }
 
     private fun updateTypeControl() {
@@ -302,7 +304,8 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
         return card.addRow().apply {
             sortList()
             viewModelScope.launch {
-                dataController.updateCard(card)
+                dataController.addRow(this@apply)
+                status = Row.Status.ADDED
             }
         }
     }
@@ -402,42 +405,56 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     }
 
     fun pasteCell(copyCell: Cell?, updateRow: (Int) -> Unit) {
-        if (isEqualTypeCellAndCopyCell(copyCell))
-            card.rows.forEachIndexed { indexRow, row ->
-                row.cellList.forEachIndexed { indexCell, cell ->
-                    if (cell.isSelect) {
-                        copyCell?.let {
-                            cell.sourceValue = it.sourceValue
-                            updateTypeControlColumn(indexCell)//
-                            updateTotals()
+        viewModelScope.launch {
+
+            if (isEqualTypeCellAndCopyCell(copyCell))
+                card.rows.forEachIndexed { indexRow, row ->
+                    row.cellList.forEachIndexed { indexCell, cell ->
+                        if (cell.isSelect) {
+                            copyCell?.let {
+                                cell.sourceValue = it.sourceValue
+                                updateRowToDB(row)
+                                updateTypeControlColumn(indexCell)//
+                                updateTotals()
+                            }
+
+                            withContext(Dispatchers.Main) {
+                                updateRow(indexRow)
+                            }
+                            return@launch
                         }
-                        updateRow(indexRow)
-                        return
                     }
                 }
-            }
+        }
+    }
+
+    private fun updateRowToDB(row: Row) {
+        viewModelScope.launch {
+            updatedCardStatus.postValue(true)
+            dataController.updateRow(row)
+            updatedCardStatus.postValue(false)
+        }
     }
 
     fun getSelectedCellType(): ColumnType? {
         return card.getSelectedCell()?.type
     }
 
-    fun deleteRows(updateView: (Int) -> Unit) {
+    fun deleteRows(updateView: (Int, Int) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            var delIndex = 0
-            sortedRows.forEach { r ->
-                if (r.status == Row.Status.DELETED) {
-                    r.status = Row.Status.NONE
-                    withContext(Dispatchers.Main) {
-                        updateView(delIndex)
-                    }
-                    delIndex--
-                    card.rows.remove(r)
-                }
-                delIndex++
+            val deletedRows: List<Row> = sortedRows.filter { it.status == Row.Status.DELETED }
+            val indexOfFirst = sortedRows.indexOfFirst { it.status == Row.Status.DELETED }
+            val indexOfLast = sortedRows.indexOfLast { it.status == Row.Status.DELETED }
+            deletedRows.forEach {
+                it.status = Row.Status.NONE
+            }
+            card.rows.removeAll(deletedRows)
+
+            withContext(Dispatchers.Main) {
+                updateView(indexOfFirst, indexOfLast)
             }
             sortList()
-            dataController.updateCard(card)
+            dataController.deleteRows(deletedRows)
         }
         // сортировка листа и обновлении происходит после анимации удаления
     }
@@ -450,34 +467,39 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     }
 
     fun pasteRows() {
-        val selectedRowList = card.getSelectedRows()
-        // самый нижний элемент чтобы вставить туда
-        val i = selectedRowList.size - 1
-        val element = selectedRowList[i]
-        val indexLastRow = card.rows.indexOf(element)
+        viewModelScope.launch {
 
-        copyRowList?.let { copyList ->
+            val selectedRowList = card.getSelectedRows()
+            // самый нижний элемент чтобы вставить туда
+            val i = selectedRowList.size - 1
+            val element = selectedRowList[i]
+            val indexLastRow = card.rows.indexOf(element)
 
+            copyRowList?.let { copyList ->
 
-            if (isCapabilityPaste()) {
-                // выделенные строки ниже которых надо добавить
-                selectedRowList.forEach { it.status = Row.Status.NONE }
+                if (isCapabilityPaste()) {
+                    // выделенные строки ниже которых надо добавить
+                    selectedRowList.forEach { it.status = Row.Status.NONE }
 
-                // отдельный лист чтоб копировать элементы а не ссылки на них потому что в копилист бывают ссылки
-                val list = mutableListOf<Row>()
-                // добавляем в лист копии методом .копи
-                copyList.forEach {
-                    list.add(it.copy().apply {
-                        status = Row.Status.ADDED
-                    }) //  копируемый ров
+                    // отдельный лист чтоб копировать элементы а не ссылки на них потому что в копилист бывают ссылки
+                    val list = mutableListOf<Row>()
+                    // добавляем в лист копии методом .копи
+                    copyList.forEach {
+                        list.add(it.copy().apply {
+                            status = Row.Status.ADDED
+                        }) //  копируемый ров
+                    }
+                    card.rows.addAll(indexLastRow + 1, list)
+                    list.forEach {
+                        dataController.addRow(it)
+                    }
+                    updateTypeControl()
+                    sortList()
+                    updateTotals()
+
                 }
-                card.rows.addAll(indexLastRow + 1, list)
-                updateTypeControl()
-                sortList()
-                updateTotals()
 
             }
-
         }
     }
 
@@ -516,16 +538,16 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
         rows.forEach {
             it.status = Row.Status.NONE
         }
-        val lastRow = rows[rows.size - 1]
-        lastRow.status = Row.Status.SELECT
+        sortList()
+        sortedRows.last().status = Row.Status.SELECT
         pasteRows()
     }
 
-    fun updateCardIntoDB() = viewModelScope.launch {
-        updatedCardStatus.value = true
-        dataController.updateCard(card)
-        updatedCardStatus.value = false
-        updateTotals()
+    fun updateEditCellRow() {
+        viewModelScope.launch {
+            updateRowToDB(sortedRows[rowSelectPosition])
+            updateTotals()
+        }
     }
 
     enum class SelectMode {
@@ -533,7 +555,10 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     }
 }
 
-class ViewModelMainFactory(private val context: Context, private val pageList: MutableList<Page>) :
+class ViewModelMainFactory(
+    private val context: Context,
+    private val pageList: MutableList<Page>
+) :
     ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return MainViewModel(context, pageList) as T

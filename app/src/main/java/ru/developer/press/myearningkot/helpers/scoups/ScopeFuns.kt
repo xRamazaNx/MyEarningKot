@@ -1,4 +1,4 @@
-package ru.developer.press.myearningkot.model
+package ru.developer.press.myearningkot.helpers.scoups
 
 import android.text.TextUtils
 import android.view.Gravity
@@ -12,6 +12,7 @@ import kotlinx.android.synthetic.main.total_item_value.view.*
 import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.activity.CardActivity
+import ru.developer.press.myearningkot.database.Card
 import kotlinx.android.synthetic.main.total_item_layout.view.totalValueContainer as totalValueContainer1
 
 fun Card.createViewInPlate(plateView: View) {
