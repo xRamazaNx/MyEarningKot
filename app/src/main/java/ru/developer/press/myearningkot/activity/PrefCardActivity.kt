@@ -891,6 +891,7 @@ class PrefCardActivity : BasicCardActivity() {
                                     updatePlate()
                                 }
                             }
+                            true
                         }
                         .show(supportFragmentManager, "setNameElement")
                 }

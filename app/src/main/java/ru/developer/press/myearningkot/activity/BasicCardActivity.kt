@@ -71,7 +71,6 @@ abstract class BasicCardActivity : AppCompatActivity() {
             observePlate()
             observeTotals()
         }
-//        tableView.horizontalScrollView.columnsScrollView = columnScrollContainer
         updateHorizontalScrollSwitched()
         createRecyclerView()
     }
@@ -140,8 +139,7 @@ abstract class BasicCardActivity : AppCompatActivity() {
     fun createTitles() {
         columnContainer.removeAllViews()
         viewModel?.columnLDList?.forEach { column ->
-            val title: TextView =
-                layoutInflater.inflate(R.layout.title_column, null) as TextView
+            val title: TextView = layoutInflater.inflate(R.layout.title_column, null) as TextView
             column.observe(this@BasicCardActivity, Observer {
                 bindTitleOfColumn(it, title)
             })

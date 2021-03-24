@@ -1,19 +1,27 @@
 package ru.developer.press.myearningkot.database
 
 import android.content.Context
-import androidx.lifecycle.MutableLiveData
 import androidx.room.Transaction
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
+import ru.developer.press.myearningkot.App
 import ru.developer.press.myearningkot.R
+import ru.developer.press.myearningkot.database.FireStore.RefType.*
+import ru.developer.press.myearningkot.helpers.MyLiveData
+import ru.developer.press.myearningkot.helpers.liveData
+import ru.developer.press.myearningkot.helpers.runOnMain
+import ru.developer.press.myearningkot.helpers.scoups.calcTotals
 import ru.developer.press.myearningkot.helpers.scoups.updateTypeControl
 import ru.developer.press.myearningkot.model.ListType
 import ru.developer.press.myearningkot.model.Row
 import ru.developer.press.myearningkot.model.Total
 
 val gson = Gson()
+
 class DataController(context: Context) {
 
     private val sampleDao: SampleDao
@@ -27,7 +35,6 @@ class DataController(context: Context) {
 
     private val fireStore = FireStore()
     private val dispatcher = Dispatchers.Default
-
 
     private fun inflateCard(card: Card): Card {
         // add columns
@@ -44,10 +51,12 @@ class DataController(context: Context) {
         // add totals
         val totalRefs = totalDao.getAllOf(card.refId)
         val totals = totalRefs.fold(mutableListOf<Total>()) { list, totalRef ->
-            list.add(gson.fromJson(totalRef.json, Total::class.java))
+            val total = gson.fromJson(totalRef.json, Total::class.java)
+            list.add(total)
             list
         }
         card.totals.addAll(totals)
+        card.calcTotals()
 
         return card
     }
@@ -77,6 +86,167 @@ class DataController(context: Context) {
         columnDao = database.columnDao()
         rowDao = database.rowDao()
         totalDao = database.totalDao()
+    }
+
+    suspend fun syncRefs() {
+        withContext(Dispatchers.IO) {
+            val pageList = getPageList()
+            pageList.forEach { pageDB ->
+                val pageFire: Page? = fireStore.getRef(FireStore.ChangedRef(PAGE, pageDB.refId))
+                val pageWithName = fireStore.pageWithName(pageDB.name)
+                val newPage = when {
+                    // если нет такой вкладки на сервере и нет с таким же именем
+                    pageFire == null && pageWithName == null -> {
+                        fireStore.addPage(pageDB)
+                        pageDB
+                    }
+                    pageFire == null && pageWithName != null -> {
+                        replacePageInDB(pageDB, pageWithName)
+                        pageWithName
+                    }
+                    else -> {
+                        when {
+                            pageFire!!.dateChange > pageDB.dateChange -> {
+                                pageDao.insert(pageFire)
+                                pageFire
+                            }
+                            pageFire.dateChange < pageDB.dateChange -> {
+                                fireStore.addPage(pageDB)
+                                pageDB
+                            }
+                            else -> null
+                        }
+                    }
+                }
+                newPage?.let { changedPage ->
+                    val changedRef: FireStore.ChangedRef =
+                        FireStore.ChangedRef(PAGE, changedPage.refId)
+                            .apply { name = changedPage.name }
+                    runOnMain {
+                        App.fireStoreChanged.value = changedRef
+                    }
+                }
+            }
+            fireStore.setSyncListener { changedRef ->
+                GlobalScope.launch {
+                    var newChangedRef: FireStore.ChangedRef? = null
+                    when (changedRef.type) {
+                        PAGE -> {
+                            val pageDB = pageDao.getById(changedRef.refId)
+                            val pageFire = fireStore.getRef<Page>(changedRef)!!
+                            // если нет то значит и так новое
+                            newChangedRef =
+                                if (pageDB != null) {
+                                    when {
+                                        // если в базе дата старая чем в фиресторе
+                                        pageDB.dateChange < pageFire.dateChange -> {
+                                            pageDao.update(pageFire)
+                                            FireStore.ChangedRef(PAGE, pageFire.refId)
+                                                .apply { name = pageFire.name }
+                                        }
+                                        // если в базе дата новая чем в фиресторе
+                                        pageDB.dateChange > pageFire.dateChange -> {
+                                            fireStore.addPage(pageDB)
+                                            FireStore.ChangedRef(PAGE, pageDB.refId)
+                                                .apply { name = pageDB.name }
+                                        }
+                                        else -> null
+                                    }
+                                } else {
+                                    val findEqualNamesPage =
+                                        pageDao.getAll().find { it.name == pageFire.name }
+
+                                    if (findEqualNamesPage != null) {
+                                        replacePageInDB(findEqualNamesPage, pageFire)
+                                    } else {
+                                        pageDao.insert(pageFire)
+                                    }
+                                    FireStore.ChangedRef(PAGE, pageFire.refId)
+                                        .apply { name = pageFire.name }
+                                }
+                        }
+                        CARD -> {
+                            val cardDB = cardDao.getById(changedRef.refId)
+                            val cardFire = fireStore.getRef<Card>(changedRef)!!
+
+                            if (cardDB != null) {
+                                if (cardDB.dateChange < cardFire.dateChange) {
+                                    cardDao.update(cardFire)
+                                } else {
+                                    fireStore.addCard(cardDB)
+                                }
+                            } else {
+                                cardDao.insert(cardFire)
+                            }
+                        }
+                        COLUMN -> {
+                            val columnDB: ColumnJson? = columnDao.getById(changedRef.refId)
+                            val columnFire = fireStore.getRef<ColumnJson>(changedRef)!!
+
+                            if (columnDB != null) {
+                                if (columnDB.dateChange < columnFire.dateChange) {
+                                    columnDao.update(columnFire)
+                                } else {
+                                    fireStore.addJsonValue(columnDB, COLUMN_PATH)
+                                }
+                            } else {
+                                columnDao.insert(columnFire)
+                            }
+                        }
+                        ROW -> {
+                            val rowDB: RowJson? = rowDao.getById(changedRef.refId)
+                            val rowFire = fireStore.getRef<RowJson>(changedRef)!!
+
+                            if (rowDB != null) {
+                                if (rowDB.dateChange < rowFire.dateChange) {
+                                    rowDao.update(rowFire)
+                                } else {
+                                    fireStore.addJsonValue(rowDB, ROW_PATH)
+                                }
+                            } else {
+                                rowDao.insert(rowFire)
+                            }
+                        }
+                        TOTAL -> {
+                            val totalDB: TotalJson? = totalDao.getById(changedRef.refId)
+                            val totalFire = fireStore.getRef<TotalJson>(changedRef)!!
+
+                            if (totalDB != null) {
+                                if (totalDB.dateChange < totalFire.dateChange) {
+                                    totalDao.update(totalFire)
+                                } else {
+                                    fireStore.addJsonValue(totalDB, TOTAL_PATH)
+                                }
+                            } else {
+                                totalDao.insert(totalFire)
+                            }
+                        }
+                    }
+                    newChangedRef?.let {
+                        runOnMain {
+                            App.fireStoreChanged.value = it
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Transaction
+    private fun replacePageInDB(
+        from: Page,
+        to: Page
+    ) {
+        // все карточки из вкладки
+        val cards = cardDao.getAllOf(from.refId)
+        // удаляем вкладку (обновить не получится так как обновить можно только по ид а ид приходится менять)
+        pageDao.delete(from.refId)
+        // переназначаем им новый ид вкладки
+        cards.forEach {
+            it.pageId = to.refId
+            cardDao.update(it)
+        }
+        pageDao.insert(to)
     }
 
     @Transaction
@@ -114,31 +284,37 @@ class DataController(context: Context) {
 
     suspend fun getCard(refId: String): Card {
         return withContext(dispatcher) {
-            inflateCard(cardDao.getById(refId)).apply { updateTypeControl() }
+            inflateCard(cardDao.getById(refId)!!).apply { updateTypeControl() }
         }
     }
 
-    suspend fun addPage(pageName: String): Page {
+    suspend fun addPage(pageName: String, position: Int): Page {
         return withContext(dispatcher) {
             val page = Page(pageName)
+            page.position = position
             fireStore.addPage(page)
             pageDao.insert(page)
             page
         }
     }
 
+    private suspend fun inflatePage(page: Page) {
+        val cards = cardDao.getAllOf(page.refId)
+        cards.forEach { card ->
+            inflateCard(card)
+            page.cards.add(runOnMain { liveData(card) })
+        }
+    }
+
     suspend fun getPageList(): MutableList<Page> {
         return withContext(dispatcher) {
             val pageList = pageDao.getAll().toMutableList()
+            pageList.sortBy { it.position }
             pageList.find { it.name == samplePageName }?.let { samplePage ->
                 pageList.remove(samplePage)
             }
             pageList.forEach { page ->
-                val cards = cardDao.getAllOf(page.refId)
-                cards.forEach { card ->
-                    inflateCard(card)
-                    page.cards.add(MutableLiveData<Card>().apply { postValue(card) })
-                }
+                inflatePage(page)
             }
             pageList.toMutableList()
         }
@@ -168,12 +344,15 @@ class DataController(context: Context) {
     }
 
     fun updatePage(page: Page) {
-        doAsync { pageDao.update(page) }
+        doAsync {
+            page.dateChange = System.currentTimeMillis()
+            pageDao.update(page)
+        }
     }
 
     suspend fun getSampleCard(sampleID: String): Card {
         return withContext(dispatcher) {
-            inflateCard(sampleDao.getByRefId(sampleID)) as Card
+            inflateCard(sampleDao.getByRefId(sampleID)!!) as Card
         }
     }
 
@@ -219,6 +398,7 @@ class DataController(context: Context) {
     @Transaction // для обновления всей карточки после настройки
     suspend fun updateCard(card: Card) {
         withContext(dispatcher) {
+            card.dateChange = System.currentTimeMillis()
             cardDao.update(card)
             // удалить все имеющиеся колоны этой карточки
             val columnsFromDB = columnDao.getAllOf(card.refId)
@@ -284,6 +464,12 @@ class DataController(context: Context) {
             val jsonValue = row.rowJson()
             rowDao.update(jsonValue)
             fireStore.addJsonValue(jsonValue, ROW_PATH)
+        }
+    }
+
+    suspend fun getPage(pageId: String): Page? {
+        return withContext(Dispatchers.IO) {
+            pageDao.getById(pageId)?.also { inflatePage(it) }
         }
     }
 }

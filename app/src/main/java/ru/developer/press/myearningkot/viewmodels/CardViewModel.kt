@@ -4,7 +4,6 @@ package ru.developer.press.myearningkot.viewmodels
 
 import android.content.Context
 import android.widget.LinearLayout
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -15,6 +14,9 @@ import ru.developer.press.myearningkot.ProvideDataRows
 import ru.developer.press.myearningkot.database.Card
 import ru.developer.press.myearningkot.database.DataController
 import ru.developer.press.myearningkot.database.Page
+import ru.developer.press.myearningkot.helpers.MyLiveData
+import ru.developer.press.myearningkot.helpers.liveData
+import ru.developer.press.myearningkot.helpers.runOnIO
 import ru.developer.press.myearningkot.helpers.scoups.*
 import ru.developer.press.myearningkot.model.*
 
@@ -22,23 +24,25 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     ProvideDataRows {
 
     // статус занесения изменений карточки в базу данных
-    val updatedCardStatus: MutableLiveData<Boolean> = MutableLiveData(false)
+    val updatedCardStatus: MyLiveData<Boolean> = liveData(false)
     var cellSelectPosition: Int = -1
     var rowSelectPosition: Int = -1
-    var selectMode = MutableLiveData<SelectMode>().apply {
-        value =
-            SelectMode.NONE
-    }
-    val titleLiveData = MutableLiveData<String>()
+    var selectMode = liveData(SelectMode.NONE)
+    val titleLiveData = liveData(card.name)
     val displayParam = DisplayParam()
-    val cardLiveData = MutableLiveData<Card>()
-    val totalLiveData = MutableLiveData<Card>()
+    val cardLiveData = liveData(card)
+    val totalLiveData = liveData(card)
     var copyRowList: MutableList<Row>? = null
 
-    var columnLDList = mutableListOf<MutableLiveData<Column>>()
+    var columnLDList = mutableListOf<MyLiveData<Column>>()
 
     override val sortedRows: MutableList<Row> = mutableListOf()
 
+    init {
+        sortList()
+        updateColumnDL()
+        updateCardLD()
+    }
     override fun getColumns(): MutableList<Column> = card.columns
     override fun getWidth(): Int {
         return if (cardLiveData.value!!.enableHorizontalScroll)
@@ -54,7 +58,7 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
         columnLDList.clear()
         card.apply {
             columns.forEach {
-                columnLDList.add(MutableLiveData<Column>().apply { postValue(it) })
+                columnLDList.add(liveData(it))
             }
 
         }
@@ -107,13 +111,6 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
 
     fun addColumnSample(columnType: ColumnType, name: String) {
         card.addColumnSample(columnType, name)
-        updateCardLD()
-    }
-
-
-    init {
-        sortList()
-        updateColumnDL()
         updateCardLD()
     }
 
@@ -304,6 +301,7 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
         return card.addRow().apply {
             sortList()
             viewModelScope.launch {
+                card.calcTotals()
                 dataController.addRow(this@apply)
                 status = Row.Status.ADDED
             }
@@ -406,7 +404,6 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
 
     fun pasteCell(copyCell: Cell?, updateRow: (Int) -> Unit) {
         viewModelScope.launch {
-
             if (isEqualTypeCellAndCopyCell(copyCell))
                 card.rows.forEachIndexed { indexRow, row ->
                     row.cellList.forEachIndexed { indexCell, cell ->
@@ -428,9 +425,10 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
         }
     }
 
-    private fun updateRowToDB(row: Row) {
-        viewModelScope.launch {
+    private suspend fun updateRowToDB(row: Row) {
+        runOnIO {
             updatedCardStatus.postValue(true)
+            card.calcTotals()
             dataController.updateRow(row)
             updatedCardStatus.postValue(false)
         }
@@ -545,7 +543,8 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
 
     fun updateEditCellRow() {
         viewModelScope.launch {
-            updateRowToDB(sortedRows[rowSelectPosition])
+            val row = sortedRows[rowSelectPosition]
+            updateRowToDB(row)
             updateTotals()
         }
     }

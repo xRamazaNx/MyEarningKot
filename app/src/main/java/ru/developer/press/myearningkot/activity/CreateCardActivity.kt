@@ -31,7 +31,7 @@ class CreateCardActivity : AppCompatActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             val data = it.data
             if (data != null) {
-                val id = data.getStringExtra(CARD_ID)?:""
+                val id = data.getStringExtra(CARD_ID) ?: ""
                 if (id.isNotEmpty()) {
                     lifecycleScope.launch {
                         viewModel.updateSamples {
@@ -50,9 +50,10 @@ class CreateCardActivity : AppCompatActivity() {
             viewModel = ViewModelProvider(
                 this@CreateCardActivity,
                 ViewModelProvider.NewInstanceFactory()
-            ).get(
-                CreateCardViewModel::class.java
-            ).apply { create(this@CreateCardActivity) }
+            ).get(CreateCardViewModel::class.java)
+                .apply {
+                    create(this@CreateCardActivity)
+                }
             adapter = viewModel.getAdapter()
             withContext(Dispatchers.Main) {
                 recycler.layoutManager = LinearLayoutManager(this@CreateCardActivity)

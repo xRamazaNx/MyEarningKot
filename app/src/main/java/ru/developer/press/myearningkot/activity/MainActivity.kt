@@ -18,9 +18,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.unit.dp
+import androidx.core.animation.doOnEnd
 import androidx.core.content.res.ResourcesCompat
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.MarginPageTransformer
 import co.zsmb.materialdrawerkt.builders.accountHeader
@@ -39,14 +39,14 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.mikepenz.materialdrawer.Drawer
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
-import org.jetbrains.anko.collections.forEachReversedWithIndex
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.textColorResource
 import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.App.Companion.app
-import ru.developer.press.myearningkot.adapters.AdapterViewPagerFromMain
+import ru.developer.press.myearningkot.adapters.AdapterViewPagerToMain
 import ru.developer.press.myearningkot.database.Card
 import ru.developer.press.myearningkot.database.DataController
+import ru.developer.press.myearningkot.database.FireStore
 import ru.developer.press.myearningkot.database.Page
 import ru.developer.press.myearningkot.databinding.ActivityMainBinding
 import ru.developer.press.myearningkot.dialogs.DialogSetName
@@ -54,10 +54,9 @@ import ru.developer.press.myearningkot.helpers.*
 import ru.developer.press.myearningkot.viewmodels.MainViewModel
 import ru.developer.press.myearningkot.viewmodels.ViewModelMainFactory
 
-class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
+class MainActivity : AppCompatActivity(), ProvideDataCards {
     private lateinit var drawer: Drawer
-    private lateinit var adapterViewPagerFromMain: AdapterViewPagerFromMain
-    private val initObserver = MutableLiveData<(() -> Unit)>()
+    private lateinit var adapterViewPagerToMain: AdapterViewPagerToMain
     private val registerForActivityResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             val id: String? = it.data?.getStringExtra(CreateCardActivity.createCardID)
@@ -66,7 +65,7 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
                 if (id.isNotEmpty()) {
                     val indexPage = tabs.selectedTabPosition
                     viewModel.createCard(indexPage, id, name ?: "") { positionCard ->
-                        adapterViewPagerFromMain.scrollToPosition(
+                        adapterViewPagerToMain.insertCardToPosition(
                             indexPage,
                             positionCard
                         )
@@ -75,7 +74,6 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
                 }
             }
         }
-
     private var initializerViewModel: Job = GlobalScope.launch(Dispatchers.Main) {
         val pageList = withContext(Dispatchers.IO) {
             DataController(this@MainActivity).getPageList()
@@ -87,10 +85,6 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
             MainViewModel::class.java
         )
         root.progressBar.visibility = GONE
-        initObserver.value = {
-            viewModel.calcAllCards()
-            viewInit()
-        }
     }
 
     private lateinit var viewModel: MainViewModel
@@ -102,14 +96,24 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
         root = ActivityMainBinding.inflate(layoutInflater)
         setContentView(root.root)
         setSupportActionBar(root.toolbar)
-        // он должен быть тут первым а то статусбар внизу оказывается из за поздей инициализации
+        // он должен быть тут первым а то статусбар внизу оказывается из-за поздней инициализации
         initDrawer()
         root.toolbar.setTitleTextColor(getColorFromRes(R.color.colorOnPrimary))
 
         initializerViewModel.start()
-        initObserver.observe(this, {
-            it?.invoke()
-        })
+        initializerViewModel.invokeOnCompletion {
+            viewModel.calcAllCards()
+            viewInit()
+            App.fireStoreChanged.observe(this, observer { changedRef ->
+                if (changedRef.type == FireStore.RefType.PAGE) {
+                    viewModel.changedPage(changedRef) {
+                        runOnUiThread {
+                            initTabAndViewPager()
+                        }
+                    }
+                }
+            })
+        }
     }
 
     private fun viewInit() {
@@ -155,32 +159,32 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
         root.addPageButton.setOnClickListener {
             DialogSetName().setTitle(getString(R.string.create_page))
                 .setPositiveListener { pageName ->
-                    viewModel.addPage(pageName) { _: Page ->
-                        adapterViewPagerFromMain.addPage()
-                        linkViewPagerAndTabs()
-                        root.tabs.postDelayed({
-                            root.tabs.getTabAt(root.tabs.tabCount - 1)?.select()
-                        }, 200)
+                    viewModel.addPage(pageName) { page: Page? ->
+                        if (page == null) {
+                            toast("Вкладка с таким именем существует!")
+                        } else {
+                            adapterViewPagerToMain.addPage(page.refId)
+                            linkViewPagerAndTabs()
+                            root.tabs.postDelayed({
+                                root.tabs.getTabAt(root.tabs.tabCount - 1)?.select()
+                            }, 200)
+                        }
                     }
 
                 }.show(supportFragmentManager, "setName")
         }
-        val pages = viewModel.getPages()
-        pages.forEachReversedWithIndex { index, it ->
-            it.observe(this@MainActivity, Observer {
-                root.tabs.getTabAt(index)?.select()
-            })
-        }
     }
 
     private fun initTabAndViewPager() {
-        this.adapterViewPagerFromMain = AdapterViewPagerFromMain(
+        this.adapterViewPagerToMain = AdapterViewPagerToMain(
             supportFragmentManager,
             lifecycle,
             viewModel
         )
-        root.viewPager.adapter = adapterViewPagerFromMain
-        root.viewPager.setPageTransformer(MarginPageTransformer(dip(4)))
+        val viewPager = root.viewPager
+        viewPager.offscreenPageLimit = 5
+        viewPager.adapter = adapterViewPagerToMain
+        viewPager.setPageTransformer(MarginPageTransformer(dip(4)))
 
         linkViewPagerAndTabs()
     }
@@ -228,7 +232,7 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
                 onProfileChanged { view: View, profile, _ ->
                     if (currentUser == null) {
                         login()
-                    } else{
+                    } else {
                         popupMenu {
                             section {
                                 item {
@@ -315,7 +319,9 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
             // Successfully signed in
             if (it.resultCode == RESULT_OK) {
                 response?.let {
-                    initDrawer() }
+                    initDrawer()
+                    viewModel.loginSuccess()
+                }
                 return@registerForActivityResult
             } else {
                 // Sign in failed
@@ -358,7 +364,8 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
             .build()
         loginRegister.launch(build)
     }
-    private fun logOut(){
+
+    private fun logOut() {
         AuthUI.getInstance().signOut(this)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -374,16 +381,12 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
     override fun onResume() {
         super.onResume()
         initializerViewModel.invokeOnCompletion {
-            viewModel.checkUpdatedCard()
+            viewModel.checkUpdatedCard(tabs.selectedTabPosition)
         }
     }
 
     override fun getSize(): Int {
         return viewModel.getPages()[root.tabs.selectedTabPosition].value!!.cards.size
-    }
-
-    override fun cardClick(idCard: String) {
-        viewModel.cardClick(idCard)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -423,21 +426,14 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
     }
 
     private fun linkViewPagerAndTabs() {
-        val nameList = mutableListOf<String>().apply {
-            repeat(viewModel.getPageCount()) {
-                add(viewModel.getTabName(it))
-            }
-        }
-        val context = root.tabs.context
         TabLayoutMediator(root.tabs, root.viewPager) { tab, position ->
-            val tabTextView = TextView(context).apply {
+            val tabTextView = TextView(this).apply {
                 textSize = 16f
                 isSingleLine = true
                 layoutParams = TableLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT).apply {
                     weight = 0f
                 }
                 gravity = Gravity.CENTER
-                text = nameList[position]
 
                 setFont(R.font.roboto_medium)
                 textColorResource = R.color.textColorTabsTitleNormal
@@ -455,7 +451,17 @@ class MainActivity : AppCompatActivity(), ProvideDataCards, CardClickListener {
                 }
             }
         }.attach()
-
+        viewModel.getPages().forEachIndexed { index, myLiveData ->
+            myLiveData.observe(this, observer { page ->
+                val customView = tabs.getTabAt(index)?.customView
+                (customView as TextView).text = page.name
+                customView.animate().scaleX(1.2f).setUpdateListener {
+                    it.doOnEnd {
+                        customView.animate().scaleX(1f)
+                    }
+                }
+            })
+        }
         root.tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
 
             override fun onTabReselected(tab: TabLayout.Tab?) {

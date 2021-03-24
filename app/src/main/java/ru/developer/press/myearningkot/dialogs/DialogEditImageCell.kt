@@ -27,7 +27,7 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.support.v4.toast
 import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.adapters.AdapterViewPagerFromImageCell
+import ru.developer.press.myearningkot.adapters.AdapterViewPagerToImageCell
 import ru.developer.press.myearningkot.helpers.filesFolder
 import ru.developer.press.myearningkot.helpers.setAlertButtonColors
 import ru.developer.press.myearningkot.model.Column
@@ -65,7 +65,7 @@ class DialogEditImageCell(
         val tabs = imageViewer.imagesTabs
 
         val activity = requireActivity()
-        val adapter = AdapterViewPagerFromImageCell(
+        val adapter = AdapterViewPagerToImageCell(
             fragmentManager = activity.supportFragmentManager,
             lifecycle = lifecycle,
             imageUriList = imageValue.imagePathList

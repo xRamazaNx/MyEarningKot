@@ -1,59 +1,59 @@
 package ru.developer.press.myearningkot.viewmodels
 
-import androidx.lifecycle.MutableLiveData
 import ru.developer.press.myearningkot.CellTypeControl
 import ru.developer.press.myearningkot.database.Card
+import ru.developer.press.myearningkot.helpers.liveData
 import ru.developer.press.myearningkot.model.Row
 import ru.developer.press.myearningkot.model.SortMethod
 import ru.developer.press.myearningkot.model.Total
 
 class PageVM {
-    val name = MutableLiveData<String>()
+    val name = liveData<String>()
     val cards = mutableListOf<Card>()
 }
 
 class CardVM {
-    val isShowDatePeriod = MutableLiveData<Boolean>()
-    val datePeriod = MutableLiveData<String>()
+    val isShowDatePeriod = liveData<Boolean>()
+    val datePeriod = liveData<String>()
 
-    val isShowTotalInfo = MutableLiveData<Boolean>()
-    val isCardPrefUpdate = MutableLiveData<Boolean>()
+    val isShowTotalInfo = liveData<Boolean>()
+    val isCardPrefUpdate = liveData<Boolean>()
 
 //    var valuta = 0
-    val enableSomeStroke = MutableLiveData<Boolean>()
+    val enableSomeStroke = liveData<Boolean>()
     val sortPref = SortPrefVM()
-    val enableHorizontalScroll = MutableLiveData<Boolean>()
-    val enableHorizontalScrollTotal = MutableLiveData<Boolean>()
-    val heightCells = MutableLiveData<Int>()
-    val dateCreated = MutableLiveData<Long>()
-    val dateModify = MutableLiveData<Long>()
+    val enableHorizontalScroll = liveData<Boolean>()
+    val enableHorizontalScrollTotal = liveData<Boolean>()
+    val heightCells = liveData<Int>()
+    val dateCreated = liveData<Long>()
+    val dateModify = liveData<Long>()
     val rows = mutableListOf<RowVM>()
     val columns = mutableListOf<ColumnVM>()
     val totals = mutableListOf<Total>()
 
-    val dateOfPeriod = MutableLiveData<String>()
+    val dateOfPeriod = liveData<String>()
 }
 
 class ColumnVM {
 
 }
 class RowVM {
-    val status = MutableLiveData<Row.Status>()
+    val status = liveData<Row.Status>()
     val cellList = mutableListOf<CellVM>()
 }
 
 class CellVM {
-    val isSelect =MutableLiveData<Boolean>()
+    val isSelect =liveData<Boolean>()
 
-    val isPrefColumnSelect = MutableLiveData<Boolean>()
+    val isPrefColumnSelect = liveData<Boolean>()
 
-    val cellTypeControl = MutableLiveData<CellTypeControl>()
+    val cellTypeControl = liveData<CellTypeControl>()
 
-    var displayValue = MutableLiveData<String>()
+    var displayValue = liveData<String>()
 }
 
 class SortPrefVM {
-    var isSave = MutableLiveData<Boolean>()
-    var sortMethod = MutableLiveData<SortMethod>()
-    var sortFofColumnId = MutableLiveData<Int>()
+    var isSave = liveData<Boolean>()
+    var sortMethod = liveData<SortMethod>()
+    var sortFofColumnId = liveData<Int>()
 }

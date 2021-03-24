@@ -10,7 +10,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -19,48 +19,66 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.stfalcon.imageviewer.StfalconImageViewer
-import kotlinx.android.synthetic.main.main_cards_layout.*
+import kotlinx.android.synthetic.main.main_cards_layout.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.matchParent
-import ru.developer.press.myearningkot.activity.MainActivity
 import ru.developer.press.myearningkot.adapters.AdapterCard
+import ru.developer.press.myearningkot.database.Card
 import ru.developer.press.myearningkot.database.Page
-
+import ru.developer.press.myearningkot.helpers.MyLiveData
+import ru.developer.press.myearningkot.helpers.runOnMain
 
 class PageFragment : Fragment() {
-    lateinit var page: MutableLiveData<Page>
+    var page: Page? = null
     private var adapterCard: AdapterCard? = null
     private var recycler: RecyclerView? = null
+
+    companion object {
+        private const val PAGE_ID = "page_id"
+        fun create(pageId: String): PageFragment {
+            val pageFragment = PageFragment()
+            pageFragment.arguments = Bundle().apply {
+                putString(PAGE_ID, pageId)
+            }
+            return pageFragment
+        }
+
+        var getPageLiveData: ((String) -> Page)? = null
+
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        getPageLiveData?.let {
+            page = it.invoke(arguments?.getString(PAGE_ID)!!)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.main_cards_layout, null)
+        val inflate = inflater.inflate(R.layout.main_cards_layout, null)
+        recycler = inflate.recyclerCards
+        iniAdapter(page!!)
+        return inflate
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        recycler = recyclerCards
-        recycler?.layoutManager = LinearLayoutManager(context)
-        adapterCard = AdapterCard(page.value!!, activity as MainActivity)
-
-        updateRecycler()
-        super.onViewCreated(view, savedInstanceState)
+    private fun iniAdapter(page: Page) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            adapterCard = AdapterCard(page.cards)
+            runOnMain {
+                recycler?.adapter = adapterCard
+            }
+        }
     }
 
-    private fun updateRecycler() {
-
-        recycler?.adapter = adapterCard
-
-    }
-
-    fun scrollToPosition(cardPosition: Int) {
-       recycler?.scrollToPosition(cardPosition)
-    }
-
-    fun notifyCardInRecycler(positionCard: Int) {
-        scrollToPosition(positionCard)
+    fun insertToPosition(cardPosition: Int) {
+        adapterCard?.notifyDataSetChanged()
+        recycler?.scrollToPosition(cardPosition)
     }
 }
 

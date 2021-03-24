@@ -9,8 +9,9 @@ import android.view.MotionEvent
 import android.view.ViewConfiguration
 import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
-import androidx.lifecycle.MutableLiveData
 import kotlinx.android.synthetic.main.activity_card.view.*
+import ru.developer.press.myearningkot.helpers.MyLiveData
+import ru.developer.press.myearningkot.helpers.liveData
 
 
 class ScrollContainer(
@@ -20,9 +21,7 @@ class ScrollContainer(
     var dragNdropMode: Boolean = false
     private var isMove: Boolean = false
     private var moveSize = 0f
-    val isLong = MutableLiveData<Boolean>().apply {
-        value = false
-    }
+    val isLong = liveData(false)
 
     private val hand = Handler(Looper.getMainLooper())
     private var mLongPressed = Runnable {

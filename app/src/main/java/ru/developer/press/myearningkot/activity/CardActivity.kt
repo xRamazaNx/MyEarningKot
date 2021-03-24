@@ -34,7 +34,6 @@ import ru.developer.press.myearningkot.helpers.EditCellControl
 import ru.developer.press.myearningkot.helpers.getColorFromRes
 import ru.developer.press.myearningkot.helpers.getDrawableRes
 import ru.developer.press.myearningkot.helpers.scoups.getSelectedRows
-import ru.developer.press.myearningkot.helpers.scoups.hideAddTotalButton
 import ru.developer.press.myearningkot.model.*
 import ru.developer.press.myearningkot.viewmodels.CardViewModel
 import ru.developer.press.myearningkot.viewmodels.CardViewModel.SelectMode
@@ -77,11 +76,8 @@ open class CardActivity : BasicCardActivity() {
     private var isLongClick = false
     private val launch = CoroutineScope(Dispatchers.Main).launch {
         val id = intent.getStringExtra(CARD_ID)!!
-        val card = withContext(Dispatchers.IO) {
-            DataController(this@CardActivity).getCard(id)
-        }
+        val card = DataController(this@CardActivity).getCard(id)
         createViewModel(card)
-
         progressBar.visibility = GONE
         doStart()
         viewModel?.apply {
@@ -489,9 +485,6 @@ open class CardActivity : BasicCardActivity() {
             divide_line.visibility = GONE
             nameCard.visibility = GONE
         }
-        viewModel?.card?.let {
-            totalAmountView.hideAddTotalButton(it)
-        }
     }
 
     private fun hideViewWhileScroll() {
@@ -647,8 +640,9 @@ open class CardActivity : BasicCardActivity() {
             column,
             selectCell.sourceValue
         ) { newValue ->
+
             selectCell.sourceValue = newValue
-            viewModel?.updateEditCellRow()
+            updateEditCellRow()
             updateTypeControlColumn(cellSelectPosition)
             if (column is NumberColumn) {
                 card.columns.filterIsInstance<NumberColumn>().forEach {

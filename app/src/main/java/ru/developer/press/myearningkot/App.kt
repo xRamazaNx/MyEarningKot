@@ -16,10 +16,11 @@ import kotlinx.coroutines.*
 import ru.developer.press.myearningkot.adapters.animationAdd
 import ru.developer.press.myearningkot.adapters.animationDelete
 import ru.developer.press.myearningkot.database.DataController
+import ru.developer.press.myearningkot.database.FireStore
 import ru.developer.press.myearningkot.helpers.filesFolder
 import ru.developer.press.myearningkot.helpers.getColorFromRes
+import ru.developer.press.myearningkot.helpers.liveData
 import ru.developer.press.myearningkot.model.*
-
 
 class App : Application(), ActivityLifecycleCallbacks {
 
@@ -29,6 +30,8 @@ class App : Application(), ActivityLifecycleCallbacks {
         fun Activity.app(): App {
             return application as App
         }
+
+        var fireStoreChanged = liveData<FireStore.ChangedRef>()
     }
 
     var currentActivity: AppCompatActivity? = null
@@ -43,16 +46,13 @@ class App : Application(), ActivityLifecycleCallbacks {
                 }
         }
     private val pref: SharedPreferences
-        get() = getSharedPreferences(
-            "app.setting",
-            Context.MODE_PRIVATE
-        )
+        get() = getSharedPreferences("app.setting", Context.MODE_PRIVATE)
 
     override fun onCreate() {
+        val dataController = DataController(applicationContext)
         authUser = Firebase.auth
 
         GlobalScope.launch {
-
             registerActivityLifecycleCallbacks(this@App)
             animationDelete = AnimationUtils.loadAnimation(applicationContext, R.anim.anim_delete)
             animationAdd =
@@ -72,9 +72,10 @@ class App : Application(), ActivityLifecycleCallbacks {
             Bugsnag.init(applicationContext)
             val isFirst = pref.getBoolean(prefFirstKey, true)
             if (isFirst) {
-                DataController(applicationContext).createDefaultSamplesJob(applicationContext)
+                dataController.createDefaultSamplesJob(applicationContext)
                 pref.edit().putBoolean(prefFirstKey, false).apply()
             }
+            dataController.syncRefs()
             super.onCreate()
         }
     }

@@ -7,19 +7,23 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import ru.developer.press.myearningkot.AdapterPageInterface
 import ru.developer.press.myearningkot.PageFragment
 
-class AdapterViewPagerFromMain(
+class AdapterViewPagerToMain(
     fragmentManager: FragmentManager,
     lifecycle: Lifecycle,
     private val pageInterface: AdapterPageInterface
 ) : FragmentStateAdapter(fragmentManager, lifecycle) {
-
     private val fragments = mutableListOf<PageFragment>()
 
     //
     init {
         fragments.clear()
-        repeat(pageInterface.getPages().size) {
-            addPage()
+        val pages = pageInterface.getPages()
+        pages.forEach {
+            addPage(it.value!!.refId)
+        }
+
+        PageFragment.getPageLiveData = {
+            pages.find { liveData -> liveData.value!!.refId == it }!!.value!!
         }
     }
 
@@ -28,22 +32,16 @@ class AdapterViewPagerFromMain(
     }
 
     override fun createFragment(pagePosition: Int): Fragment {
-        return fragments[pagePosition].apply {
-            page = pageInterface.getPages()[pagePosition]
-        }
+        return fragments[pagePosition].apply { page = pageInterface.getPages()[pagePosition].value }
     }
 
-    fun scrollToPosition(positionPage: Int, positionCard: Int) {
-        fragments[positionPage].scrollToPosition(positionCard)
+    fun insertCardToPosition(positionPage: Int, positionCard: Int) {
+        fragments[positionPage].insertToPosition(positionCard)
     }
 
-    fun addPage() {
+    fun addPage(pageId: String) {
         fragments.add(
-            PageFragment()
+            PageFragment.create(pageId)
         )
-    }
-
-    fun notifyCardInPage(tabPosition: Int, cardPosition: Int) {
-        fragments[tabPosition].notifyCardInRecycler(cardPosition)
     }
 }

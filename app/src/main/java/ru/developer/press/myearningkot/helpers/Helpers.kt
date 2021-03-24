@@ -26,8 +26,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.list_item_change_layout.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.R
+import ru.developer.press.myearningkot.database.FireStore
 import ru.developer.press.myearningkot.model.Column
 import ru.developer.press.myearningkot.model.NumberTypePref
 import ru.developer.press.myearningkot.model.NumerationColumn
@@ -37,6 +40,53 @@ import java.text.DecimalFormatSymbols
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
+fun <T> liveData(t: T? = null): MyLiveData<T> {
+    return MyLiveData(t)
+}
+
+suspend fun <T> runOnMain(block: suspend () -> T): T {
+    return withContext(Dispatchers.Main) {
+        block.invoke()
+    }
+}
+
+suspend fun <T> runOnIO(block: suspend () -> T): T {
+    return withContext(Dispatchers.IO) {
+        block.invoke()
+    }
+}
+
+class FireStoreChangedLiveData() {
+    fun addChanged(changedRef: FireStore.ChangedRef) {
+        changed.invoke(changedRef)
+    }
+
+    private var changed: (changedRef: FireStore.ChangedRef) -> Unit = {}
+    fun observeChanged(changed: (changedRef: FireStore.ChangedRef) -> Unit) {
+        this.changed = changed
+    }
+}
+
+class MyLiveData<T>(t: T?) : MutableLiveData<T>() {
+    init {
+        t?.let {
+            value = it
+        }
+    }
+
+    fun updateValue() {
+        postValue(value)
+    }
+}
+
+fun <T> observer(changed: (T) -> Unit): Observer<T> {
+    return object : Observer<T> {
+        override fun onChanged(t: T?) {
+            t?.let { changed.invoke(it) }
+        }
+
+    }
+}
 
 class SingleLiveEvent<T> : MutableLiveData<T>() {
 
@@ -49,7 +99,7 @@ class SingleLiveEvent<T> : MutableLiveData<T>() {
             Log.w(TAG, "Multiple observers registered but only one will be notified of changes.")
         }
 
-        // Observe the internal MutableLiveData
+        // Observe the internal MyLiveData
         super.observe(owner, Observer<T> { t ->
             if (mPending.compareAndSet(true, false)) {
                 observer.onChanged(t)

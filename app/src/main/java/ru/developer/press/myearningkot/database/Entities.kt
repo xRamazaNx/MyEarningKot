@@ -1,9 +1,9 @@
 package ru.developer.press.myearningkot.database
 
-import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 import com.google.firebase.firestore.Exclude
 import ru.developer.press.myearningkot.ProvideCardPropertyForCell
+import ru.developer.press.myearningkot.helpers.MyLiveData
 import ru.developer.press.myearningkot.helpers.getDate
 import ru.developer.press.myearningkot.model.*
 import java.util.*
@@ -20,12 +20,12 @@ open class Ref {
         dateChange = dateCreate
     }
 
-    fun copyRefFrom(ref: Ref) {
+    open fun copyRefFrom(ref: Ref) {
         refId = ref.refId
         dateCreate = ref.dateCreate
-        dateChange = ref.dateChange
+        dateChange = System.currentTimeMillis()
+        ref.dateChange = dateChange
     }
-
     @PrimaryKey
     var refId: String = UUID.randomUUID().toString()
     var dateCreate = System.currentTimeMillis()
@@ -43,9 +43,15 @@ class Page(
 ) : Ref() {
     var position = 0
 
-    @Exclude
+    override fun copyRefFrom(ref: Ref) {
+        super.copyRefFrom(ref)
+        val copPage = ref as Page
+        position = copPage.position
+        name = copPage.name
+    }
     @Ignore
-    val cards = mutableListOf<MutableLiveData<Card>>()
+    @get:Exclude
+    val cards = mutableListOf<MyLiveData<Card>>()
 }
 
 @Entity(
@@ -57,6 +63,7 @@ class Page(
     )]
 )
 open class Card(var pageId: String, var name: String = "") : Ref(), ProvideCardPropertyForCell {
+    constructor() : this("")
 
     @Embedded(prefix = "card_pref")
     var cardPref = PrefForCard()
@@ -78,15 +85,15 @@ open class Card(var pageId: String, var name: String = "") : Ref(), ProvideCardP
         }
 
     @Ignore
-    @Exclude
+    @get:Exclude
     val rows = mutableListOf<Row>()
 
     @Ignore
-    @Exclude
+    @get:Exclude
     val columns = mutableListOf<Column>()
 
     @Ignore
-    @Exclude
+    @get:Exclude
     val totals = mutableListOf<Total>()
 
     val dateOfPeriod: String
@@ -115,7 +122,9 @@ open class JsonValue(pageId: String, cardId: String) : IdsRef(pageId, cardId) {
         onDelete = ForeignKey.CASCADE
     )]
 )
-class ColumnJson(pageId: String, cardId: String) : JsonValue(pageId, cardId)
+class ColumnJson(pageId: String, cardId: String) : JsonValue(pageId, cardId) {
+    constructor() : this("", "")
+}
 
 @Entity(
     foreignKeys = [ForeignKey(
@@ -125,7 +134,9 @@ class ColumnJson(pageId: String, cardId: String) : JsonValue(pageId, cardId)
         onDelete = ForeignKey.CASCADE
     )]
 )
-class RowJson(pageId: String, cardId: String) : JsonValue(pageId, cardId)
+class RowJson(pageId: String, cardId: String) : JsonValue(pageId, cardId) {
+    constructor() : this("", "")
+}
 
 @Entity(
     foreignKeys = [ForeignKey(
@@ -135,27 +146,30 @@ class RowJson(pageId: String, cardId: String) : JsonValue(pageId, cardId)
         onDelete = ForeignKey.CASCADE
     )]
 )
-class TotalJson(pageId: String, cardId: String) : JsonValue(pageId, cardId)
+class TotalJson(pageId: String, cardId: String) : JsonValue(pageId, cardId) {
+    constructor() : this("", "")
+}
 
 @Entity
 class ListTypeJson : Ref() {
     var json: String = ""
 }
 
-fun Column.columnJson():ColumnJson{
+fun Column.columnJson(): ColumnJson {
     val columnJson = ColumnJson(pageId, cardId)
     columnJson.json = gson.toJson(this)
     columnJson.copyRefFrom(this)
     return columnJson
 }
 
-fun Row.rowJson():RowJson{
+fun Row.rowJson(): RowJson {
     val rowJson = RowJson(pageId, cardId)
     rowJson.json = gson.toJson(this)
     rowJson.copyRefFrom(this)
     return rowJson
 }
-fun Total.totalJson():TotalJson{
+
+fun Total.totalJson(): TotalJson {
     val totalJson = TotalJson(pageId, cardId)
     totalJson.json = gson.toJson(this)
     totalJson.copyRefFrom(this)

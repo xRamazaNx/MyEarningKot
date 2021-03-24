@@ -2,24 +2,31 @@ package ru.developer.press.myearningkot.helpers.scoups
 
 import android.text.TextUtils
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import kotlinx.android.synthetic.main.card.view.*
 import kotlinx.android.synthetic.main.total_item_layout.view.*
 import kotlinx.android.synthetic.main.total_item_value.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.activity.CardActivity
 import ru.developer.press.myearningkot.database.Card
+import ru.developer.press.myearningkot.helpers.runOnIO
+import ru.developer.press.myearningkot.helpers.runOnMain
 import kotlinx.android.synthetic.main.total_item_layout.view.totalValueContainer as totalValueContainer1
 
 fun Card.createViewInPlate(plateView: View) {
     val context = plateView.context
     val nameCard = plateView.nameCard
     val datePeriodCard = plateView.datePeriodCard
-
     nameCard.text = name
     val isCardActivity = context is CardActivity
     datePeriodCard.visibility = if (isShowDatePeriod && !isCardActivity) View.VISIBLE else GONE
@@ -30,8 +37,9 @@ fun Card.createViewInPlate(plateView: View) {
     cardPref.dateOfPeriodPref.prefForTextView.customize(datePeriodCard, R.font.roboto_medium)
 
     //главный контейнер для заголовков и значений
+    val inflater = LayoutInflater.from(context)
     val totalContainer: LinearLayout =
-        context.layoutInflater.inflate(
+        inflater.inflate(
             R.layout.total_item_layout,
             null
         ) as LinearLayout
@@ -64,7 +72,7 @@ fun Card.createViewInPlate(plateView: View) {
     totals.forEachIndexed { index, totalItem ->
         // лайот где валуе и линия
         val valueLayout =
-            context.layoutInflater.inflate(R.layout.total_item_value, null)
+            inflater.inflate(R.layout.total_item_value, null)
 
         val layoutParams = LinearLayout.LayoutParams(totalItem.width, matchParent).apply {
             weight = 1f
@@ -87,12 +95,9 @@ fun Card.createViewInPlate(plateView: View) {
         totalItem.titlePref.customize(title)
 
         totalItem.totalPref.prefForTextView.customize(value)
-        totalItem.calcFormula(this)
-        value.text = totalItem.value
-
+        valueLayout.totalValue.text = totalItem.value
         totalTitleLayout.addView(title)
         totalValueLayout.addView(valueLayout)
-
     }
 
 }
@@ -103,16 +108,6 @@ fun Card.updateTotalAmount(plateView: View) {
         // лайот где валуе и линия
         val valueLayout = totalValueLayout.getChildAt(index)
         val value = valueLayout.totalValue
-        totalItem.calcFormula(this)
         value.text = totalItem.value
     }
-}
-
-fun View.hideAddTotalButton(card: Card) {
-
-//    if (card.enableHorizontalScrollTotal)
-//        totalContainerScroll.getChildAt(1).visibility = GONE
-//    else
-//        totalContainerDisableScroll.getChildAt(1).visibility = GONE
-
 }

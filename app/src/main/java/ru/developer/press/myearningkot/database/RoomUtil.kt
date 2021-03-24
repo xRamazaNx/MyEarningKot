@@ -59,7 +59,7 @@ interface TotalDao {
     fun getAllOf(id: String): List<TotalJson>
 
     @Query("Select * FROM TotalJson where refId = :id")
-    fun getById(id: String): TotalJson
+    fun getById(id: String): TotalJson?
 
     @Delete
     fun delete(totalRef: TotalJson)
@@ -78,7 +78,7 @@ interface TotalDao {
 interface ColumnDao {
 
     @Query("Select * FROM ColumnJson where refId = :id")
-    fun getById(id: String): ColumnJson
+    fun getById(id: String): ColumnJson?
 
     @Delete
     fun delete(columnRef: ColumnJson)
@@ -103,7 +103,7 @@ interface RowDao {
     fun getAllOf(id: String): List<RowJson>
 
     @Query("Select * FROM RowJson where refId = :id")
-    fun getById(id: String): RowJson
+    fun getById(id: String): RowJson?
 
     @Delete
     fun delete(jsonValue: RowJson)
@@ -124,7 +124,7 @@ interface ListTypeDao {
     fun getAll(): List<ListTypeJson>
 
     @Query("Select * FROM ListTypeJson where refId = :id")
-    fun getById(id: String): ListTypeJson
+    fun getById(id: String): ListTypeJson?
 
     @Delete
     fun delete(listType: ListTypeJson)
@@ -143,7 +143,7 @@ interface SampleDao {
     fun getAll(pageRefId: String = samplePageName): List<Card>
 
     @Query("Select * FROM Card where refId = :id")
-    fun getByRefId(id: String): Card
+    fun getByRefId(id: String): Card?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(sample: Card)
@@ -162,7 +162,7 @@ interface CardDao {
     fun getAllOf(id: String): List<Card>
 
     @Query("Select * FROM Card where refId = :id")
-    fun getById(id: String): Card
+    fun getById(id: String): Card?
 
     @Query("DELETE FROM Card WHERE refId = :deleteId")
     fun delete(deleteId: String)
@@ -181,7 +181,7 @@ interface PageDao {
     fun getAll(): List<Page>
 
     @Query("Select * FROM Page where refId = :id")
-    fun getById(id: String): Page
+    fun getById(id: String): Page?
 
     @Query("DELETE FROM Page WHERE refId = :deleteId")
     fun delete(deleteId: String)
@@ -195,7 +195,6 @@ interface PageDao {
 
 fun convertRefToColumn(refs: List<JsonValue>): List<Column> {
     return refs.fold(mutableListOf()) { list, columnRef ->
-        log(columnRef.json)
         list.add(getColumnFromJson(columnRef))
         list
     }

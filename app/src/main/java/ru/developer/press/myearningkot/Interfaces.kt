@@ -3,9 +3,9 @@ package ru.developer.press.myearningkot
 //import ru.developer.press.myearningkot.model.card
 import android.content.Context
 import android.view.View
-import androidx.lifecycle.MutableLiveData
 import ru.developer.press.myearningkot.database.Card
 import ru.developer.press.myearningkot.database.Page
+import ru.developer.press.myearningkot.helpers.MyLiveData
 import ru.developer.press.myearningkot.model.Column
 import ru.developer.press.myearningkot.model.Prefs
 import ru.developer.press.myearningkot.model.Row
@@ -13,7 +13,7 @@ import ru.developer.press.myearningkot.model.Row
 // для viewPage обратная связь реализатор PageViewModel
 interface AdapterPageInterface {
     fun getPageCount(): Int
-    fun getPages(): MutableList<MutableLiveData<Page>>
+    fun getPages(): MutableList<MyLiveData<Page>>
 }
 
 interface ProvideData {
@@ -48,12 +48,6 @@ interface ProvideValueProperty {
     fun getWidthColumn(): Int
     var provideCardPropertyForCell: ProvideCardPropertyForCell
     var typePref: Prefs?
-}
-
-
-// listeners
-interface CardClickListener {
-    fun cardClick(idCard: String)
 }
 
 interface RowClickListener {

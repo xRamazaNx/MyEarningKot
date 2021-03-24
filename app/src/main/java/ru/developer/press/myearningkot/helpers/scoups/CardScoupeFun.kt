@@ -70,6 +70,7 @@ fun Card.addRow(
     row.status = Row.Status.ADDED
     rows.add(row)
     updateTypeControlRow(rows.size - 1)
+    calcTotals()
     return row
 }
 
@@ -94,10 +95,16 @@ fun Card.addColumn(type: ColumnType, name: String, position: Int = columns.size)
         it.cellList.add(position, getNewCell(column))
     }
     updateTypeControlColumn(column)
+    calcTotals()
     return column
 
 }
 
+fun Card.calcTotals(){
+    totals.forEach {
+        it.calcFormula(this)
+    }
+}
 fun Card.addColumnSample(type: ColumnType, name: String, position: Int = columns.size) {
     val column = when (type) {
         ColumnType.NUMERATION -> NumerationColumn(name,pageId, refId)
@@ -141,6 +148,7 @@ fun Card.deleteColumn(column: Column? = null): Boolean {
     rows.forEach {
         it.cellList.removeAt(index)
     }
+    calcTotals()
 //        // удаляем ид колоны из списка суммируемых если он есть в нем
 //        sumColumnId.forEach {
 //            if (it == col.id) {
@@ -331,6 +339,7 @@ fun Card.getSelectedCell(): Cell? {
 
 fun Card.deleteRow(row: Row) {
     rows.remove(row)
+    calcTotals()
 }
 
 fun Card.getSelectedRows(): MutableList<Row> {

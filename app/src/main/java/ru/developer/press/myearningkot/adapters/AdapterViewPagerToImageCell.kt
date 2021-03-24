@@ -6,7 +6,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import ru.developer.press.myearningkot.ImageFragment
 
-class AdapterViewPagerFromImageCell(
+class AdapterViewPagerToImageCell(
     fragmentManager: FragmentManager,
     lifecycle: Lifecycle,
     private val imageUriList: MutableList<String>
