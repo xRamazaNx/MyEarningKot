@@ -8,6 +8,7 @@ import android.view.View.GONE
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Column
 import androidx.lifecycle.lifecycleScope
 import kotlinx.android.synthetic.main.card.view.*
 import kotlinx.android.synthetic.main.total_item_layout.view.*
@@ -23,7 +24,7 @@ import ru.developer.press.myearningkot.helpers.runOnIO
 import ru.developer.press.myearningkot.helpers.runOnMain
 import kotlinx.android.synthetic.main.total_item_layout.view.totalValueContainer as totalValueContainer1
 
-fun Card.createViewInPlate(plateView: View) {
+fun Card.inflatePlate(plateView: View) {
     val context = plateView.context
     val nameCard = plateView.nameCard
     val datePeriodCard = plateView.datePeriodCard

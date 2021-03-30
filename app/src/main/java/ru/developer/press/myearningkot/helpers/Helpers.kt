@@ -19,6 +19,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.MainThread
+import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.lifecycle.LifecycleOwner
@@ -83,6 +84,25 @@ fun <T> observer(changed: (T) -> Unit): Observer<T> {
     return object : Observer<T> {
         override fun onChanged(t: T?) {
             t?.let { changed.invoke(it) }
+        }
+
+    }
+}
+
+
+fun <T> singleObserver(changed: (T) -> Unit): Observer<T> {
+    return object : Observer<T> {
+        private var isFirst = true
+        private var oldValue: T? = null
+        override fun onChanged(t: T?) {
+            if (isFirst) {
+                isFirst = false
+                return
+            }
+            if (oldValue === t)
+                return
+            t?.let { changed.invoke(it) }
+            oldValue = t
         }
 
     }
@@ -307,7 +327,12 @@ fun View.addRipple() = with(TypedValue()) {
     setBackgroundResource(resourceId)
 }
 
-fun View.animateColor(colorFrom: Int, colorTo: Int, duration: Long = 325) {
+fun View.animateColor(
+    colorFrom: Int,
+    colorTo: Int,
+    duration: Long = 325,
+    endAnimate: () -> Unit = {}
+) {
 //    val drawable = background
     val valueAnimator: ValueAnimator = ValueAnimator.ofFloat(0.0f, 1.0f)
     valueAnimator.duration = duration
@@ -315,7 +340,9 @@ fun View.animateColor(colorFrom: Int, colorTo: Int, duration: Long = 325) {
     valueAnimator.addUpdateListener {
         val fractionAnim = valueAnimator.animatedValue as Float
         backgroundColor = ColorUtils.blendARGB(colorFrom, colorTo, fractionAnim)
-
+    }
+    valueAnimator.doOnEnd {
+        endAnimate.invoke()
     }
 //    valueAnimator.doOnEnd {
 //        background = drawable

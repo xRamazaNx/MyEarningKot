@@ -236,7 +236,14 @@ fun Card.deleteRow(index: Int = rows.size - 1) {
     if (rows.isEmpty())
         return
     rows.removeAt(index)
+    calcTotals()
 
+}
+
+fun Card.deleteRows(removedList: List<Row>) {
+    if (removedList.isNotEmpty())
+        rows.removeAll(removedList)
+    calcTotals()
 }
 
 fun Card.updateTypeControlColumn(column: Column) {

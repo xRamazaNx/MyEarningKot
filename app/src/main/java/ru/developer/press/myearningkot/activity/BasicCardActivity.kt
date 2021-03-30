@@ -24,7 +24,7 @@ import ru.developer.press.myearningkot.adapters.AdapterRecyclerInCard
 import ru.developer.press.myearningkot.databinding.ActivityCardBinding
 import ru.developer.press.myearningkot.helpers.bindTitleOfColumn
 import ru.developer.press.myearningkot.helpers.getColorFromRes
-import ru.developer.press.myearningkot.helpers.scoups.createViewInPlate
+import ru.developer.press.myearningkot.helpers.scoups.inflatePlate
 import ru.developer.press.myearningkot.helpers.scoups.updateTotalAmount
 import ru.developer.press.myearningkot.viewmodels.CardViewModel
 
@@ -32,7 +32,7 @@ import ru.developer.press.myearningkot.viewmodels.CardViewModel
 abstract class BasicCardActivity : AppCompatActivity() {
     private lateinit var root: ActivityCardBinding
     protected lateinit var adapter: AdapterRecyclerInCard
-    lateinit var columnContainer:LinearLayout
+    lateinit var columnContainer: LinearLayout
     abstract var viewModel: CardViewModel?
 
 
@@ -77,7 +77,7 @@ abstract class BasicCardActivity : AppCompatActivity() {
 
     private fun observePlate() {
         viewModel?.cardLiveData?.observe(this, Observer {
-            it.createViewInPlate(totalAmountView)
+            it.inflatePlate(totalAmountView)
             totalAmountView.backgroundResource = R.drawable.background_for_card_in_card_activity
         })
     }
@@ -170,9 +170,7 @@ abstract class BasicCardActivity : AppCompatActivity() {
     }
 
     protected fun notifyAdapter() {
-        viewModel?.let {
-            adapter.notifyDataSetChanged()
-        }
+        adapter.notifyDataSetChanged()
     }
 }
 

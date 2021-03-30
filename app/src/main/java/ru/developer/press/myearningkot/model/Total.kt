@@ -4,14 +4,14 @@ import android.graphics.Color
 import com.google.gson.annotations.SerializedName
 import ru.developer.press.myearningkot.FormulaId
 import ru.developer.press.myearningkot.database.Card
-import ru.developer.press.myearningkot.database.IdsRef
+import ru.developer.press.myearningkot.database.BelongIds
 import ru.developer.press.myearningkot.helpers.Calc
 import ru.developer.press.myearningkot.helpers.getDecimalFormatNumber
 import java.math.BigDecimal
 import java.util.*
 import kotlin.random.Random
 
-class Total(pageId: String, cardId: String) : IdsRef(pageId, cardId), FormulaId {
+class Total(pageId: String, cardId: String) : BelongIds(pageId, cardId), FormulaId {
     override var idToFormula: Long = Random.nextLong()
 
     @SerializedName("w")

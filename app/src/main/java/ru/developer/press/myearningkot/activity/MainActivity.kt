@@ -18,7 +18,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.ui.unit.dp
 import androidx.core.animation.doOnEnd
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.ViewModelProvider
@@ -36,6 +35,7 @@ import com.github.zawadz88.materialpopupmenu.popupMenu
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.firebase.firestore.DocumentChange.Type.*
 import com.mikepenz.materialdrawer.Drawer
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
@@ -50,9 +50,12 @@ import ru.developer.press.myearningkot.database.FireStore
 import ru.developer.press.myearningkot.database.Page
 import ru.developer.press.myearningkot.databinding.ActivityMainBinding
 import ru.developer.press.myearningkot.dialogs.DialogSetName
+import ru.developer.press.myearningkot.dialogs.myDialog
 import ru.developer.press.myearningkot.helpers.*
 import ru.developer.press.myearningkot.viewmodels.MainViewModel
 import ru.developer.press.myearningkot.viewmodels.ViewModelMainFactory
+import splitties.alertdialog.appcompat.negativeButton
+import splitties.alertdialog.appcompat.positiveButton
 
 class MainActivity : AppCompatActivity(), ProvideDataCards {
     private lateinit var drawer: Drawer
@@ -104,12 +107,20 @@ class MainActivity : AppCompatActivity(), ProvideDataCards {
         initializerViewModel.invokeOnCompletion {
             viewModel.calcAllCards()
             viewInit()
-            App.fireStoreChanged.observe(this, observer { changedRef ->
-                if (changedRef.type == FireStore.RefType.PAGE) {
-                    viewModel.changedPage(changedRef) {
-                        runOnUiThread {
-                            initTabAndViewPager()
+            App.fireStoreChanged.observe(this, singleObserver { refData ->
+                if (refData.refType == FireStore.RefType.PAGE) {
+                    when(refData.updatedType){
+                        ADDED -> {}
+                        MODIFIED -> {
+                            viewModel.changedPage(refData.refIds.refId) {
+                                runOnUiThread {
+                                    val position = tabs.selectedTabPosition
+                                    initTabAndViewPager()
+                                    selectTab(position)
+                                }
+                            }
                         }
+                        REMOVED -> {}
                     }
                 }
             })
@@ -165,14 +176,18 @@ class MainActivity : AppCompatActivity(), ProvideDataCards {
                         } else {
                             adapterViewPagerToMain.addPage(page.refId)
                             linkViewPagerAndTabs()
-                            root.tabs.postDelayed({
-                                root.tabs.getTabAt(root.tabs.tabCount - 1)?.select()
-                            }, 200)
+                            selectTab(root.tabs.tabCount - 1)
                         }
                     }
 
                 }.show(supportFragmentManager, "setName")
         }
+    }
+
+    private fun selectTab(position: Int) {
+        root.tabs.postDelayed({
+            root.tabs.getTabAt(position)?.select()
+        }, 200)
     }
 
     private fun initTabAndViewPager() {
@@ -396,30 +411,42 @@ class MainActivity : AppCompatActivity(), ProvideDataCards {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-//            R.id.page_bacground_color -> {
-//                val tabs = tabs
-//                val position = tabs.selectedTabPosition
-//                ColorPickerDialog.newBuilder()
-//                    .setColor(viewModel.getPages()[position].value!!.background)
-//                    .create().apply {
-//                        setColorPickerDialogListener(object : ColorPickerDialogListener {
-//                            override fun onColorSelected(dialogId: Int, color: Int) {
-////                                tabs.getTabAt(tabs.selectedTabPosition)?.select()
-//                                viewModel.pageColorChanged(color, position)
-//
-//                            }
-//
-//                            override fun onDialogDismissed(dialogId: Int) {
-//
-//                            }
-//                        })
-//                    }.show(supportFragmentManager, "pageBackgroundColorDialog")
-//            }
+            R.id.deletePage -> {
+                if (tabs.tabCount <= 1) {
+                    toast("Стоп! Нельзя удалить единственную вкладку.")
+                    return false
+                }
+                myDialog {
+                    setTitle("Внимание!")
+                    setMessage("Вы действительно хотите удалить вкладку? все учетные карточки из этой вкладки будут удалены!")
+                    positiveButton(R.string.DELETE) {
+                        viewModel.deletePage(tabs.selectedTabPosition) { position ->
+                            adapterViewPagerToMain.deletePage(position)
+                            initTabAndViewPager()
+                            selectTab(position)
+                        }
+                    }
+                    negativeButton(R.string.cancel) {
+                        it.dismiss()
+                    }
+
+                }.apply {
+                    positiveButtonColorRes = R.color.colorRed
+                }.show(supportFragmentManager, "page_delete")
+            }
         }
         return true
     }
 
     private fun TabLayout.Tab.tabSelected() {
+        val tabCount = tabs.tabCount
+        repeat(tabCount) {
+            val tabAt = tabs.getTabAt(it)
+            if (tabAt != this) {
+                val textView = tabAt?.customView as TextView?
+                textView?.textColorResource = R.color.textColorTabsTitleNormal
+            }
+        }
         val textView = customView as TextView
         textView.textColorResource = R.color.textColorTabsTitleSelected
         parent?.setSelectedTabIndicatorColor(getColorFromRes(R.color.textColorTabsTitleSelected))
@@ -468,16 +495,21 @@ class MainActivity : AppCompatActivity(), ProvideDataCards {
                 tab?.tabSelected()
             }
 
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-                val textView = tab?.customView as TextView
-                textView.textColorResource = R.color.textColorTabsTitleNormal
-            }
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
 
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 tab?.tabSelected()
             }
 
         })
+        runOnUiThread {
+            toolbar.post {
+                if (tabs.tabCount > 1)
+                    toolbar.menu.findItem(R.id.deletePage)?.icon?.setTint(getColorFromRes(R.color.colorIconItemMenu))
+                else
+                    toolbar.menu.findItem(R.id.deletePage)?.icon?.setTint(getColorFromRes(R.color.colorControlNormal))
+            }
+        }
     }
 }
 

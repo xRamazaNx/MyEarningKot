@@ -6,10 +6,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.developer.press.myearningkot.AdapterPageInterface
-import ru.developer.press.myearningkot.database.Card
-import ru.developer.press.myearningkot.database.DataController
-import ru.developer.press.myearningkot.database.FireStore
-import ru.developer.press.myearningkot.database.Page
+import ru.developer.press.myearningkot.database.*
 import ru.developer.press.myearningkot.helpers.MyLiveData
 import ru.developer.press.myearningkot.helpers.SingleLiveEvent
 import ru.developer.press.myearningkot.helpers.liveData
@@ -195,21 +192,31 @@ class MainViewModel(context: Context, list: MutableList<Page>) : ViewModel(),
         }
     }
 
-    fun changedPage(changedRef: FireStore.ChangedRef, updateViewPager: () -> Unit) {
+    fun changedPage(id: String, updateViewPager: () -> Unit) {
         synchronized(pageList) {
             viewModelScope.launch {
-                val find = pageList.find { it.value!!.name == changedRef.name }
+                val pageDB = dataController.getPage(id)
+                val find = pageList.find { it.value!!.name == pageDB!!.name }
                 if (find == null) {
-                    dataController.getPage(changedRef.refId)?.let { page ->
-                        pageList.add(liveData(page))
-                        pageList.sortBy { it.value?.position }
-                        updateViewPager.invoke()
-                    }
+                    pageList.add(liveData(pageDB))
+                    pageList.sortBy { it.value?.position }
+                    updateViewPager.invoke()
                 } else {
                     // на всякий пожарный
-                    find.value!!.refId = changedRef.refId
+                    find.value!!.refId = pageDB!!.refId
                     find.updateValue()
                 }
+            }
+        }
+    }
+
+    fun deletePage(tabPosition: Int, updateView: (position: Int) -> Unit) {
+        viewModelScope.launch {
+            val pageLiveData = pageList[tabPosition]
+            pageList.removeAt(tabPosition)
+            dataController.deletePage(pageLiveData.value!!)
+            runOnMain {
+                updateView.invoke(tabPosition)
             }
         }
     }

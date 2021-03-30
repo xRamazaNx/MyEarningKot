@@ -25,7 +25,6 @@ import kotlinx.coroutines.*
 import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.App.Companion.app
 import ru.developer.press.myearningkot.adapters.animationAdd
-import ru.developer.press.myearningkot.adapters.animationDelete
 import ru.developer.press.myearningkot.database.Card
 import ru.developer.press.myearningkot.database.DataController
 import ru.developer.press.myearningkot.dialogs.PICK_IMAGE_MULTIPLE
@@ -33,7 +32,6 @@ import ru.developer.press.myearningkot.dialogs.editCellTag
 import ru.developer.press.myearningkot.helpers.EditCellControl
 import ru.developer.press.myearningkot.helpers.getColorFromRes
 import ru.developer.press.myearningkot.helpers.getDrawableRes
-import ru.developer.press.myearningkot.helpers.scoups.getSelectedRows
 import ru.developer.press.myearningkot.model.*
 import ru.developer.press.myearningkot.viewmodels.CardViewModel
 import ru.developer.press.myearningkot.viewmodels.CardViewModel.SelectMode
@@ -48,7 +46,7 @@ open class CardActivity : BasicCardActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             val data = it.data
             if (data != null) {
-                val id = data.getStringExtra(CARD_ID)?:""
+                val id = data.getStringExtra(CARD_ID) ?: ""
                 if (id.isNotEmpty()) {
                     if (viewModel == null) {
                         recreate()
@@ -97,27 +95,19 @@ open class CardActivity : BasicCardActivity() {
         fbAddRow.setContentCoverColour(Color.TRANSPARENT)
         hideViewWhileScroll()
 
-        // листенер для обновления после удаления то есть после ее анимации
-        val animateListener = object : Animation.AnimationListener {
-            override fun onAnimationRepeat(p0: Animation?) {
+        animationAdd.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation?) {
 
             }
 
-            override fun onAnimationEnd(p0: Animation?) {
-                viewModel?.apply {
-                    deleteRows { first, last ->
-                        adapter.notifyItemRangeRemoved(first, last)
-                    }
-                    selectMode.value = SelectMode.NONE
-                }
+            override fun onAnimationEnd(animation: Animation?) {
+                adapter.notifyDataSetChanged()
             }
 
-            override fun onAnimationStart(p0: Animation?) {
+            override fun onAnimationRepeat(animation: Animation?) {
             }
 
-        }
-        animationDelete.setAnimationListener(animateListener)
-        animationAdd.setAnimationListener(animateListener)
+        })
     }
 
 
@@ -433,12 +423,10 @@ open class CardActivity : BasicCardActivity() {
     }
 
     private fun removeSelectedRows() {
-        viewModel?.apply {
-            card.getSelectedRows().forEach {
-                it.status = Row.Status.DELETED
-            }
+        viewModel?.deleteRows {
+            adapter.notifyDataSetChanged()
         }
-        notifyAdapter()
+
     }
 
     // выполняем что ни будь и рекуклер обновляется после конца анимации
@@ -606,16 +594,10 @@ open class CardActivity : BasicCardActivity() {
                             fbAddRow.openSpeedDialMenu()
                         }
                         // если нажали в простое
-                        else -> CoroutineScope(Dispatchers.Main).launch {
-                            val rowAdded = withContext(Dispatchers.IO) {
-                                addRow()
+                        else ->
+                            addRow {
+                                scrollToPosition(sortedRows.size)
                             }
-//                            notifyAdapter()
-                            // обновляем в начале так как отчет идет в самой карточке
-                            updateTotals()
-                            scrollToPosition(sortedRows.indexOf(rowAdded) + 1)
-
-                        }
                     }
                 }
             }

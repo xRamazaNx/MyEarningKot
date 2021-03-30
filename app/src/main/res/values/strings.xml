@@ -399,4 +399,5 @@
     <string name="add_total">Добавить итог</string>
     <string name="preview">Предпросмотр</string>
     <string name="sample_menu">Меню шаблона</string>
+    <string name="delete_page">Удалить вкладку</string>
 </resources>

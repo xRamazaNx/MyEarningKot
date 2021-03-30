@@ -1,10 +1,12 @@
 package ru.developer.press.myearningkot.database
 
 import androidx.room.*
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.Exclude
 import ru.developer.press.myearningkot.ProvideCardPropertyForCell
 import ru.developer.press.myearningkot.helpers.MyLiveData
 import ru.developer.press.myearningkot.helpers.getDate
+import ru.developer.press.myearningkot.helpers.scoups.calcTotals
 import ru.developer.press.myearningkot.model.*
 import java.util.*
 
@@ -26,16 +28,25 @@ open class Ref {
         dateChange = System.currentTimeMillis()
         ref.dateChange = dateChange
     }
+
     @PrimaryKey
     var refId: String = UUID.randomUUID().toString()
     var dateCreate = System.currentTimeMillis()
     var dateChange: Long = dateCreate
 }
 
-open class IdsRef(
+open class BelongIds(
     var pageId: String,
     var cardId: String
-) : Ref()
+) : Ref() {
+    companion object {
+        fun withPage(refId: String): BelongIds {
+            return BelongIds("", "").apply {
+                this.refId = refId
+            }
+        }
+    }
+}
 
 @Entity
 class Page(
@@ -49,6 +60,7 @@ class Page(
         position = copPage.position
         name = copPage.name
     }
+
     @Ignore
     @get:Exclude
     val cards = mutableListOf<MyLiveData<Card>>()
@@ -110,7 +122,7 @@ open class Card(var pageId: String, var name: String = "") : Ref(), ProvideCardP
     override fun getValutaType(): Int = valuta
 }
 
-open class JsonValue(pageId: String, cardId: String) : IdsRef(pageId, cardId) {
+open class JsonValue(pageId: String, cardId: String) : BelongIds(pageId, cardId) {
     var json: String = ""
 }
 
@@ -175,4 +187,10 @@ fun Total.totalJson(): TotalJson {
     totalJson.copyRefFrom(this)
     return totalJson
 }
+
+data class UpdatedRefData(
+    val refIds: BelongIds,
+    val refType: FireStore.RefType,
+    val updatedType: DocumentChange.Type
+)
 

@@ -44,4 +44,9 @@ class AdapterViewPagerToMain(
             PageFragment.create(pageId)
         )
     }
+
+    fun deletePage(position: Int) {
+        fragments.removeAt(position)
+        notifyItemRemoved(position)
+    }
 }

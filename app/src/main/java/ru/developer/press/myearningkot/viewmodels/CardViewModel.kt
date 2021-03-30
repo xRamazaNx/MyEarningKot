@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.developer.press.myearningkot.ProvideDataRows
@@ -17,8 +18,10 @@ import ru.developer.press.myearningkot.database.Page
 import ru.developer.press.myearningkot.helpers.MyLiveData
 import ru.developer.press.myearningkot.helpers.liveData
 import ru.developer.press.myearningkot.helpers.runOnIO
+import ru.developer.press.myearningkot.helpers.runOnMain
 import ru.developer.press.myearningkot.helpers.scoups.*
 import ru.developer.press.myearningkot.model.*
+import kotlin.time.Duration
 
 open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     ProvideDataRows {
@@ -43,6 +46,7 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
         updateColumnDL()
         updateCardLD()
     }
+
     override fun getColumns(): MutableList<Column> = card.columns
     override fun getWidth(): Int {
         return if (cardLiveData.value!!.enableHorizontalScroll)
@@ -296,15 +300,18 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     }
 
     private val dataController = DataController(context)
+    private val animatedDuration = 700L
 
-    fun addRow(): Row {
-        return card.addRow().apply {
+    fun addRow(end: () -> Unit) {
+        viewModelScope.launch {
+            val addRow = card.addRow()
+            dataController.addRow(addRow)
             sortList()
-            viewModelScope.launch {
-                card.calcTotals()
-                dataController.addRow(this@apply)
-                status = Row.Status.ADDED
-            }
+            runOnMain { end.invoke() }
+            delay(animatedDuration)
+            addRow.status = Row.Status.NONE
+            card.calcTotals()
+            runOnMain { end.invoke() }
         }
     }
 
@@ -438,20 +445,22 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
         return card.getSelectedCell()?.type
     }
 
-    fun deleteRows(updateView: (Int, Int) -> Unit) {
+    fun deleteRows(updateView: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            val deletedRows: List<Row> = sortedRows.filter { it.status == Row.Status.DELETED }
-            val indexOfFirst = sortedRows.indexOfFirst { it.status == Row.Status.DELETED }
-            val indexOfLast = sortedRows.indexOfLast { it.status == Row.Status.DELETED }
+            val deletedRows: List<Row> = sortedRows.filter { it.status == Row.Status.SELECT }
             deletedRows.forEach {
-                it.status = Row.Status.NONE
+                it.status = Row.Status.DELETED
             }
-            card.rows.removeAll(deletedRows)
-
-            withContext(Dispatchers.Main) {
-                updateView(indexOfFirst, indexOfLast)
+            runOnMain {
+                updateView()
             }
+            delay(animatedDuration)
+            card.deleteRows(deletedRows)
+            selectMode.postValue(SelectMode.NONE)
             sortList()
+            runOnMain {
+                updateView()
+            }
             dataController.deleteRows(deletedRows)
         }
         // сортировка листа и обновлении происходит после анимации удаления
@@ -488,6 +497,7 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
                         }) //  копируемый ров
                     }
                     card.rows.addAll(indexLastRow + 1, list)
+                    card.calcTotals()
                     list.forEach {
                         dataController.addRow(it)
                     }

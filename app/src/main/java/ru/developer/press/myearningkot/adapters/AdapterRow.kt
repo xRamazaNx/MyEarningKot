@@ -7,6 +7,7 @@ import android.view.animation.Animation
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeAdapter
@@ -31,6 +32,7 @@ class AdapterRecyclerInCard(
     private val provideDataRows: ProvideDataRows,
     private val totalView: View?
 ) : RecyclerView.Adapter<RowHolder>() {
+
     private var cellClickPrefFunction: ((Int) -> Unit)? = null
     fun setCellClickPref(cellClickFun: ((Int) -> Unit)?) {
         cellClickPrefFunction = cellClickFun
@@ -175,8 +177,8 @@ class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataList
         if (itemViewType == -1) {
             return
         }
-        row.elementView = itemView
         val context = itemView.context
+        row.elementView = itemView
 
         positionRow = adapterPosition
 
@@ -205,18 +207,24 @@ class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataList
                 }
             }
             Row.Status.ADDED -> {
-                itemView.startAnimation(animationAdd)
-                itemView.animateColor(
-                    context.getColorFromRes(R.color.colorSecondaryLight),
-                    Color.TRANSPARENT,
-                    700
-                )
-                row.status = Row.Status.NONE
-                bind(row, columns, previousRow, secondRow)
+                if (row.elementView.animation == null) {
+                    row.elementView.startAnimation(animationAdd)
+                    row.elementView.animateColor(
+                        context.getColorFromRes(R.color.colorSecondaryLight),
+                        Color.TRANSPARENT,
+                        700
+                    )
+                }
             }
             Row.Status.DELETED -> {
-                itemView.startAnimation(animationDelete)
-                itemView.animateColor(Color.TRANSPARENT, Color.RED, 700)
+                if (row.elementView.animation == null) {
+                    row.elementView.animateColor(Color.TRANSPARENT, Color.RED, 300) {
+                        row.elementView
+                            .animate()
+                            .setDuration(1000)
+                            .translationX(itemView.width.toFloat() + 30)
+                    }
+                }
             }
             else -> {
                 // если есть хоть один свитч который настроен на поведение меняющее запись
@@ -227,6 +235,8 @@ class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataList
                         row.crossOut(itemView, behavior.crossOut && cell.sourceValue.toBoolean())
                     }
                 }
+                row.elementView.animation = null
+                row.elementView.translationX = 0F
                 row.setBackground(R.color.colorBackgroundCard)
             }
         }

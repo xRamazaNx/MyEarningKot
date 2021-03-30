@@ -7,10 +7,10 @@ import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import org.jetbrains.anko.backgroundColorResource
 import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.database.IdsRef
+import ru.developer.press.myearningkot.database.BelongIds
 import java.util.*
 
-class Row(pageId:String, cardId:String) : IdsRef(pageId, cardId), Backgrounder {
+class Row(pageId:String, cardId:String) : BelongIds(pageId, cardId), Backgrounder {
     fun crossOut(itemView: View, isCrossOut: Boolean) {
         val frameLayout = itemView as FrameLayout
         if (isCrossOut) {
@@ -24,7 +24,9 @@ class Row(pageId:String, cardId:String) : IdsRef(pageId, cardId), Backgrounder {
         }
     }
 
+    @Transient
     var status = Status.NONE
+
     @Transient
     override var currentBackground: Int = -1
     @Transient

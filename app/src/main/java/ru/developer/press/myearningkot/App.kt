@@ -17,6 +17,7 @@ import ru.developer.press.myearningkot.adapters.animationAdd
 import ru.developer.press.myearningkot.adapters.animationDelete
 import ru.developer.press.myearningkot.database.DataController
 import ru.developer.press.myearningkot.database.FireStore
+import ru.developer.press.myearningkot.database.UpdatedRefData
 import ru.developer.press.myearningkot.helpers.filesFolder
 import ru.developer.press.myearningkot.helpers.getColorFromRes
 import ru.developer.press.myearningkot.helpers.liveData
@@ -31,7 +32,7 @@ class App : Application(), ActivityLifecycleCallbacks {
             return application as App
         }
 
-        var fireStoreChanged = liveData<FireStore.ChangedRef>()
+        var fireStoreChanged = liveData<UpdatedRefData>()
     }
 
     var currentActivity: AppCompatActivity? = null

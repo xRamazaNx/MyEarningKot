@@ -11,7 +11,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -25,9 +24,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.matchParent
 import ru.developer.press.myearningkot.adapters.AdapterCard
-import ru.developer.press.myearningkot.database.Card
 import ru.developer.press.myearningkot.database.Page
-import ru.developer.press.myearningkot.helpers.MyLiveData
 import ru.developer.press.myearningkot.helpers.runOnMain
 
 class PageFragment : Fragment() {
@@ -56,15 +53,18 @@ class PageFragment : Fragment() {
         }
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        recycler = view.recyclerCards
+        iniAdapter(page!!)
+
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val inflate = inflater.inflate(R.layout.main_cards_layout, null)
-        recycler = inflate.recyclerCards
-        iniAdapter(page!!)
-        return inflate
+        return inflater.inflate(R.layout.main_cards_layout, null)
     }
 
     private fun iniAdapter(page: Page) {

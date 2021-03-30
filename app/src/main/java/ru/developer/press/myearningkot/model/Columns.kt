@@ -6,13 +6,13 @@ import com.google.gson.annotations.SerializedName
 import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.adapters.ParamModel
 import ru.developer.press.myearningkot.database.Card
-import ru.developer.press.myearningkot.database.IdsRef
+import ru.developer.press.myearningkot.database.BelongIds
 import ru.developer.press.myearningkot.helpers.*
 import java.math.BigDecimal
 import java.util.*
 import kotlin.random.Random
 
-abstract class Column(var name: String, pageId: String, cardId: String) : IdsRef(pageId,cardId), FormulaId {
+abstract class Column(var name: String, pageId: String, cardId: String) : BelongIds(pageId,cardId), FormulaId {
     @SerializedName("itf")
     override var idToFormula: Long = Random.nextLong()
     companion object {
