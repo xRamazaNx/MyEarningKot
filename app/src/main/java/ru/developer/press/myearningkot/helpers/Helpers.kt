@@ -23,13 +23,11 @@ import androidx.annotation.MainThread
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.list_item_change_layout.view.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.model.Column
@@ -41,23 +39,7 @@ import java.text.DecimalFormatSymbols
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
-fun <T> liveData(t: T? = null): MyLiveData<T> {
-    return MyLiveData(t)
-}
-
-suspend fun <T> runOnMain(block: suspend () -> T): T {
-    return withContext(Dispatchers.Main) {
-        block.invoke()
-    }
-}
-
-suspend fun <T> runOnIO(block: suspend () -> T): T {
-    return withContext(Dispatchers.IO) {
-        block.invoke()
-    }
-}
-
-class MyLiveData<T>(t: T?) : MutableLiveData<T>() {
+abstract class MyLiveData<T>(t: T?) : MutableLiveData<T>() {
     init {
         t?.let {
             value = it
@@ -67,6 +49,10 @@ class MyLiveData<T>(t: T?) : MutableLiveData<T>() {
     fun updateValue() {
         postValue(value)
     }
+}
+
+fun <T> liveData(t: T? = null): MyLiveData<T> {
+    return object : MyLiveData<T>(t) {}
 }
 
 fun <T> observer(changed: (T) -> Unit): Observer<T> {

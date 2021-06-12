@@ -17,9 +17,7 @@ import ru.developer.press.myearningkot.adapters.animationAdd
 import ru.developer.press.myearningkot.adapters.animationDelete
 import ru.developer.press.myearningkot.database.DataController
 import ru.developer.press.myearningkot.database.UpdatedRefData
-import ru.developer.press.myearningkot.helpers.filesFolder
-import ru.developer.press.myearningkot.helpers.getColorFromRes
-import ru.developer.press.myearningkot.helpers.liveData
+import ru.developer.press.myearningkot.helpers.*
 import ru.developer.press.myearningkot.model.*
 
 class App : Application(), ActivityLifecycleCallbacks {
@@ -52,7 +50,7 @@ class App : Application(), ActivityLifecycleCallbacks {
         val dataController = DataController(applicationContext)
         authUser = Firebase.auth
 
-        GlobalScope.launch {
+        runOnIO {
             registerActivityLifecycleCallbacks(this@App)
             animationDelete = AnimationUtils.loadAnimation(applicationContext, R.anim.anim_delete)
             animationAdd =

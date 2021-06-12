@@ -8,14 +8,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.card_basic_pref_layout.view.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.jetbrains.anko.layoutInflater
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.database.Card
 import ru.developer.press.myearningkot.helpers.getValutaTypeList
+import ru.developer.press.myearningkot.helpers.runOnMaim
 import ru.developer.press.myearningkot.helpers.setAlertButtonColors
 import ru.developer.press.myearningkot.helpers.showItemChangeDialog
 
@@ -129,7 +127,7 @@ class DialogBasicPrefCard(
     }
 
     private fun updateCard() {
-        CoroutineScope(Dispatchers.Main).launch {
+        runOnMaim {
             delay(250)
             basicPrefEvent()
         }

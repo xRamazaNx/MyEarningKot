@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory
-        android:title="@string/font_size_zapisi_category">
+    <PreferenceCategory android:title="@string/font_size_zapisi_category">
 
         <ListPreference
             android:layout_width="wrap_content"
@@ -12,7 +10,7 @@
             android:entries="@array/font_size"
             android:entryValues="@array/font_size"
             android:key="@string/number"
-            android:title="@string/number"/>
+            android:title="@string/number" />
         <ListPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -20,7 +18,7 @@
             android:entries="@array/font_size"
             android:entryValues="@array/font_size"
             android:key="@string/summa"
-            android:title="@string/summa"/>
+            android:title="@string/summa" />
         <ListPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -28,7 +26,7 @@
             android:entries="@array/font_size"
             android:entryValues="@array/font_size"
             android:key="@string/avans"
-            android:title="@string/avans"/>
+            android:title="@string/avans" />
         <ListPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -36,7 +34,7 @@
             android:entries="@array/font_size"
             android:entryValues="@array/font_size"
             android:key="@string/note"
-            android:title="@string/note"/>
+            android:title="@string/note" />
         <ListPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -44,7 +42,7 @@
             android:entries="@array/font_size"
             android:entryValues="@array/font_size"
             android:key="@string/date"
-            android:title="@string/date"/>
+            android:title="@string/date" />
         <ListPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -52,10 +50,9 @@
             android:entries="@array/font_size"
             android:entryValues="@array/font_size"
             android:key="@string/date_period_key"
-            android:title="@string/day_period"/>
+            android:title="@string/day_period" />
     </PreferenceCategory>
-    <PreferenceCategory
-        android:title="@string/font_size_obshee_category">
+    <PreferenceCategory android:title="@string/font_size_obshee_category">
 
         <ListPreference
             android:layout_width="wrap_content"
@@ -64,7 +61,7 @@
             android:entries="@array/font_size"
             android:entryValues="@array/font_size"
             android:key="@string/zarplata"
-            android:title="@string/zarplata"/>
+            android:title="@string/zarplata" />
         <ListPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -72,7 +69,7 @@
             android:entries="@array/font_size"
             android:entryValues="@array/font_size"
             android:key="@string/avans_key_obshee"
-            android:title="@string/avans"/>
+            android:title="@string/avans" />
         <ListPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -80,6 +77,6 @@
             android:entries="@array/font_size"
             android:entryValues="@array/font_size"
             android:key="@string/residue"
-            android:title="@string/residue"/>
+            android:title="@string/residue" />
     </PreferenceCategory>
 </PreferenceScreen>

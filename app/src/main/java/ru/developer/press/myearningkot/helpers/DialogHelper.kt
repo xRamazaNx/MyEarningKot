@@ -17,6 +17,7 @@ fun AlertDialog.setAlertButtonColors(colorPositiveRes: Int, colorNegativeRes: In
         }
     }
 }
+
 fun android.app.AlertDialog.setAlertButtonColors(colorPositiveRes: Int, colorNegativeRes: Int) {
     setOnShowListener {
         getButton(DialogInterface.BUTTON_POSITIVE).apply {

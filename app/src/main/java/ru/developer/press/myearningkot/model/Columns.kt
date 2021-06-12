@@ -12,9 +12,11 @@ import java.math.BigDecimal
 import java.util.*
 import kotlin.random.Random
 
-abstract class Column(var name: String, pageId: String, cardId: String) : BelongIds(pageId,cardId), FormulaId {
+abstract class Column(var name: String, pageId: String, cardId: String) : BelongIds(pageId, cardId),
+    FormulaId {
     @SerializedName("itf")
     override var idToFormula: Long = Random.nextLong()
+
     companion object {
         @SerializedName("tc")
         var titleColor: Int = 0
@@ -74,7 +76,8 @@ abstract class Column(var name: String, pageId: String, cardId: String) : Belong
 
 }
 
-class NumerationColumn(name: String, pageId: String, cardId: String) : Column(name,pageId,cardId) {
+class NumerationColumn(name: String, pageId: String, cardId: String) :
+    Column(name, pageId, cardId) {
     companion object {
         var color = 0
     }
@@ -105,7 +108,7 @@ class NumerationColumn(name: String, pageId: String, cardId: String) : Column(na
 
 }
 
-class TextColumn(name: String, pageId: String, cardId: String) : Column(name,pageId,cardId) {
+class TextColumn(name: String, pageId: String, cardId: String) : Column(name, pageId, cardId) {
     @SerializedName("cp")
     var typePref = TextTypePref()
 
@@ -121,7 +124,7 @@ class TextColumn(name: String, pageId: String, cardId: String) : Column(name,pag
     }
 }
 
-class NumberColumn(name: String, pageId: String, cardId: String) : Column(name,pageId,cardId) {
+class NumberColumn(name: String, pageId: String, cardId: String) : Column(name, pageId, cardId) {
     @SerializedName("cp")
     var typePref = NumberTypePref()
 
@@ -180,7 +183,7 @@ class NumberColumn(name: String, pageId: String, cardId: String) : Column(name,p
     }
 }
 
-class PhoneColumn(name: String, pageId: String, cardId: String) : Column(name,pageId,cardId) {
+class PhoneColumn(name: String, pageId: String, cardId: String) : Column(name, pageId, cardId) {
     companion object {
         var nameOfMan = ""
         var lastName = ""
@@ -239,7 +242,7 @@ class PhoneColumn(name: String, pageId: String, cardId: String) : Column(name,pa
 
 }
 
-class DateColumn(name: String, pageId: String, cardId: String) : Column(name,pageId,cardId) {
+class DateColumn(name: String, pageId: String, cardId: String) : Column(name, pageId, cardId) {
     @SerializedName("cp")
     var typePref = DateTypePref()
 
@@ -256,7 +259,7 @@ class DateColumn(name: String, pageId: String, cardId: String) : Column(name,pag
 
 }
 
-class ColorColumn(name: String, pageId: String, cardId: String) : Column(name,pageId,cardId) {
+class ColorColumn(name: String, pageId: String, cardId: String) : Column(name, pageId, cardId) {
     @SerializedName("cp")
     var typePref = ColorTypePref()
 
@@ -272,7 +275,7 @@ class ColorColumn(name: String, pageId: String, cardId: String) : Column(name,pa
 //        выбор фигруы для цвета
 }
 
-class SwitchColumn(name: String, pageId: String, cardId: String) : Column(name,pageId,cardId) {
+class SwitchColumn(name: String, pageId: String, cardId: String) : Column(name, pageId, cardId) {
     @SerializedName("cp")
     var typePref = SwitchTypePref()
 
@@ -288,7 +291,7 @@ class SwitchColumn(name: String, pageId: String, cardId: String) : Column(name,p
     // может будут выборы типа
 }
 
-class ImageColumn(name: String, pageId: String, cardId: String) : Column(name,pageId,cardId) {
+class ImageColumn(name: String, pageId: String, cardId: String) : Column(name, pageId, cardId) {
     @SerializedName("cp")
     var typePref = ImageTypePref()
 
@@ -304,7 +307,7 @@ class ImageColumn(name: String, pageId: String, cardId: String) : Column(name,pa
     // может рамки не знаю
 }
 
-class ListColumn(name: String, pageId: String, cardId: String) : Column(name,pageId,cardId) {
+class ListColumn(name: String, pageId: String, cardId: String) : Column(name, pageId, cardId) {
     @SerializedName("cp")
     var typePref = ListTypePref()
 

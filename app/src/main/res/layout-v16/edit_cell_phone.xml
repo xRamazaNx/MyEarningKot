@@ -136,8 +136,7 @@
             android:paddingEnd="16dp"
             android:paddingBottom="8dp"
             android:text="@string/call"
-            android:textColor="@color/textColorPrimary"
-            />
+            android:textColor="@color/textColorPrimary" />
 
     </com.google.android.material.card.MaterialCardView>
 

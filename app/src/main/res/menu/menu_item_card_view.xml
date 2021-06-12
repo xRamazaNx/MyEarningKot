@@ -3,8 +3,8 @@
 
     <item
         android:id="@+id/id_complete_card_menu_item"
-        android:title="@string/COMPLETE_ACCOUNTING_CARD"/>
+        android:title="@string/COMPLETE_ACCOUNTING_CARD" />
     <item
         android:id="@+id/id_delete_item_cardView"
-        android:title="@string/DELETE"/>
+        android:title="@string/DELETE" />
 </menu>

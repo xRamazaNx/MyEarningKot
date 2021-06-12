@@ -6,8 +6,8 @@ import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.model.ColumnType
 
 class PrefSelectedControl {
-     var showWidthSeekBar:((List<SelectedElement>))->Unit = {}
-     var hideWidthSeekBar:((List<SelectedElement>))->Unit = {}
+    var showWidthSeekBar: ((List<SelectedElement>)) -> Unit = {}
+    var hideWidthSeekBar: ((List<SelectedElement>)) -> Unit = {}
 
     val isRenameMode: Boolean
         get() {

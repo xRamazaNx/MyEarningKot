@@ -6,10 +6,10 @@
     android:orientation="vertical"
     android:background="@color/colorBackground">
 
-<!--    <FrameLayout-->
-<!--        android:background="@color/colorControlNormal"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="1dp"/>-->
+    <!--    <FrameLayout-->
+    <!--        android:background="@color/colorControlNormal"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="1dp"/>-->
     <SeekBar
         android:padding="16dp"
         android:id="@+id/widthColumnSeekBar"

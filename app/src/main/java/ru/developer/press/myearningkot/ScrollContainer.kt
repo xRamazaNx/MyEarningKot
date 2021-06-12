@@ -42,7 +42,7 @@ class ScrollContainer(
 
         if (ev.action == MotionEvent.ACTION_MOVE) {
             isMove =
-                // диапозон который используется для определения движения пальца
+                    // диапозон который используется для определения движения пальца
                 !(ev.x - motionEventFromActionDown.x in -10f..10f && ev.y - motionEventFromActionDown.y in -10f..10f)
         }
         if (ev.action == MotionEvent.ACTION_DOWN) {

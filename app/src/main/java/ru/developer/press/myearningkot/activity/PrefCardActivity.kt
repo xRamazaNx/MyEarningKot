@@ -37,8 +37,11 @@ import ru.developer.press.myearningkot.database.DataController
 import ru.developer.press.myearningkot.dialogs.DialogBasicPrefCard
 import ru.developer.press.myearningkot.dialogs.DialogSetName
 import ru.developer.press.myearningkot.dialogs.myDialog
+import ru.developer.press.myearningkot.helpers.io
+import ru.developer.press.myearningkot.helpers.main
 import ru.developer.press.myearningkot.helpers.prefLayouts.*
 import ru.developer.press.myearningkot.helpers.prefLayouts.ElementPrefType.*
+import ru.developer.press.myearningkot.helpers.runOnMaim
 import ru.developer.press.myearningkot.helpers.showItemChangeDialog
 import ru.developer.press.myearningkot.model.*
 import ru.developer.press.myearningkot.viewmodels.CardViewModel
@@ -128,7 +131,7 @@ class PrefCardActivity : BasicCardActivity() {
             } else {
                 dataController.getSampleCard(prefCardInfo.idCard)
             }
-            withContext(Dispatchers.Main) {
+            main {
                 viewModel = ViewModelProvider(
                     this@PrefCardActivity, ViewModelCardFactory(
                         this@PrefCardActivity,
@@ -287,8 +290,8 @@ class PrefCardActivity : BasicCardActivity() {
                 viewModel?.card.let { card ->
                     val dialogBasicPrefCard = DialogBasicPrefCard(card!!) {
                         // ps покрывает обновление всех четырех настроек которые настраиваются в диалоге
-                        CoroutineScope(Dispatchers.Main).launch {
-                            withContext(Dispatchers.IO) {
+                        runOnMaim {
+                            io {
                                 adapter = getAdapterForRecycler()
                             }
                             updateHorizontalScrollSwitched()
@@ -668,8 +671,8 @@ class PrefCardActivity : BasicCardActivity() {
                                         }
 
                                         override fun prefChanged() {
-                                            CoroutineScope(Dispatchers.Main).launch {
-                                                withContext(Dispatchers.IO) {
+                                            runOnMaim {
+                                                io {
                                                     columnList.forEach {
                                                         viewModel?.updateTypeControlColumn(it)
                                                     }
@@ -701,8 +704,8 @@ class PrefCardActivity : BasicCardActivity() {
                                         }
 
                                         override fun recreateView() {
-                                            CoroutineScope(Dispatchers.Main).launch {
-                                                withContext(Dispatchers.IO) {
+                                            runOnMaim {
+                                                io {
                                                     adapter = getAdapterForRecycler()
                                                 }
                                                 updateHorizontalScrollSwitched()

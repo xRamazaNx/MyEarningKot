@@ -9,16 +9,17 @@ import androidx.fragment.app.DialogFragment
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.helpers.setAlertButtonColors
 
-fun myDialog (init : AlertDialog.Builder.() -> Unit) : MyDialog{
+fun myDialog(init: AlertDialog.Builder.() -> Unit): MyDialog {
     return MyDialog().apply {
-        setAlertConfig( init)
+        setAlertConfig(init)
     }
 }
+
 class MyDialog : DialogFragment() {
     var positiveButtonColorRes = R.color.colorAccent
     var negativeButtonColorRes = R.color.colorAccent
 
-    private var alertInit :AlertDialog.Builder.() -> Unit = {}
+    private var alertInit: AlertDialog.Builder.() -> Unit = {}
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog: AlertDialog.Builder = AlertDialog.Builder(requireContext()).apply {

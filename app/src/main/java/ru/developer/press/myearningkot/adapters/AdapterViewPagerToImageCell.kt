@@ -23,6 +23,7 @@ class AdapterViewPagerToImageCell(
             fragments.add(ImageFragment())
         }
     }
+
     override fun createFragment(position: Int): Fragment {
 
         return fragments[position].apply {

@@ -25,7 +25,7 @@ import org.jetbrains.anko.dip
 import org.jetbrains.anko.matchParent
 import ru.developer.press.myearningkot.adapters.AdapterCard
 import ru.developer.press.myearningkot.database.Page
-import ru.developer.press.myearningkot.helpers.runOnMain
+import ru.developer.press.myearningkot.helpers.main
 
 class PageFragment : Fragment() {
     var page: Page? = null
@@ -59,6 +59,7 @@ class PageFragment : Fragment() {
         iniAdapter(page!!)
 
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -70,7 +71,7 @@ class PageFragment : Fragment() {
     private fun iniAdapter(page: Page) {
         lifecycleScope.launch(Dispatchers.IO) {
             adapterCard = AdapterCard(page.cards)
-            runOnMain {
+            main {
                 recycler?.adapter = adapterCard
             }
         }

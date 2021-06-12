@@ -42,7 +42,7 @@ class AdapterCard(private val cards: MutableList<MyLiveData<Card>>) :
             val idCard = card.value!!.refId
             setClick(idCard)
             setLongClick(idCard)
-            card.observe(activity, observer {  c ->
+            card.observe(activity, observer { c ->
                 c.inflatePlate(itemView)
                 itemView.setShowTotalInfo(c.isShowTotalInfo)
 
@@ -55,11 +55,14 @@ class AdapterCard(private val cards: MutableList<MyLiveData<Card>>) :
                     }
                 }
 
-
             })
 
             val colorFromRes = itemView.context.getColorFromRes(R.color.colorSelectCard)
-            itemView.animateColor(Color.Transparent.toArgb(), colorFromRes, ItemAnimator.animateDuration)
+            itemView.animateColor(
+                Color.Transparent.toArgb(),
+                colorFromRes,
+                ItemAnimator.animateDuration
+            )
         }
 
         private fun setLongClick(idCard: String) {

@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <set xmlns:android="http://schemas.android.com/apk/res/android"
-     android:duration="400"
-     android:fillAfter="true"
-     android:interpolator="@android:anim/accelerate_decelerate_interpolator"
-     android:shareInterpolator="false"
-    >
+    android:duration="400"
+    android:fillAfter="true"
+    android:interpolator="@android:anim/accelerate_decelerate_interpolator"
+    android:shareInterpolator="false">
     <translate
 
         android:fromYDelta="-8%"
-        android:toYDelta="0%"
-        />
+        android:toYDelta="0%" />
 
 
 </set>

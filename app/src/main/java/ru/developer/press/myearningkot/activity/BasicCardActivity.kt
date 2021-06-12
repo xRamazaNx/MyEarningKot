@@ -12,18 +12,13 @@ import androidx.core.view.contains
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_card.*
 import kotlinx.android.synthetic.main.card.view.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.jetbrains.anko.backgroundColorResource
 import org.jetbrains.anko.backgroundResource
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.adapters.AdapterRow
 import ru.developer.press.myearningkot.databinding.ActivityCardBinding
-import ru.developer.press.myearningkot.helpers.ItemAnimator
-import ru.developer.press.myearningkot.helpers.bindTitleOfColumn
-import ru.developer.press.myearningkot.helpers.getColorFromRes
+import ru.developer.press.myearningkot.helpers.*
 import ru.developer.press.myearningkot.helpers.scoups.inflatePlate
 import ru.developer.press.myearningkot.helpers.scoups.updateTotalAmount
 import ru.developer.press.myearningkot.viewmodels.CardViewModel
@@ -151,12 +146,13 @@ abstract class BasicCardActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        CoroutineScope(Dispatchers.Main).launch {
-            withContext(Dispatchers.IO) {
+        runOnMaim {
+            io {
                 while (true) {
                     if (viewModel != null) {
                         break
                     }
+                    delay(50)
                 }
             }
             setShowTotalInfo(viewModel!!.card.isShowTotalInfo)

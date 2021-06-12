@@ -9,7 +9,7 @@ import org.jetbrains.anko.backgroundColorResource
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.database.BelongIds
 
-class Row(pageId:String, cardId:String) : BelongIds(pageId, cardId), Backgrounder {
+class Row(pageId: String, cardId: String) : BelongIds(pageId, cardId), Backgrounder {
     fun crossOut(itemView: View, isCrossOut: Boolean) {
         val frameLayout = itemView as FrameLayout
         if (isCrossOut) {
@@ -28,6 +28,7 @@ class Row(pageId:String, cardId:String) : BelongIds(pageId, cardId), Backgrounde
 
     @Transient
     override var currentBackground: Int = -1
+
     @Transient
     override lateinit var elementView: View
 

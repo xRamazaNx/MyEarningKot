@@ -19,12 +19,12 @@ import ru.developer.press.myearningkot.helpers.prefLayouts.subtractChar
 interface Backgrounder {
     var currentBackground: Int
 
-    var elementView:View
+    var elementView: View
 
     fun setBackground(backgroundRes: Int) {
         currentBackground = backgroundRes
         val drawable =
-            elementView.let { ContextCompat.getDrawable(it.context,currentBackground) }
+            elementView.let { ContextCompat.getDrawable(it.context, currentBackground) }
         elementView.background = drawable
     }
 }
@@ -88,12 +88,17 @@ class ImageTypeValue {
 class ListType {
     @SerializedName("ln")
     var listName: String = ""
+
     @SerializedName("l")
     var list: MutableList<String> = mutableListOf()
 }
 
 class Formula {
-    fun getFormulaString(context:Context, columnList: List<NumberColumn>, totalList: List<Total>?): Spannable {
+    fun getFormulaString(
+        context: Context,
+        columnList: List<NumberColumn>,
+        totalList: List<Total>?
+    ): Spannable {
         val spannable = SpannableStringBuilder()
         val strBuilder = java.lang.StringBuilder()
         formulaElements.forEach { element ->

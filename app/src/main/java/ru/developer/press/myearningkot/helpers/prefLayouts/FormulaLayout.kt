@@ -46,7 +46,7 @@ class FormulaLayout(
         }
 
         initClickNumbers()
-        initClickOperation(view){
+        initClickOperation(view) {
             formula.formulaElements.add(Formula.FormulaElement().apply {
                 type = OTHER
                 value = " $it "
@@ -72,11 +72,11 @@ class FormulaLayout(
         val title = view.totalContainerTitle
         val container = view.totalsContainerInFormula
 
-        if (totalList.isEmpty()){
+        if (totalList.isEmpty()) {
             title.visibility = GONE
         }
         val elementList = formula.formulaElements
-        totalList.forEach {total ->
+        totalList.forEach { total ->
             val textView = TextView(view.context).apply {
                 initParamTextView()
                 text = total.title
@@ -159,7 +159,7 @@ class FormulaLayout(
     }
 
     private fun displayFormula() {
-        displayTextView.text = formula.getFormulaString(view.context,allNColumns, allNTotals)
+        displayTextView.text = formula.getFormulaString(view.context, allNColumns, allNTotals)
     }
 
 
@@ -243,7 +243,8 @@ fun formulaDialogShow(
     }
     dialog.window?.setBackgroundDrawable(ColorDrawable(context.getColorFromRes(R.color.colorPrimary)))
 }
-fun initClickOperation(view: View, callBack : (String) -> Unit) {
+
+fun initClickOperation(view: View, callBack: (String) -> Unit) {
     val add = view.add
     val sub = view.subtract
     val mult = view.multiply

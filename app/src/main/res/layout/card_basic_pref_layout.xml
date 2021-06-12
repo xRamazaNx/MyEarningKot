@@ -33,6 +33,7 @@
         android:textColor="@color/colorTitle"
         android:textSize="14sp"
         android:textStyle="bold" />
+
     <TextView
         android:fontFamily="@font/roboto"
         app:fontFamily="@font/roboto"

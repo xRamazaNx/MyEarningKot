@@ -7,7 +7,8 @@
     android:orientation="vertical">
 
     <include layout="@layout/toolbar_pref" />
-    <include layout="@layout/width_seek_bar_layout"/>
+
+    <include layout="@layout/width_seek_bar_layout" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -192,6 +193,7 @@
                     android:id="@+id/acceptRow"
                     android:text="@string/acceptRow"
                     android:textColor="@color/textColorPrimary" />
+
                 <TextView
                     android:textSize="14sp"
                     android:background="@color/colorPrimaryDark"
@@ -202,7 +204,7 @@
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
 
             </LinearLayout>
 

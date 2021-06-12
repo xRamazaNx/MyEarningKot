@@ -5,10 +5,10 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
-        
+
         <item name="colorSecondary">@color/colorSecondary</item>
         <item name="colorSecondaryVariant">@color/colorSecondaryDark</item>
-        
+
         <item name="colorOnPrimary">@color/colorOnPrimary</item>
         <item name="colorAccent">@color/accent</item>
         <item name="android:colorBackground">@color/colorBackground</item>
@@ -45,12 +45,12 @@
         <item name="font">@font/roboto</item>
     </style>
 
-<!--    <style name="ToolbarTheme" parent="Theme.AppCompat.Light.NoAct ionBar">-->
-<!--        <item name="android:textColorPrimary">@color/white</item>-->
-<!--        <item name="android:textColorSecondary">@color/light_gray</item>-->
-<!--        <item name="android:textColor">@color/light_gray</item>-->
-<!--        <item name="android:background">@color/colorPrimary</item>-->
-<!--    </style>-->
+    <!--    <style name="ToolbarTheme" parent="Theme.AppCompat.Light.NoAct ionBar">-->
+    <!--        <item name="android:textColorPrimary">@color/white</item>-->
+    <!--        <item name="android:textColorSecondary">@color/light_gray</item>-->
+    <!--        <item name="android:textColor">@color/light_gray</item>-->
+    <!--        <item name="android:background">@color/colorPrimary</item>-->
+    <!--    </style>-->
 
     <style name="myDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
 
@@ -95,8 +95,8 @@
 
     <style name="editTextStyle" parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="hintTextColor">@color/colorTitle</item>
-        <item name="android:textColorHint"> @color/textColorSecondary</item>
-        <item name="boxStrokeColor"> @color/textColorSecondary</item>
+        <item name="android:textColorHint">@color/textColorSecondary</item>
+        <item name="boxStrokeColor">@color/textColorSecondary</item>
     </style>
 
 </resources>

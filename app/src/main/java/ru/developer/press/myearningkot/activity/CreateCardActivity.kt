@@ -13,9 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.create_card_activity.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.jetbrains.anko.toast
 import ru.developer.press.myearningkot.R
+import ru.developer.press.myearningkot.helpers.main
 import ru.developer.press.myearningkot.viewmodels.CreateCardViewModel
 
 class CreateCardActivity : AppCompatActivity() {
@@ -55,7 +55,7 @@ class CreateCardActivity : AppCompatActivity() {
                     create(this@CreateCardActivity)
                 }
             adapter = viewModel.getAdapter()
-            withContext(Dispatchers.Main) {
+            main {
                 recycler.layoutManager = LinearLayoutManager(this@CreateCardActivity)
                 recycler.adapter = adapter
             }

@@ -77,8 +77,8 @@ class MainActivity : AppCompatActivity(), ProvideDataCards {
                 }
             }
         }
-    private var initializerViewModel: Job = GlobalScope.launch(Dispatchers.Main) {
-        val pageList = withContext(Dispatchers.IO) {
+    private var initializerViewModel: Job = runOnMaim {
+        val pageList = io {
             DataController(this@MainActivity).getPageList()
         }
         viewModel = ViewModelProvider(
@@ -109,8 +109,9 @@ class MainActivity : AppCompatActivity(), ProvideDataCards {
             viewInit()
             App.fireStoreChanged.observe(this, singleObserver { refData ->
                 if (refData.refType == FireStore.RefType.PAGE) {
-                    when(refData.updatedType){
-                        ADDED -> {}
+                    when (refData.updatedType) {
+                        ADDED -> {
+                        }
                         MODIFIED -> {
                             viewModel.changedPage(refData.refIds.refId) {
                                 runOnUiThread {
@@ -120,7 +121,8 @@ class MainActivity : AppCompatActivity(), ProvideDataCards {
                                 }
                             }
                         }
-                        REMOVED -> {}
+                        REMOVED -> {
+                        }
                     }
                 }
             })

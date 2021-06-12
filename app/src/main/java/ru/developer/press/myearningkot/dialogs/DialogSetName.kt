@@ -23,11 +23,13 @@ class DialogSetName : DialogFragment() {
         this.name = name
         return this
     }
+
     fun setTitle(title: String): DialogSetName {
         this.title = title
         return this
     }
-    fun setPositiveListener(click:((String) -> Boolean)? = null): DialogSetName {
+
+    fun setPositiveListener(click: ((String) -> Boolean)? = null): DialogSetName {
         positiveClick = click
         return this
     }

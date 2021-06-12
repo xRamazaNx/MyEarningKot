@@ -1,7 +1,6 @@
 package ru.developer.press.myearningkot.activity
 
 import android.animation.Animator
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -27,9 +26,7 @@ import ru.developer.press.myearningkot.database.Card
 import ru.developer.press.myearningkot.database.DataController
 import ru.developer.press.myearningkot.dialogs.PICK_IMAGE_MULTIPLE
 import ru.developer.press.myearningkot.dialogs.editCellTag
-import ru.developer.press.myearningkot.helpers.EditCellControl
-import ru.developer.press.myearningkot.helpers.getColorFromRes
-import ru.developer.press.myearningkot.helpers.getDrawableRes
+import ru.developer.press.myearningkot.helpers.*
 import ru.developer.press.myearningkot.model.*
 import ru.developer.press.myearningkot.viewmodels.CardViewModel
 import ru.developer.press.myearningkot.viewmodels.CardViewModel.SelectMode
@@ -50,7 +47,7 @@ open class CardActivity : BasicCardActivity() {
                         recreate()
                     } else {
                         viewModel?.viewModelScope?.launch {
-                            val card = withContext(Dispatchers.Default) {
+                            val card = io {
                                 DataController(this@CardActivity).getCard(id)
                             }
 
@@ -70,7 +67,7 @@ open class CardActivity : BasicCardActivity() {
         }
     override var viewModel: CardViewModel? = null
     private var isLongClick = false
-    private val launch = CoroutineScope(Dispatchers.Main).launch {
+    private val launch = runOnMaim {
         val id = intent.getStringExtra(CARD_ID)!!
         val card = DataController(this@CardActivity).getCard(id)
         createViewModel(card)

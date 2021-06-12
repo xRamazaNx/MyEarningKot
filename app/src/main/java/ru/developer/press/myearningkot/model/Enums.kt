@@ -23,6 +23,7 @@ fun getColumnTypeList(): MutableList<String> = mutableListOf<String>().apply {
     add("Изображение")
 //    add("Список")
 }
+
 fun getColumnTypeEnumList(): MutableList<ColumnType> = mutableListOf<ColumnType>().apply {
     add(ColumnType.NUMBER)
     add(ColumnType.TEXT)
@@ -40,6 +41,7 @@ enum class SortMethod {
     UP,
     DOWN
 }
-enum class InputTypeNumberColumn{
+
+enum class InputTypeNumberColumn {
     MANUAL, FORMULA
 }

@@ -6,20 +6,13 @@ import android.content.Context
 import android.widget.LinearLayout
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import ru.developer.press.myearningkot.ProvideDataRows
 import ru.developer.press.myearningkot.adapters.AdapterRow.Companion.animatedDuration
 import ru.developer.press.myearningkot.database.Card
 import ru.developer.press.myearningkot.database.DataController
 import ru.developer.press.myearningkot.database.Page
-import ru.developer.press.myearningkot.helpers.MyLiveData
-import ru.developer.press.myearningkot.helpers.liveData
-import ru.developer.press.myearningkot.helpers.runOnIO
-import ru.developer.press.myearningkot.helpers.runOnMain
+import ru.developer.press.myearningkot.helpers.*
 import ru.developer.press.myearningkot.helpers.scoups.*
 import ru.developer.press.myearningkot.model.*
 
@@ -35,7 +28,7 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     val displayParam = DisplayParam()
     val cardLiveData = liveData(card)
     val totalLiveData = liveData(card)
-    var copyRowList: MutableList<Row>? = null
+    private var copyRowList: MutableList<Row>? = null
 
     var columnLDList = mutableListOf<MyLiveData<Column>>()
 
@@ -71,7 +64,7 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
         cardLiveData.postValue(card)
     }
 
-    fun updateTotals() {
+    private fun updateTotals() {
         totalLiveData.postValue(card)
     }
 
@@ -301,16 +294,16 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     private val dataController = DataController(context)
 
     fun addRow(end: () -> Unit) {
-        viewModelScope.launch {
+        runOnViewModel {
             val addRow = card.addRow()
             dataController.addRow(addRow)
             sortList()
-            runOnMain { end.invoke() }
+            main { end.invoke() }
             delay(animatedDuration)
             addRow.status = Row.Status.NONE
             addRow.elementView.animation = null
             card.calcTotals()
-            runOnMain { end.invoke() }
+            main { end.invoke() }
         }
     }
 
@@ -409,7 +402,7 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     }
 
     fun pasteCell(copyCell: Cell?, updateRow: (Int) -> Unit) {
-        viewModelScope.launch {
+        runOnViewModel {
             if (isEqualTypeCellAndCopyCell(copyCell))
                 card.rows.forEachIndexed { indexRow, row ->
                     row.cellList.forEachIndexed { indexCell, cell ->
@@ -421,10 +414,10 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
                                 updateTotals()
                             }
 
-                            withContext(Dispatchers.Main) {
+                            main {
                                 updateRow(indexRow)
                             }
-                            return@launch
+                            return@runOnViewModel
                         }
                     }
                 }
@@ -432,7 +425,7 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     }
 
     private suspend fun updateRowToDB(row: Row) {
-        runOnIO {
+        io {
             updatedCardStatus.postValue(true)
             card.calcTotals()
             dataController.updateRow(row)
@@ -445,11 +438,11 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     }
 
     fun deleteRows(updateView: (position: Int) -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
+        runOnViewModel {
             val deletedRows = sortedRows.filter { it.status == Row.Status.SELECT }
             deletedRows.forEach {
                 it.status = Row.Status.DELETED
-                runOnMain {
+                main {
                     updateView(
                         sortedRows.indexOf(it)
                     )
@@ -472,7 +465,7 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     }
 
     fun pasteRows() {
-        viewModelScope.launch {
+        runOnViewModel {
             // самый нижний элемент чтобы вставить туда
             val indexLastRow = sortedRows.indexOfLast { it.status == Row.Status.SELECT }
             copyRowList?.let { copyList ->
@@ -542,7 +535,7 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     }
 
     fun updateEditCellRow() {
-        viewModelScope.launch {
+        runOnViewModel {
             val row = sortedRows[rowSelectPosition]
             updateRowToDB(row)
             updateTotals()

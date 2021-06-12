@@ -19,7 +19,7 @@ class CardVM {
     val isShowTotalInfo = liveData<Boolean>()
     val isCardPrefUpdate = liveData<Boolean>()
 
-//    var valuta = 0
+    //    var valuta = 0
     val enableSomeStroke = liveData<Boolean>()
     val sortPref = SortPrefVM()
     val enableHorizontalScroll = liveData<Boolean>()
@@ -37,13 +37,14 @@ class CardVM {
 class ColumnVM {
 
 }
+
 class RowVM {
     val status = liveData<Row.Status>()
     val cellList = mutableListOf<CellVM>()
 }
 
 class CellVM {
-    val isSelect =liveData<Boolean>()
+    val isSelect = liveData<Boolean>()
 
     val isPrefColumnSelect = liveData<Boolean>()
 

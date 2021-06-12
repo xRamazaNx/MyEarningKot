@@ -9,10 +9,10 @@
         app:showAsAction="always" />
 
 
-<!--    <item-->
-<!--        android:id="@+id/page_bacground_color"-->
-<!--        android:icon="@drawable/ic_page_background_color"-->
-<!--        app:showAsAction="always"-->
-<!--        android:title="@string/background"-->
-<!--        tools:ignore="AlwaysShowAction" />-->
+    <!--    <item-->
+    <!--        android:id="@+id/page_bacground_color"-->
+    <!--        android:icon="@drawable/ic_page_background_color"-->
+    <!--        app:showAsAction="always"-->
+    <!--        android:title="@string/background"-->
+    <!--        tools:ignore="AlwaysShowAction" />-->
 </menu>

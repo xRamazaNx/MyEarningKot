@@ -34,7 +34,7 @@
     <color name="textColorTabsTitleSelected">#00828f</color>
 
     <color name="colorDivider">#5A5A5A</color>
-<!--     фон для счетчика сообщений-->
+    <!--     фон для счетчика сообщений-->
     <color name="backOnCount">#00828f</color>
 
     <color name="colorControlEnabled">#096e80</color>
@@ -332,241 +332,241 @@
     <color name="md_yellow_A400">#FFEA00</color>
     <color name="md_yellow_A700">#FFD600</color>
 
-<!--    <color name="shape_select_solid">#1E1491FF</color>-->
-<!--    <color name="shape_cell_select_solid">#1EFFE814</color>-->
-<!--    <color name="shape_cell_select_border">#A60000</color>-->
-<!--    <color name="shape_select_border">#005698</color>-->
-<!--    <color name="shape_select_back">#86BDE6</color>-->
-<!--    <color name="yellow">@color/md_yellow_500</color>-->
+    <!--    <color name="shape_select_solid">#1E1491FF</color>-->
+    <!--    <color name="shape_cell_select_solid">#1EFFE814</color>-->
+    <!--    <color name="shape_cell_select_border">#A60000</color>-->
+    <!--    <color name="shape_select_border">#005698</color>-->
+    <!--    <color name="shape_select_back">#86BDE6</color>-->
+    <!--    <color name="yellow">@color/md_yellow_500</color>-->
 
-<!--    <color name="gray_select">#2DB8B8B8</color>-->
-<!--    <color name="yellow_fb_button">#FF9800</color>-->
+    <!--    <color name="gray_select">#2DB8B8B8</color>-->
+    <!--    <color name="yellow_fb_button">#FF9800</color>-->
 
-<!--    <color name="color_normal">#646464</color>-->
-<!--    <color name="color_background_info_card">#4B4B4B</color>-->
-<!--    <color name="color_activated">#08B193</color>-->
+    <!--    <color name="color_normal">#646464</color>-->
+    <!--    <color name="color_background_info_card">#4B4B4B</color>-->
+    <!--    <color name="color_activated">#08B193</color>-->
 
-<!--    <color name="transparent">#00ffffff</color>-->
-<!--    <color name="fon_font_setting">#f8fffe</color>-->
-<!--    <color name="color_long_click_item">#D1D1D1</color>-->
+    <!--    <color name="transparent">#00ffffff</color>-->
+    <!--    <color name="fon_font_setting">#f8fffe</color>-->
+    <!--    <color name="color_long_click_item">#D1D1D1</color>-->
 
-<!--    <color name="redButton">#e12323</color>-->
-<!--    <color name="greenButton">#1D753A</color>-->
-<!--    <color name="greenButtonLight">#77BD73</color>-->
+    <!--    <color name="redButton">#e12323</color>-->
+    <!--    <color name="greenButton">#1D753A</color>-->
+    <!--    <color name="greenButtonLight">#77BD73</color>-->
 
-<!--    <color name="color_gradient_poloska_card">#eeeeee</color> // используется в градиенте-->
-<!--    <color name="color_date_arhive_card">#eeeeee</color> // используется в дате карточки-->
-<!--    <color name="color_title_column">#eeeeee</color> // используется в zagolovke-->
+    <!--    <color name="color_gradient_poloska_card">#eeeeee</color> // используется в градиенте-->
+    <!--    <color name="color_date_arhive_card">#eeeeee</color> // используется в дате карточки-->
+    <!--    <color name="color_title_column">#eeeeee</color> // используется в zagolovke-->
 
-<!--    <color name="color_polosa_razdelitel">#969696</color> // для разделителей в карточке сумма аванс остаток-->
+    <!--    <color name="color_polosa_razdelitel">#969696</color> // для разделителей в карточке сумма аванс остаток-->
 
-<!--    <color name="white">#FFFFFF</color> // основной цвет текста-->
-<!--    <color name="text">#141414</color> // основной цвет текста в записях-->
-<!--    <color name="colorPrimary">#323232</color> // цвет primary-->
-<!--    <color name="cent_opacity">#C3323232</color> // цвет primary-->
-<!--    <color name="cent_opacity_lite">#25323232</color> // цвет primary-->
-<!--    <color name="cent_light">#3F3F3F</color> // цвет primary-->
-<!--    <color name="cent_selected">#2D2D2D</color> // цвет primary-->
-<!--    <color name="centDark">#282828</color> // цвет primary dark-->
-<!--    <color name="centDarkTemnee">#202020</color>-->
-<!--    <color name="centDarkTemnee2">#1D1D1D</color>-->
-<!--    <color name="dark_text">#C2C2C2</color>-->
-<!--    <color name="greenslabee">#f5fff5</color>-->
-<!--    <color name="color_obvodka">#4B4B4B</color>-->
+    <!--    <color name="white">#FFFFFF</color> // основной цвет текста-->
+    <!--    <color name="text">#141414</color> // основной цвет текста в записях-->
+    <!--    <color name="colorPrimary">#323232</color> // цвет primary-->
+    <!--    <color name="cent_opacity">#C3323232</color> // цвет primary-->
+    <!--    <color name="cent_opacity_lite">#25323232</color> // цвет primary-->
+    <!--    <color name="cent_light">#3F3F3F</color> // цвет primary-->
+    <!--    <color name="cent_selected">#2D2D2D</color> // цвет primary-->
+    <!--    <color name="centDark">#282828</color> // цвет primary dark-->
+    <!--    <color name="centDarkTemnee">#202020</color>-->
+    <!--    <color name="centDarkTemnee2">#1D1D1D</color>-->
+    <!--    <color name="dark_text">#C2C2C2</color>-->
+    <!--    <color name="greenslabee">#f5fff5</color>-->
+    <!--    <color name="color_obvodka">#4B4B4B</color>-->
 
-<!--    //цвет в записях-->
-<!--    <color name="color_avans_zapisi">#7b1c1c</color>-->
+    <!--    //цвет в записях-->
+    <!--    <color name="color_avans_zapisi">#7b1c1c</color>-->
 
-<!--    // цвет в карточке-->
-<!--    <color name="color_sum">#6EFF63</color>-->
-<!--    <color name="color_avans">#FF6565</color>-->
-<!--    <color name="color_balance">#598CFF</color>-->
+    <!--    // цвет в карточке-->
+    <!--    <color name="color_sum">#6EFF63</color>-->
+    <!--    <color name="color_avans">#FF6565</color>-->
+    <!--    <color name="color_balance">#598CFF</color>-->
 
-<!--    <color name="text_number_donat">#88D7FF</color>-->
+    <!--    <color name="text_number_donat">#88D7FF</color>-->
 
 
-<!--    <color name="light_gray">#E5E5E5</color>-->
-<!--    <color name="light_gray_opacity">#AEC1C1C1</color>-->
+    <!--    <color name="light_gray">#E5E5E5</color>-->
+    <!--    <color name="light_gray_opacity">#AEC1C1C1</color>-->
 
-<!--    <color name="gray">#CCCCCC</color>-->
-<!--    <color name="gray_1">#A2A2A2</color>-->
-<!--    <color name="gray_transparent">#46A0FFA4</color>-->
+    <!--    <color name="gray">#CCCCCC</color>-->
+    <!--    <color name="gray_1">#A2A2A2</color>-->
+    <!--    <color name="gray_transparent">#46A0FFA4</color>-->
 
-<!--    <color name="black">#FF000000</color>-->
+    <!--    <color name="black">#FF000000</color>-->
 
-<!--    <color name="light_blue">#FF78c8e6</color>-->
+    <!--    <color name="light_blue">#FF78c8e6</color>-->
 
-<!--    <color name="primary">#ef5451</color>-->
+    <!--    <color name="primary">#ef5451</color>-->
 
-<!--    <color name="primary_dark">#c22115</color>-->
+    <!--    <color name="primary_dark">#c22115</color>-->
 
-<!--    <color name="accent">#A9352C</color>-->
+    <!--    <color name="accent">#A9352C</color>-->
 
-<!--    <color name="button_color">@color/primary_dark</color>-->
+    <!--    <color name="button_color">@color/primary_dark</color>-->
 
-<!--    &lt;!&ndash;material color&ndash;&gt;-->
+    <!--    &lt;!&ndash;material color&ndash;&gt;-->
 
 
-<!--    <color name="material_green_500">#4CAF50</color>-->
+    <!--    <color name="material_green_500">#4CAF50</color>-->
 
-<!--    <color name="light_grey_google">#E3ECF5</color>-->
+    <!--    <color name="light_grey_google">#E3ECF5</color>-->
 
-<!--    <color name="material_red_500">#f44336</color>-->
+    <!--    <color name="material_red_500">#f44336</color>-->
 
-<!--    <color name="material_red_400">#ef5350</color>-->
+    <!--    <color name="material_red_400">#ef5350</color>-->
 
-<!--    <color name="material_red_300">#e57373</color>-->
+    <!--    <color name="material_red_300">#e57373</color>-->
 
-<!--    <color name="material_red_200">#EF9A9A</color>-->
+    <!--    <color name="material_red_200">#EF9A9A</color>-->
 
-<!--    <color name="material_red_100">#FFCDD2</color>-->
+    <!--    <color name="material_red_100">#FFCDD2</color>-->
 
-<!--    <color name="redcarpet_chat_red">#ffdfdf</color>-->
+    <!--    <color name="redcarpet_chat_red">#ffdfdf</color>-->
 
-<!--    <color name="grey_90">#414042</color>-->
+    <!--    <color name="grey_90">#414042</color>-->
 
-<!--    <color name="grey_80">#58595B</color>-->
+    <!--    <color name="grey_80">#58595B</color>-->
 
-<!--    <color name="grey_70">#6D6E71</color>-->
+    <!--    <color name="grey_70">#6D6E71</color>-->
 
-<!--    <color name="grey_60">#808285</color>-->
+    <!--    <color name="grey_60">#808285</color>-->
 
-<!--    <color name="grey_50">#939598</color>-->
+    <!--    <color name="grey_50">#939598</color>-->
 
-<!--    <color name="grey_40">#A7A9AC</color>-->
+    <!--    <color name="grey_40">#A7A9AC</color>-->
 
-<!--    <color name="grey_30">#BCBEC0</color>-->
+    <!--    <color name="grey_30">#BCBEC0</color>-->
 
-<!--    <color name="grey_20">#D1D3D4</color>-->
+    <!--    <color name="grey_20">#D1D3D4</color>-->
 
-<!--    <color name="grey_10">#dadcdd</color>-->
+    <!--    <color name="grey_10">#dadcdd</color>-->
 
-<!--    <color name="grey_5">#eceeef</color>-->
+    <!--    <color name="grey_5">#eceeef</color>-->
 
-<!--    <color name="grey_200">#eeeeee</color>-->
+    <!--    <color name="grey_200">#eeeeee</color>-->
 
-<!--    <color name="colorControlNormal">#FF78909C</color>-->
+    <!--    <color name="colorControlNormal">#FF78909C</color>-->
 
-<!--    <color name="colorControlActivated">#F44336</color>-->
+    <!--    <color name="colorControlActivated">#F44336</color>-->
 
-<!--    <color name="colorSwitchThumbNormal">#FF78909C</color>-->
+    <!--    <color name="colorSwitchThumbNormal">#FF78909C</color>-->
 
-<!--    <color name="colorPrimaryQuarter">#3303A9F4</color>-->
+    <!--    <color name="colorPrimaryQuarter">#3303A9F4</color>-->
 
-<!--    <color name="colorPrimaryHalf">@color/blue_accent_700</color>-->
+    <!--    <color name="colorPrimaryHalf">@color/blue_accent_700</color>-->
 
-<!--    <color name="colorControlNormalHalf">#9078909C</color>-->
+    <!--    <color name="colorControlNormalHalf">#9078909C</color>-->
 
-<!--    <color name="colorControlActivatedHalf">#9003A9F4</color>-->
+    <!--    <color name="colorControlActivatedHalf">#9003A9F4</color>-->
 
-<!--    <color name="colorAccentQuarter">#3300E5FF</color>-->
+    <!--    <color name="colorAccentQuarter">#3300E5FF</color>-->
 
-<!--    <color name="colorAccentHalf">#9000E5FF</color>-->
+    <!--    <color name="colorAccentHalf">#9000E5FF</color>-->
 
-<!--    &lt;!&ndash;<color name="text_color">#ff545454</color>&ndash;&gt;-->
+    <!--    &lt;!&ndash;<color name="text_color">#ff545454</color>&ndash;&gt;-->
 
 
-<!--    <color name="blue_accent_700">#2962FF</color>-->
+    <!--    <color name="blue_accent_700">#2962FF</color>-->
 
-<!--    <color name="white_opaque">#FFFFFF</color>-->
+    <!--    <color name="white_opaque">#FFFFFF</color>-->
 
-<!--    <color name="text_color_light">#aa545454</color>-->
+    <!--    <color name="text_color_light">#aa545454</color>-->
 
-<!--    <color name="fb_color">#3B5998</color>-->
+    <!--    <color name="fb_color">#3B5998</color>-->
 
-<!--    <color name="light_blue_color">#ff989ce8</color>-->
+    <!--    <color name="light_blue_color">#ff989ce8</color>-->
 
-<!--    <color name="rc_card_highlight_blue">#2980B9</color>-->
+    <!--    <color name="rc_card_highlight_blue">#2980B9</color>-->
 
-<!--    <color name="rc_card_gray">#ff303030</color>-->
+    <!--    <color name="rc_card_gray">#ff303030</color>-->
 
-<!--    <color name="rc_card_gray_light">#fff0f0f0</color>-->
+    <!--    <color name="rc_card_gray_light">#fff0f0f0</color>-->
 
-<!--    <color name="rc_card_border">#ff909090</color>-->
+    <!--    <color name="rc_card_border">#ff909090</color>-->
 
-<!--    <color name="bg_color">#E1CACA</color>-->
+    <!--    <color name="bg_color">#E1CACA</color>-->
 
-<!--    <color name="bg_color_darker">#D1D1D1</color>-->
+    <!--    <color name="bg_color_darker">#D1D1D1</color>-->
 
-<!--    <color name="white_translucent">#EEFFFFFF</color>-->
+    <!--    <color name="white_translucent">#EEFFFFFF</color>-->
 
-<!--    <color name="white_medium_translucent">#AAFFFFFF</color>-->
+    <!--    <color name="white_medium_translucent">#AAFFFFFF</color>-->
 
-<!--    <color name="white_more_translucent">#44FFFFFF</color>-->
+    <!--    <color name="white_more_translucent">#44FFFFFF</color>-->
 
-<!--    <color name="black_more_translucent">#44000000</color>-->
+    <!--    <color name="black_more_translucent">#44000000</color>-->
 
-<!--    <color name="accent_primary">#ffbbbbbb</color>-->
+    <!--    <color name="accent_primary">#ffbbbbbb</color>-->
 
-<!--    <color name="accent_secondary">#ff7e7979</color>-->
+    <!--    <color name="accent_secondary">#ff7e7979</color>-->
 
-<!--    <color name="redcarpet_splash">#fff40313</color>-->
+    <!--    <color name="redcarpet_splash">#fff40313</color>-->
 
-<!--    <color name="redcarpet_splash_translucent">#44f40313</color>-->
+    <!--    <color name="redcarpet_splash_translucent">#44f40313</color>-->
 
-<!--    <color name="redcarpet_black_translucent">#99000000</color>-->
+    <!--    <color name="redcarpet_black_translucent">#99000000</color>-->
 
-<!--    <color name="redcarpet_accent_trans">#ccb8020e</color>-->
+    <!--    <color name="redcarpet_accent_trans">#ccb8020e</color>-->
 
-<!--    <color name="redcarpet_orange">#faff3920</color>-->
+    <!--    <color name="redcarpet_orange">#faff3920</color>-->
 
-<!--    <color name="redcarpet_orange_translucent">#ccff3920</color>-->
+    <!--    <color name="redcarpet_orange_translucent">#ccff3920</color>-->
 
-<!--    <color name="redcarpet_green_translucent">#1ab021</color>-->
+    <!--    <color name="redcarpet_green_translucent">#1ab021</color>-->
 
-<!--    &lt;!&ndash;<color name="redcarpet_primary">#FC2B1D</color> original, too bright &ndash;&gt;-->
+    <!--    &lt;!&ndash;<color name="redcarpet_primary">#FC2B1D</color> original, too bright &ndash;&gt;-->
 
 
-<!--    <color name="redcarpet_primary">#ffe52b1d</color>-->
+    <!--    <color name="redcarpet_primary">#ffe52b1d</color>-->
 
-<!--    <color name="redcarpet_red_new">#eb221d</color>-->
+    <!--    <color name="redcarpet_red_new">#eb221d</color>-->
 
-<!--    &lt;!&ndash;<color name="redcarpet_primary">#E53935</color> material dull&ndash;&gt;-->
+    <!--    &lt;!&ndash;<color name="redcarpet_primary">#E53935</color> material dull&ndash;&gt;-->
 
 
-<!--    <color name="redcarpet_primary_darker">#ffa72727</color>-->
+    <!--    <color name="redcarpet_primary_darker">#ffa72727</color>-->
 
-<!--    <color name="redcarpet_accent">#ffc22115</color>-->
+    <!--    <color name="redcarpet_accent">#ffc22115</color>-->
 
-<!--    <color name="redcarpet_red_ish">#ffdcdc</color>-->
+    <!--    <color name="redcarpet_red_ish">#ffdcdc</color>-->
 
-<!--    <color name="material_red_50">#ffebee</color>-->
+    <!--    <color name="material_red_50">#ffebee</color>-->
 
-<!--    <color name="disabled_gray">#ffe1e0df</color>-->
+    <!--    <color name="disabled_gray">#ffe1e0df</color>-->
 
-<!--    <color name="disabled_gray_dark">#ffc0bfbe</color>-->
+    <!--    <color name="disabled_gray_dark">#ffc0bfbe</color>-->
 
-<!--    <color name="translucent_black">#EE000000</color>-->
+    <!--    <color name="translucent_black">#EE000000</color>-->
 
-<!--    <color name="transparent_black">#AA000000</color>-->
+    <!--    <color name="transparent_black">#AA000000</color>-->
 
-<!--    <color name="list_background">#F5F5F5</color>-->
+    <!--    <color name="list_background">#F5F5F5</color>-->
 
-<!--    <color name="list_background_end">#FAFAFA</color>-->
+    <!--    <color name="list_background_end">#FAFAFA</color>-->
 
-<!--    <color name="list_background_pressed">#ffcc2534</color>-->
+    <!--    <color name="list_background_pressed">#ffcc2534</color>-->
 
-<!--    <color name="light_grey">#ccc</color>-->
+    <!--    <color name="light_grey">#ccc</color>-->
 
-<!--    <color name="grey">#777777</color>-->
+    <!--    <color name="grey">#777777</color>-->
 
-<!--    <color name="dark_grey">#333333</color>-->
+    <!--    <color name="dark_grey">#333333</color>-->
 
-<!--    <color name="input_gray">#F92723</color>-->
+    <!--    <color name="input_gray">#F92723</color>-->
 
-<!--    <color name="button_green">#E75B58</color>-->
+    <!--    <color name="button_green">#E75B58</color>-->
 
-<!--    <color name="button_gray">#ffcb130b</color>-->
+    <!--    <color name="button_gray">#ffcb130b</color>-->
 
-<!--    <color name="blue">#5BA8D8</color>-->
+    <!--    <color name="blue">#5BA8D8</color>-->
 
-<!--    <color name="yellow_butter">#ffe0d700</color>-->
+    <!--    <color name="yellow_butter">#ffe0d700</color>-->
 
-<!--    <color name="yellow_accent_700">#ffd600</color>-->
+    <!--    <color name="yellow_accent_700">#ffd600</color>-->
 
-<!--    <color name="textColor">#ff545454</color>-->
+    <!--    <color name="textColor">#ff545454</color>-->
 
-<!--    <color name="grey_transparent">#70545454</color>-->
+    <!--    <color name="grey_transparent">#70545454</color>-->
 
-<!--    <color name="light_grey_transparent">#33aaaaaa</color>-->
+    <!--    <color name="light_grey_transparent">#33aaaaaa</color>-->
 </resources>

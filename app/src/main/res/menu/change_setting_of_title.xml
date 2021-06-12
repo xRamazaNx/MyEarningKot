@@ -3,8 +3,8 @@
 
     <item
         android:id="@+id/name_column"
-        android:title="@string/name"/>
+        android:title="@string/name" />
     <item
         android:id="@+id/color_column"
-        android:title="@string/color"/>
+        android:title="@string/color" />
 </menu>

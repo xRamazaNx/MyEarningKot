@@ -657,9 +657,9 @@ class PrefListColumnLayout(
                     typeIndex,
                     createListText
                 ) { index ->
-                    CoroutineScope(Dispatchers.Main).launch {
+                    runOnMaim {
                         if (index == -1) {
-                            withContext(Dispatchers.IO) {
+                            io {
                                 dataController.addListType(ListType().apply {
                                     listName = newList
                                 })

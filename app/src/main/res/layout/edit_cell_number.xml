@@ -4,6 +4,7 @@
     android:background="@color/colorDialogBackground"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
+
     <TextView
         android:id="@+id/titleNumberEdit"
         android:layout_width="match_parent"
@@ -28,7 +29,8 @@
         android:maxHeight="200dp"
         android:hint="@string/set_text"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
+
     <LinearLayout
         android:paddingStart="8dp"
         android:paddingEnd="8dp"

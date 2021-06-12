@@ -31,30 +31,30 @@
             android:textColor="@color/textColorPrimary"
             android:textSize="20sp" />
 
-<!--        <ImageButton-->
-<!--            android:id="@+id/deleteColumn"-->
-<!--            android:layout_width="48dp"-->
-<!--            android:layout_height="48dp"-->
-<!--            android:background="?android:attr/selectableItemBackground"-->
-<!--            android:tint="@color/md_red_400"-->
-<!--            android:visibility="gone"-->
-<!--            app:srcCompat="@drawable/ic_delete_forever_button" />-->
+        <!--        <ImageButton-->
+        <!--            android:id="@+id/deleteColumn"-->
+        <!--            android:layout_width="48dp"-->
+        <!--            android:layout_height="48dp"-->
+        <!--            android:background="?android:attr/selectableItemBackground"-->
+        <!--            android:tint="@color/md_red_400"-->
+        <!--            android:visibility="gone"-->
+        <!--            app:srcCompat="@drawable/ic_delete_forever_button" />-->
 
-<!--        <ImageButton-->
-<!--            android:id="@+id/moveToLeft"-->
-<!--            android:layout_width="48dp"-->
-<!--            android:layout_height="48dp"-->
-<!--            android:background="?android:attr/selectableItemBackground"-->
-<!--            android:visibility="gone"-->
-<!--            app:srcCompat="@drawable/ic_move_to_left_equal_line" />-->
+        <!--        <ImageButton-->
+        <!--            android:id="@+id/moveToLeft"-->
+        <!--            android:layout_width="48dp"-->
+        <!--            android:layout_height="48dp"-->
+        <!--            android:background="?android:attr/selectableItemBackground"-->
+        <!--            android:visibility="gone"-->
+        <!--            app:srcCompat="@drawable/ic_move_to_left_equal_line" />-->
 
-<!--        <ImageButton-->
-<!--            android:id="@+id/moveToRight"-->
-<!--            android:layout_width="48dp"-->
-<!--            android:layout_height="48dp"-->
-<!--            android:background="?android:attr/selectableItemBackground"-->
-<!--            android:visibility="gone"-->
-<!--            app:srcCompat="@drawable/ic_move_to_right_equal_line" />-->
+        <!--        <ImageButton-->
+        <!--            android:id="@+id/moveToRight"-->
+        <!--            android:layout_width="48dp"-->
+        <!--            android:layout_height="48dp"-->
+        <!--            android:background="?android:attr/selectableItemBackground"-->
+        <!--            android:visibility="gone"-->
+        <!--            app:srcCompat="@drawable/ic_move_to_right_equal_line" />-->
 
         <ImageButton
             android:id="@+id/defaultPref"

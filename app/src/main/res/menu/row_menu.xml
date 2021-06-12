@@ -10,8 +10,7 @@
     <item
         android:id="@+id/duplicateRow"
         android:icon="@drawable/ic_duplicate"
-        android:title="@string/DUPLICATE"
-        />
+        android:title="@string/DUPLICATE" />
     <item
         android:id="@+id/cutRow"
         android:icon="@drawable/ic_cut"

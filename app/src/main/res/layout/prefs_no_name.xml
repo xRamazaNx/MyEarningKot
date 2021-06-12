@@ -6,7 +6,8 @@
     android:orientation="vertical">
 
 
-    <include layout="@layout/toolbar_pref"/>
-    <include layout="@layout/prefs_text_view"/>
+    <include layout="@layout/toolbar_pref" />
+
+    <include layout="@layout/prefs_text_view" />
 
 </LinearLayout>

@@ -17,6 +17,7 @@ data class Cell(
 
     @Transient
     override var currentBackground: Int = -1
+
     @Transient
     override lateinit var elementView: View
 

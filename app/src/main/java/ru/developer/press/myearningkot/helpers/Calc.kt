@@ -36,6 +36,7 @@ class Calc {
     companion object {
         fun evaluate(e: String): Double? = Calc().evaluate(e)
     }
+
     private var i = 0
     private lateinit var token: Token
     private lateinit var expr: String

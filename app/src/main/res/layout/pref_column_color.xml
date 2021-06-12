@@ -6,17 +6,18 @@
     android:orientation="vertical">
 
     <include layout="@layout/toolbar_pref" />
-    <include layout="@layout/width_seek_bar_layout"/>
 
-<!--    <TextView-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:textColor="@color/light_gray"-->
-<!--        android:padding="16dp"-->
-<!--        android:background="@color/colorPrimary"-->
-<!--        android:text="@string/color_frame_type"-->
-<!--        android:drawablePadding="16dp"-->
-<!--        android:drawableEnd="@drawable/ic_setting"-->
-<!--        />-->
+    <include layout="@layout/width_seek_bar_layout" />
+
+    <!--    <TextView-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:textColor="@color/light_gray"-->
+    <!--        android:padding="16dp"-->
+    <!--        android:background="@color/colorPrimary"-->
+    <!--        android:text="@string/color_frame_type"-->
+    <!--        android:drawablePadding="16dp"-->
+    <!--        android:drawableEnd="@drawable/ic_setting"-->
+    <!--        />-->
 
 </LinearLayout>

@@ -6,11 +6,11 @@
         android:layout_height="wrap_content"
         android:defaultValue="false"
         android:key="check_box_fix_height_item"
-        android:title="Фиксировать высоту записи"/>
+        android:title="Фиксировать высоту записи" />
     <CheckBoxPreference
         android:defaultValue="false"
         android:key="check_box_note_one_line"
-        android:title="Заметка в одну строку"/>
+        android:title="Заметка в одну строку" />
     <ListPreference
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,23 +21,20 @@
         android:key="@string/zapisi_size_key"
         android:persistent="true"
         android:summary="@string/zapisi_size_key_subtitle"
-        android:title="@string/zapisi_size_key"/>
+        android:title="@string/zapisi_size_key" />
     <PreferenceScreen
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:key="@string/font_size"
-        android:title="@string/font_size">
-    </PreferenceScreen>
+        android:title="@string/font_size"></PreferenceScreen>
     <PreferenceScreen
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:key="@string/font_style"
-        android:title="@string/font_style">
-    </PreferenceScreen>
+        android:title="@string/font_style"></PreferenceScreen>
     <PreferenceScreen
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:key="@string/reset"
-        android:title="@string/reset">
-    </PreferenceScreen>
+        android:title="@string/reset"></PreferenceScreen>
 </PreferenceScreen>

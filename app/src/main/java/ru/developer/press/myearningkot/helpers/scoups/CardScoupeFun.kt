@@ -76,17 +76,17 @@ fun Card.addRow(
 
 fun Card.addColumn(type: ColumnType, name: String, position: Int = columns.size): Column {
     val column = when (type) {
-        ColumnType.NUMERATION -> NumerationColumn(name,pageId, refId)
-        ColumnType.NUMBER -> NumberColumn(name,pageId, refId)
-        ColumnType.PHONE -> PhoneColumn(name,pageId, refId)
-        ColumnType.DATE -> DateColumn(name,pageId, refId)
-        ColumnType.COLOR -> ColorColumn(name,pageId, refId)
-        ColumnType.SWITCH -> SwitchColumn(name,pageId, refId)
-        ColumnType.IMAGE -> ImageColumn(name,pageId, refId)
-        ColumnType.LIST -> ListColumn(name,pageId, refId)
-        ColumnType.TEXT -> TextColumn(name,pageId, refId)
+        ColumnType.NUMERATION -> NumerationColumn(name, pageId, refId)
+        ColumnType.NUMBER -> NumberColumn(name, pageId, refId)
+        ColumnType.PHONE -> PhoneColumn(name, pageId, refId)
+        ColumnType.DATE -> DateColumn(name, pageId, refId)
+        ColumnType.COLOR -> ColorColumn(name, pageId, refId)
+        ColumnType.SWITCH -> SwitchColumn(name, pageId, refId)
+        ColumnType.IMAGE -> ImageColumn(name, pageId, refId)
+        ColumnType.LIST -> ListColumn(name, pageId, refId)
+        ColumnType.TEXT -> TextColumn(name, pageId, refId)
         // не будет ни когда использоваться
-        ColumnType.NONE -> TextColumn(name,pageId, refId)
+        ColumnType.NONE -> TextColumn(name, pageId, refId)
     }
 
     columns.add(position, column)
@@ -100,24 +100,25 @@ fun Card.addColumn(type: ColumnType, name: String, position: Int = columns.size)
 
 }
 
-fun Card.calcTotals(){
+fun Card.calcTotals() {
     totals.forEach {
         it.calcFormula(this)
     }
 }
+
 fun Card.addColumnSample(type: ColumnType, name: String, position: Int = columns.size) {
     val column = when (type) {
-        ColumnType.NUMERATION -> NumerationColumn(name,pageId, refId)
-        ColumnType.NUMBER -> NumberColumn(name,pageId, refId)
-        ColumnType.PHONE -> PhoneColumn(name,pageId, refId)
-        ColumnType.DATE -> DateColumn(name,pageId, refId)
-        ColumnType.COLOR -> ColorColumn(name,pageId, refId)
-        ColumnType.SWITCH -> SwitchColumn(name,pageId, refId)
-        ColumnType.IMAGE -> ImageColumn(name,pageId, refId)
-        ColumnType.LIST -> ListColumn(name,pageId, refId)
-        ColumnType.TEXT -> TextColumn(name,pageId, refId)
+        ColumnType.NUMERATION -> NumerationColumn(name, pageId, refId)
+        ColumnType.NUMBER -> NumberColumn(name, pageId, refId)
+        ColumnType.PHONE -> PhoneColumn(name, pageId, refId)
+        ColumnType.DATE -> DateColumn(name, pageId, refId)
+        ColumnType.COLOR -> ColorColumn(name, pageId, refId)
+        ColumnType.SWITCH -> SwitchColumn(name, pageId, refId)
+        ColumnType.IMAGE -> ImageColumn(name, pageId, refId)
+        ColumnType.LIST -> ListColumn(name, pageId, refId)
+        ColumnType.TEXT -> TextColumn(name, pageId, refId)
         // не будет ни когда использоваться
-        ColumnType.NONE -> TextColumn(name,pageId, refId)
+        ColumnType.NONE -> TextColumn(name, pageId, refId)
     }
     column.pageId = pageId
     column.cardId = refId

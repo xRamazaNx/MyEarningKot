@@ -20,15 +20,13 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.edit_cell_image.view.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.jetbrains.anko.dip
 import org.jetbrains.anko.support.v4.toast
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.adapters.AdapterViewPagerToImageCell
 import ru.developer.press.myearningkot.helpers.filesFolder
+import ru.developer.press.myearningkot.helpers.io
+import ru.developer.press.myearningkot.helpers.runOnMaim
 import ru.developer.press.myearningkot.helpers.setAlertButtonColors
 import ru.developer.press.myearningkot.model.Column
 import ru.developer.press.myearningkot.model.ImageTypeValue
@@ -183,8 +181,8 @@ class DialogEditImageCell(
             toast("Ошибка при добавлении фото.")
         }
 
-        CoroutineScope(Dispatchers.Main).launch {
-            withContext(Dispatchers.IO) {
+        runOnMaim {
+            io {
                 imageUriList.forEach {
                     val openInputStream = requireContext().contentResolver.openInputStream(it)
                     val nameFile = it.path?.substringAfterLast('/')

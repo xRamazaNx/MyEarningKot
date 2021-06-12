@@ -80,6 +80,7 @@ internal class ExceptionHandler private constructor(
     Thread.UncaughtExceptionHandler {
     @SuppressLint("SimpleDateFormat")
     private val formatter: DateFormat = SimpleDateFormat("dd.MM.yy HH:mm")
+
     @SuppressLint("SimpleDateFormat")
     private val fileFormatter: DateFormat = SimpleDateFormat("dd-MM-yy")
     private var versionName = "0"
@@ -168,8 +169,7 @@ internal class ExceptionHandler private constructor(
 
 class CustomExceptionHandler(private val localPath: String?) :
     Thread.UncaughtExceptionHandler {
-    private val defaultUEH
-            = Thread.getDefaultUncaughtExceptionHandler()
+    private val defaultUEH = Thread.getDefaultUncaughtExceptionHandler()
     override fun uncaughtException(t: Thread?, e: Throwable) {
         val timestamp: String = Calendar.getInstance().timeInMillis.toString()
         val result: Writer = StringWriter()

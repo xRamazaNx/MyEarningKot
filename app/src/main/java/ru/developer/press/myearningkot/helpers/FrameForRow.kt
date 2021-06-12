@@ -7,7 +7,7 @@ import android.graphics.Paint
 import android.widget.FrameLayout
 import ru.developer.press.myearningkot.R
 
-class FrameForRow(context: Context) : FrameLayout(context){
+class FrameForRow(context: Context) : FrameLayout(context) {
     private val paint = Paint().apply {
         isAntiAlias = true
         style = Paint.Style.STROKE
@@ -15,6 +15,7 @@ class FrameForRow(context: Context) : FrameLayout(context){
         color = context.getColorFromRes(R.color.textColorSecondary)
         strokeWidth = 3f
     }
+
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
         val y = (height / 2).toFloat()

@@ -11,4 +11,4 @@ fun TextView.setFont(fontRes: Int, style: Int = Typeface.NORMAL) {
     setTypeface(tf, style)
 }
 
-fun Context.getDrawableRes(id:Int) = ContextCompat.getDrawable(this, id)
+fun Context.getDrawableRes(id: Int) = ContextCompat.getDrawable(this, id)
