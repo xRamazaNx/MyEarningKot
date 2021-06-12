@@ -11,7 +11,6 @@ import android.os.Looper
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View.GONE
-import android.view.animation.Animation
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -24,7 +23,6 @@ import kotlinx.android.synthetic.main.card.view.*
 import kotlinx.coroutines.*
 import ru.developer.press.myearningkot.*
 import ru.developer.press.myearningkot.App.Companion.app
-import ru.developer.press.myearningkot.adapters.animationAdd
 import ru.developer.press.myearningkot.database.Card
 import ru.developer.press.myearningkot.database.DataController
 import ru.developer.press.myearningkot.dialogs.PICK_IMAGE_MULTIPLE
@@ -59,7 +57,7 @@ open class CardActivity : BasicCardActivity() {
                             viewModel!!.updateCard(card)
                             createTitles()
                             updateHorizontalScrollSwitched()
-                            createRecyclerView()
+                            initRecyclerView()
                             viewModel?.apply {
                                 selectMode.value = SelectMode.NONE
                             }
@@ -94,20 +92,6 @@ open class CardActivity : BasicCardActivity() {
         })
         fbAddRow.setContentCoverColour(Color.TRANSPARENT)
         hideViewWhileScroll()
-
-        animationAdd.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation?) {
-
-            }
-
-            override fun onAnimationEnd(animation: Animation?) {
-                adapter.notifyDataSetChanged()
-            }
-
-            override fun onAnimationRepeat(animation: Animation?) {
-            }
-
-        })
     }
 
 
@@ -317,11 +301,11 @@ open class CardActivity : BasicCardActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CARD_EDIT_JSON_REQ_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-
-            }
-        }
+//        if (requestCode == CARD_EDIT_JSON_REQ_CODE) {
+//            if (resultCode == Activity.RESULT_OK) {
+//
+//            }
+//        }
         if (requestCode == PICK_IMAGE_MULTIPLE) {
             supportFragmentManager.fragments.find { it.tag == editCellTag }
                 ?.onActivityResult(requestCode, resultCode, data)
@@ -423,8 +407,8 @@ open class CardActivity : BasicCardActivity() {
     }
 
     private fun removeSelectedRows() {
-        viewModel?.deleteRows {
-            adapter.notifyDataSetChanged()
+        viewModel?.deleteRows { position ->
+            adapter.notifyItemChanged(position)
         }
 
     }

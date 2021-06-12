@@ -1,5 +1,6 @@
 package ru.developer.press.myearningkot.helpers.scoups
 
+import android.annotation.SuppressLint
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -7,23 +8,19 @@ import android.view.View
 import android.view.View.GONE
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.Column
-import androidx.lifecycle.lifecycleScope
 import kotlinx.android.synthetic.main.card.view.*
 import kotlinx.android.synthetic.main.total_item_layout.view.*
 import kotlinx.android.synthetic.main.total_item_value.view.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import org.jetbrains.anko.*
+import org.jetbrains.anko.dip
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.padding
+import org.jetbrains.anko.wrapContent
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.activity.CardActivity
 import ru.developer.press.myearningkot.database.Card
-import ru.developer.press.myearningkot.helpers.runOnIO
-import ru.developer.press.myearningkot.helpers.runOnMain
 import kotlinx.android.synthetic.main.total_item_layout.view.totalValueContainer as totalValueContainer1
 
+@SuppressLint("InflateParams")
 fun Card.inflatePlate(plateView: View) {
     val context = plateView.context
     val nameCard = plateView.nameCard
@@ -40,10 +37,7 @@ fun Card.inflatePlate(plateView: View) {
     //главный контейнер для заголовков и значений
     val inflater = LayoutInflater.from(context)
     val totalContainer: LinearLayout =
-        inflater.inflate(
-            R.layout.total_item_layout,
-            null
-        ) as LinearLayout
+        inflater.inflate(R.layout.total_item_layout, null) as LinearLayout
     totalContainer.layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent).apply {
         weight = 1f
     }
@@ -72,8 +66,7 @@ fun Card.inflatePlate(plateView: View) {
 
     totals.forEachIndexed { index, totalItem ->
         // лайот где валуе и линия
-        val valueLayout =
-            inflater.inflate(R.layout.total_item_value, null)
+        val valueLayout = inflater.inflate(R.layout.total_item_value, null)
 
         val layoutParams = LinearLayout.LayoutParams(totalItem.width, matchParent).apply {
             weight = 1f

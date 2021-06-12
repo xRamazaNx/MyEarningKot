@@ -321,7 +321,7 @@ class PrefCardActivity : BasicCardActivity() {
 
                     createTitles()
                     updateHorizontalScrollSwitched()
-                    createRecyclerView()
+                    initRecyclerView()
                     // после создания адаптера надо зановго заложить умение выделяться
                     clickPrefToAdapter()
                     initClicksOfElements()
@@ -658,7 +658,7 @@ class PrefCardActivity : BasicCardActivity() {
                                     object : PrefColumnChangedCallback {
                                         override fun widthChanged() {
                                             createTitles()
-                                            createRecyclerView()
+                                            initRecyclerView()
                                             clickPrefToAdapter()
                                             initClicksOfElements()
 
@@ -759,7 +759,7 @@ class PrefCardActivity : BasicCardActivity() {
                                 toast(getString(R.string.moving_not_available))
                             else {
                                 createTitles()
-                                createRecyclerView()
+                                initRecyclerView()
                                 clickPrefToAdapter()
                                 initClicksOfElements()
                                 reSelectAfterMove(columnList)
@@ -798,7 +798,7 @@ class PrefCardActivity : BasicCardActivity() {
                             if (!it) toast(getString(R.string.moving_not_available))
                             else {
                                 createTitles()
-                                createRecyclerView()
+                                initRecyclerView()
                                 clickPrefToAdapter()
                                 initClicksOfElements()
                                 reSelectAfterMove(columnList)
@@ -828,7 +828,7 @@ class PrefCardActivity : BasicCardActivity() {
                             }
                         }
                         createTitles()
-                        createRecyclerView()
+                        initRecyclerView()
                         clickPrefToAdapter()
                         initClicksOfElements()
                     } else {

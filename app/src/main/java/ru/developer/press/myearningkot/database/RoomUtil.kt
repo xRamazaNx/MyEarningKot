@@ -5,7 +5,6 @@ import androidx.room.*
 import androidx.room.Database
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.helpers.getColumnFromJson
-import ru.developer.press.myearningkot.helpers.log
 import ru.developer.press.myearningkot.helpers.scoups.addColumn
 import ru.developer.press.myearningkot.helpers.scoups.addTotal
 import ru.developer.press.myearningkot.model.*

@@ -12,6 +12,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.developer.press.myearningkot.ProvideDataRows
+import ru.developer.press.myearningkot.adapters.AdapterRow.Companion.animatedDuration
 import ru.developer.press.myearningkot.database.Card
 import ru.developer.press.myearningkot.database.DataController
 import ru.developer.press.myearningkot.database.Page
@@ -21,7 +22,6 @@ import ru.developer.press.myearningkot.helpers.runOnIO
 import ru.developer.press.myearningkot.helpers.runOnMain
 import ru.developer.press.myearningkot.helpers.scoups.*
 import ru.developer.press.myearningkot.model.*
-import kotlin.time.Duration
 
 open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     ProvideDataRows {
@@ -64,7 +64,6 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
             columns.forEach {
                 columnLDList.add(liveData(it))
             }
-
         }
     }
 
@@ -300,7 +299,6 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     }
 
     private val dataController = DataController(context)
-    private val animatedDuration = 700L
 
     fun addRow(end: () -> Unit) {
         viewModelScope.launch {
@@ -310,6 +308,7 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
             runOnMain { end.invoke() }
             delay(animatedDuration)
             addRow.status = Row.Status.NONE
+            addRow.elementView.animation = null
             card.calcTotals()
             runOnMain { end.invoke() }
         }
@@ -441,60 +440,51 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
         }
     }
 
-    fun getSelectedCellType(): ColumnType? {
+    private fun getSelectedCellType(): ColumnType? {
         return card.getSelectedCell()?.type
     }
 
-    fun deleteRows(updateView: () -> Unit) {
+    fun deleteRows(updateView: (position: Int) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            val deletedRows: List<Row> = sortedRows.filter { it.status == Row.Status.SELECT }
+            val deletedRows = sortedRows.filter { it.status == Row.Status.SELECT }
             deletedRows.forEach {
                 it.status = Row.Status.DELETED
-            }
-            runOnMain {
-                updateView()
+                runOnMain {
+                    updateView(
+                        sortedRows.indexOf(it)
+                    )
+                }
             }
             delay(animatedDuration)
             card.deleteRows(deletedRows)
-            selectMode.postValue(SelectMode.NONE)
-            sortList()
-            runOnMain {
-                updateView()
-            }
             dataController.deleteRows(deletedRows)
+            sortList()
+            selectMode.postValue(SelectMode.NONE)
         }
         // сортировка листа и обновлении происходит после анимации удаления
     }
 
     fun copySelectedRows() {
-        copyRowList = mutableListOf()
-        card.getSelectedRows().forEach {
-            copyRowList!!.add(it.copy())
-        }
+        if (copyRowList == null)
+            copyRowList = mutableListOf()
+        copyRowList?.clear()
+        copyRowList?.addAll(card.getSelectedRows())
     }
 
     fun pasteRows() {
         viewModelScope.launch {
-
-            val selectedRowList = card.getSelectedRows()
             // самый нижний элемент чтобы вставить туда
-            val i = selectedRowList.size - 1
-            val element = selectedRowList[i]
-            val indexLastRow = card.rows.indexOf(element)
-
+            val indexLastRow = sortedRows.indexOfLast { it.status == Row.Status.SELECT }
             copyRowList?.let { copyList ->
 
                 if (isCapabilityPaste()) {
                     // выделенные строки ниже которых надо добавить
-                    selectedRowList.forEach { it.status = Row.Status.NONE }
-
+                    card.getSelectedRows().forEach { it.status = Row.Status.NONE }
                     // отдельный лист чтоб копировать элементы а не ссылки на них потому что в копилист бывают ссылки
-                    val list = mutableListOf<Row>()
-                    // добавляем в лист копии методом .копи
-                    copyList.forEach {
-                        list.add(it.copy().apply {
-                            status = Row.Status.ADDED
-                        }) //  копируемый ров
+                    val list = copyList.fold(mutableListOf<Row>()) { mutableList, row ->
+                        mutableList.apply {
+                            add(row.copy().also { it.status = Row.Status.ADDED })
+                        }
                     }
                     card.rows.addAll(indexLastRow + 1, list)
                     card.calcTotals()
@@ -512,7 +502,7 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
     }
 
     fun isCapabilityPaste(): Boolean {
-        var equalColumns = false
+        var capability = false
         copyRowList?.let { copyList ->
             val copyFirstRow = copyList[0]
             val currentFirstRow = card.getSelectedRows()[0]
@@ -522,7 +512,7 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
 
             // равно ли колличесвто колон в копированном и настоящем положении у строк
             if (copyColumnSize == currentColumnSize) {
-                equalColumns = true
+                capability = true
                 // проходим по первым строкам у копированного и настоящего выделенного
                 currentFirstRow.cellList.forEachIndexed { index, cell ->
                     // ячейка из скопированной строки
@@ -530,14 +520,14 @@ open class CardViewModel(context: Context, var card: Card) : ViewModel(),
                     // равняется ли тип скопированного с настоящим
                     if (cell.type != copyCell.type) {
                         // если хоть один не совпадает то атас
-                        equalColumns = false
+                        capability = false
                         return@forEachIndexed
                     }
                 }
             }
         }
 
-        return equalColumns
+        return capability
     }
 
     fun duplicateRows() {

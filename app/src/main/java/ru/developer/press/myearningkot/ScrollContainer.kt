@@ -10,7 +10,6 @@ import android.view.ViewConfiguration
 import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import kotlinx.android.synthetic.main.activity_card.view.*
-import ru.developer.press.myearningkot.helpers.MyLiveData
 import ru.developer.press.myearningkot.helpers.liveData
 
 

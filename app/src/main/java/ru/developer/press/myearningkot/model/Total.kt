@@ -3,8 +3,8 @@ package ru.developer.press.myearningkot.model
 import android.graphics.Color
 import com.google.gson.annotations.SerializedName
 import ru.developer.press.myearningkot.FormulaId
-import ru.developer.press.myearningkot.database.Card
 import ru.developer.press.myearningkot.database.BelongIds
+import ru.developer.press.myearningkot.database.Card
 import ru.developer.press.myearningkot.helpers.Calc
 import ru.developer.press.myearningkot.helpers.getDecimalFormatNumber
 import java.math.BigDecimal

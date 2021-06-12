@@ -413,12 +413,12 @@ class MainActivity : AppCompatActivity(), ProvideDataCards {
         when (item.itemId) {
             R.id.deletePage -> {
                 if (tabs.tabCount <= 1) {
-                    toast("Стоп! Нельзя удалить единственную вкладку.")
+                    toast(getString(R.string.warning_about_deleting_single_page))
                     return false
                 }
                 myDialog {
-                    setTitle("Внимание!")
-                    setMessage("Вы действительно хотите удалить вкладку? все учетные карточки из этой вкладки будут удалены!")
+                    setTitle(getString(R.string.warning))
+                    setMessage(getString(R.string.warning_about_delete_page))
                     positiveButton(R.string.DELETE) {
                         viewModel.deletePage(tabs.selectedTabPosition) { position ->
                             adapterViewPagerToMain.deletePage(position)

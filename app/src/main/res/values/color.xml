@@ -13,6 +13,7 @@
     <color name="colorSecondaryLight">@color/md_teal_400</color>
     <color name="colorSecondary">@color/md_teal_700</color>
     <color name="colorSecondaryDark">@color/md_teal_900</color>
+    <color name="colorSelectCard">#003229</color>
 
     <color name="colorAccent">@color/md_cyan_900</color>
     <color name="colorAccentFill">#11006064</color>
@@ -50,6 +51,7 @@
     <color name="colorTransparent">#00FFFFFF</color>
     <color name="colorRed">#ee696e</color>
     <color name="colorRedButton">#E53935</color>
+    <color name="colorRemovedItem">#85201E</color>
 
     <color name="md_red_500">#F44336</color>
     <color name="md_red_600">#E53935</color>

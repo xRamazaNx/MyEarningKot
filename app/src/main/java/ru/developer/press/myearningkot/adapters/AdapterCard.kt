@@ -4,14 +4,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.animation.doOnEnd
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.card.view.*
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.activity.setShowTotalInfo
 import ru.developer.press.myearningkot.database.Card
-import ru.developer.press.myearningkot.helpers.MyLiveData
-import ru.developer.press.myearningkot.helpers.observer
+import ru.developer.press.myearningkot.helpers.*
 import ru.developer.press.myearningkot.helpers.scoups.inflatePlate
 import ru.developer.press.myearningkot.viewmodels.MainViewModel
 
@@ -40,6 +41,7 @@ class AdapterCard(private val cards: MutableList<MyLiveData<Card>>) :
         fun bind(card: MyLiveData<Card>) {
             val idCard = card.value!!.refId
             setClick(idCard)
+            setLongClick(idCard)
             card.observe(activity, observer {  c ->
                 c.inflatePlate(itemView)
                 itemView.setShowTotalInfo(c.isShowTotalInfo)
@@ -55,6 +57,17 @@ class AdapterCard(private val cards: MutableList<MyLiveData<Card>>) :
 
 
             })
+
+            val colorFromRes = itemView.context.getColorFromRes(R.color.colorSelectCard)
+            itemView.animateColor(Color.Transparent.toArgb(), colorFromRes, ItemAnimator.animateDuration)
+        }
+
+        private fun setLongClick(idCard: String) {
+            val click: (View) -> Unit = {
+                MainViewModel.cardClick.invoke(idCard)
+            }
+            itemView.setOnClickListener(click)
+            itemView.totalContainerScroll.setOnClickListener(click)
         }
 
         private fun setClick(idCard: String) {

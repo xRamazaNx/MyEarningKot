@@ -6,7 +6,6 @@ import com.google.firebase.firestore.Exclude
 import ru.developer.press.myearningkot.ProvideCardPropertyForCell
 import ru.developer.press.myearningkot.helpers.MyLiveData
 import ru.developer.press.myearningkot.helpers.getDate
-import ru.developer.press.myearningkot.helpers.scoups.calcTotals
 import ru.developer.press.myearningkot.model.*
 import java.util.*
 

@@ -246,7 +246,8 @@
     <string name="add_info_add_zapis">Добавьте запись</string>
     <string name="move_last">В конец</string>
     <string name="move_one">В начало</string>
-    <string name="warning">Восстановить</string>
+    <string name="restore">Восстановить</string>
+    <string name="warning">Внимание!</string>
     <string name="warning_message">Удалить старую базу данных?</string>
     <string name="cancel">Отмена</string>
     <string name="delete_all_data">Очистка данных</string>
@@ -400,4 +401,6 @@
     <string name="preview">Предпросмотр</string>
     <string name="sample_menu">Меню шаблона</string>
     <string name="delete_page">Удалить вкладку</string>
+    <string name="warning_about_deleting_single_page">Стоп! Невозможно удалить единственную вкладку.</string>
+    <string name="warning_about_delete_page">Вы действительно хотите удалить вкладку? все карточки в этой вкладке будут удалены!</string>
 </resources>

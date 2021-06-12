@@ -7,7 +7,6 @@ import android.view.animation.Animation
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeAdapter
@@ -27,11 +26,15 @@ import ru.developer.press.myearningkot.model.Column
 import ru.developer.press.myearningkot.model.Row
 import ru.developer.press.myearningkot.model.SwitchColumn
 
-class AdapterRecyclerInCard(
+class AdapterRow(
     private var rowClickListener: RowClickListener?,
     private val provideDataRows: ProvideDataRows,
     private val totalView: View?
 ) : RecyclerView.Adapter<RowHolder>() {
+
+    companion object {
+        const val animatedDuration = 700L
+    }
 
     private var cellClickPrefFunction: ((Int) -> Unit)? = null
     fun setCellClickPref(cellClickFun: ((Int) -> Unit)?) {
@@ -212,18 +215,17 @@ class RowHolder(view: View) : DragDropSwipeAdapter.ViewHolder(view), RowDataList
                     row.elementView.animateColor(
                         context.getColorFromRes(R.color.colorSecondaryLight),
                         Color.TRANSPARENT,
-                        700
+                        AdapterRow.animatedDuration
                     )
                 }
             }
             Row.Status.DELETED -> {
                 if (row.elementView.animation == null) {
-                    row.elementView.animateColor(Color.TRANSPARENT, Color.RED, 300) {
-                        row.elementView
-                            .animate()
-                            .setDuration(1000)
-                            .translationX(itemView.width.toFloat() + 30)
-                    }
+                    row.elementView.animateColor(
+                        Color.TRANSPARENT,
+                        context.getColorFromRes(R.color.colorRemovedItem),
+                        AdapterRow.animatedDuration
+                    )
                 }
             }
             else -> {

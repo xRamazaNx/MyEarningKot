@@ -9,7 +9,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.contains
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_card.*
 import kotlinx.android.synthetic.main.card.view.*
@@ -20,8 +19,9 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.anko.backgroundColorResource
 import org.jetbrains.anko.backgroundResource
 import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.adapters.AdapterRecyclerInCard
+import ru.developer.press.myearningkot.adapters.AdapterRow
 import ru.developer.press.myearningkot.databinding.ActivityCardBinding
+import ru.developer.press.myearningkot.helpers.ItemAnimator
 import ru.developer.press.myearningkot.helpers.bindTitleOfColumn
 import ru.developer.press.myearningkot.helpers.getColorFromRes
 import ru.developer.press.myearningkot.helpers.scoups.inflatePlate
@@ -31,7 +31,7 @@ import ru.developer.press.myearningkot.viewmodels.CardViewModel
 @SuppressLint("Registered")
 abstract class BasicCardActivity : AppCompatActivity() {
     private lateinit var root: ActivityCardBinding
-    protected lateinit var adapter: AdapterRecyclerInCard
+    protected lateinit var adapter: AdapterRow
     lateinit var columnContainer: LinearLayout
     abstract var viewModel: CardViewModel?
 
@@ -72,18 +72,18 @@ abstract class BasicCardActivity : AppCompatActivity() {
             observeTotals()
         }
         updateHorizontalScrollSwitched()
-        createRecyclerView()
+        initRecyclerView()
     }
 
     private fun observePlate() {
-        viewModel?.cardLiveData?.observe(this, Observer {
+        viewModel?.cardLiveData?.observe(this, {
             it.inflatePlate(totalAmountView)
             totalAmountView.backgroundResource = R.drawable.background_for_card_in_card_activity
         })
     }
 
     private fun observeTotals() {
-        viewModel?.totalLiveData?.observe(this, Observer {
+        viewModel?.totalLiveData?.observe(this, {
             it.updateTotalAmount(totalAmountView)
         })
     }
@@ -92,7 +92,7 @@ abstract class BasicCardActivity : AppCompatActivity() {
     fun updateHorizontalScrollSwitched() {
         viewModel?.let {
 
-            var currentLayout: View? = null
+            val currentLayout: View?
             if (it.isEnableHorizontalScroll()) {
                 if (columnDisableScrollContainer.contains(columnContainer)) {
                     columnDisableScrollContainer.removeView(columnContainer)
@@ -117,7 +117,7 @@ abstract class BasicCardActivity : AppCompatActivity() {
         }
     }
 
-    protected open fun createRecyclerView() {
+    protected open fun initRecyclerView() {
         recycler.apply {
 
             layoutManager = LinearLayoutManager(this@BasicCardActivity)
@@ -126,21 +126,23 @@ abstract class BasicCardActivity : AppCompatActivity() {
 
             adapter = this@BasicCardActivity.adapter
 
+            itemAnimator = ItemAnimator()
 
         }
 //        tableView.horizontalScrollView.moveRowNumber =
 //            (recycler.adapter as AdapterRecyclerInCard).moveRowNumber
     }
 
-    protected fun getAdapterForRecycler(): AdapterRecyclerInCard {
-        return AdapterRecyclerInCard(null, viewModel!!, totalAmountView)
+    protected fun getAdapterForRecycler(): AdapterRow {
+        return AdapterRow(null, viewModel!!, totalAmountView)
     }
 
+    @SuppressLint("InflateParams")
     fun createTitles() {
         columnContainer.removeAllViews()
         viewModel?.columnLDList?.forEach { column ->
             val title: TextView = layoutInflater.inflate(R.layout.title_column, null) as TextView
-            column.observe(this@BasicCardActivity, Observer {
+            column.observe(this@BasicCardActivity, {
                 bindTitleOfColumn(it, title)
             })
             columnContainer.addView(title)

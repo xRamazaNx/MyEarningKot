@@ -6,12 +6,14 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.developer.press.myearningkot.AdapterPageInterface
-import ru.developer.press.myearningkot.database.*
+import ru.developer.press.myearningkot.database.Card
+import ru.developer.press.myearningkot.database.DataController
+import ru.developer.press.myearningkot.database.Page
 import ru.developer.press.myearningkot.helpers.MyLiveData
 import ru.developer.press.myearningkot.helpers.SingleLiveEvent
 import ru.developer.press.myearningkot.helpers.liveData
 import ru.developer.press.myearningkot.helpers.runOnMain
-import ru.developer.press.myearningkot.helpers.scoups.*
+import ru.developer.press.myearningkot.helpers.scoups.updateTypeControlColumn
 import ru.developer.press.myearningkot.model.NumberColumn
 
 // этот класс создается (ViewModelProviders.of(this).get(Class::class.java))
@@ -152,14 +154,14 @@ class MainViewModel(context: Context, list: MutableList<Page>) : ViewModel(),
         }
     }
 
-    fun pageColorChanged(color: Int, selectedPage: Int) {
-        val liveData = pageList[selectedPage]
-        val page: Page? = liveData.value
-        page?.let {
-            dataController.updatePage(it)
-            liveData.postValue(it)
-        }
-    }
+//    fun pageColorChanged(color: Int, selectedPage: Int) {
+//        val liveData = pageList[selectedPage]
+//        val page: Page? = liveData.value
+//        page?.let {
+//            dataController.updatePage(it)
+//            liveData.postValue(it)
+//        }
+//    }
 
     fun checkUpdatedCard(selectedTabPosition: Int) {
         val page = pageList[selectedTabPosition]

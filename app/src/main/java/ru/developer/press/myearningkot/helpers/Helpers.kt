@@ -1,6 +1,7 @@
 package ru.developer.press.myearningkot.helpers
 
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.graphics.BitmapFactory
@@ -31,7 +32,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.anko.*
 import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.database.FireStore
 import ru.developer.press.myearningkot.model.Column
 import ru.developer.press.myearningkot.model.NumberTypePref
 import ru.developer.press.myearningkot.model.NumerationColumn
@@ -54,17 +54,6 @@ suspend fun <T> runOnMain(block: suspend () -> T): T {
 suspend fun <T> runOnIO(block: suspend () -> T): T {
     return withContext(Dispatchers.IO) {
         block.invoke()
-    }
-}
-
-class FireStoreChangedLiveData() {
-    fun addChanged(changedRef: FireStore.ChangedRef) {
-        changed.invoke(changedRef)
-    }
-
-    private var changed: (changedRef: FireStore.ChangedRef) -> Unit = {}
-    fun observeChanged(changed: (changedRef: FireStore.ChangedRef) -> Unit) {
-        this.changed = changed
     }
 }
 
@@ -120,7 +109,7 @@ class SingleLiveEvent<T> : MutableLiveData<T>() {
         }
 
         // Observe the internal MyLiveData
-        super.observe(owner, Observer<T> { t ->
+        super.observe(owner, { t ->
             if (mPending.compareAndSet(true, false)) {
                 observer.onChanged(t)
             }
@@ -166,12 +155,12 @@ fun getDateTypeList(): MutableList<String> {
 
 
 fun getDate(variantDate: Int, time: Long = Date().time, enableTime: Boolean): String {
-    val sDayOfWeek = arrayOf("вс, ", "пн, ", "вт, ", "ср, ", "чт, ", "пт, ", "сб, ")
+//    val sDayOfWeek = arrayOf("вс, ", "пн, ", "вт, ", "ср, ", "чт, ", "пт, ", "сб, ")
 
     val calendar = Calendar.getInstance().apply {
         timeInMillis = time
     }
-    val dayName: String = sDayOfWeek[calendar.get(Calendar.DAY_OF_WEEK) - 1]
+//    val dayName: String = sDayOfWeek[calendar.get(Calendar.DAY_OF_WEEK) - 1]
     var timeFormat = ""
     when (variantDate) {
         0 -> timeFormat = "dd.MM.yy"
@@ -204,6 +193,7 @@ fun bindTitleOfColumn(column: Column, title: TextView) {
     column.titlePref.customize(title)
 }
 
+@SuppressLint("InflateParams")
 fun Context.showItemChangeDialog(
     title: String,
     list: MutableList<String>,
@@ -289,7 +279,7 @@ inline fun <reified T> Any.equalByGson(equalObject: T): Boolean {
     return sourceAny == any
 }
 
-fun getPathForResource(resourceId: Int): String? {
+fun getPathForResource(resourceId: Int): String {
     return Uri.parse("android.resource://" + R::class.java.getPackage()!!.name + "/" + resourceId)
         .toString()
 }

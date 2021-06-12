@@ -2,7 +2,6 @@ package ru.developer.press.myearningkot.database
 
 import android.content.Context
 import androidx.room.Transaction
-import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.DocumentChange.Type.*
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -12,7 +11,7 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import ru.developer.press.myearningkot.App
 import ru.developer.press.myearningkot.R
-import ru.developer.press.myearningkot.database.FireStore.RefType.*
+import ru.developer.press.myearningkot.database.FireStore.RefType.PAGE
 import ru.developer.press.myearningkot.helpers.liveData
 import ru.developer.press.myearningkot.helpers.runOnIO
 import ru.developer.press.myearningkot.helpers.runOnMain
@@ -448,7 +447,7 @@ class DataController(context: Context) {
 
     suspend fun getSampleCard(sampleID: String): Card {
         return withContext(dispatcher) {
-            inflateCard(sampleDao.getByRefId(sampleID)!!) as Card
+            inflateCard(sampleDao.getByRefId(sampleID)!!)
         }
     }
 
@@ -460,7 +459,7 @@ class DataController(context: Context) {
         }
     }
 
-    suspend fun addSample(card: Card): List<Card> {
+    private suspend fun addSample(card: Card): List<Card> {
         return withContext(dispatcher) {
             sampleDao.insert(card)
             card.columns.forEach { column ->

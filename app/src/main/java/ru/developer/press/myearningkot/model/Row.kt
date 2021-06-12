@@ -8,7 +8,6 @@ import androidx.core.content.ContextCompat
 import org.jetbrains.anko.backgroundColorResource
 import ru.developer.press.myearningkot.R
 import ru.developer.press.myearningkot.database.BelongIds
-import java.util.*
 
 class Row(pageId:String, cardId:String) : BelongIds(pageId, cardId), Backgrounder {
     fun crossOut(itemView: View, isCrossOut: Boolean) {
@@ -36,11 +35,11 @@ class Row(pageId:String, cardId:String) : BelongIds(pageId, cardId), Backgrounde
 
 
     fun copy(): Row {
-        return Row(pageId, cardId).apply {
-            this.dateChange = this@Row.dateChange
-            this.status = Status.NONE
-            this@Row.cellList.forEach {
-                cellList.add(it.copy())
+        return Row(pageId, cardId).also { copyRow ->
+            copyRow.dateChange = dateChange
+            copyRow.status = Status.NONE
+            cellList.forEach { cell ->
+                copyRow.cellList.add(cell.copy())
             }
         }
     }
